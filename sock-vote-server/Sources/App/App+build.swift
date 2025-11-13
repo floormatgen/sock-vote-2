@@ -46,9 +46,7 @@ func buildRouter() throws -> Router<AppRequestContext> {
         // logging middleware
         LogRequestsMiddleware(.info)
     }
-    // Add default endpoint
-    router.get("/") { _,_ in
-        return "Hello!"
-    }
+    let roomController = RoomController(repository: InMemoryRoomRepository())
+    router.addRoutes(roomController.routes, atPath: "/room")
     return router
 }

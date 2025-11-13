@@ -1,0 +1,82 @@
+openapi: 3.0.0
+info:
+  title: sock-vote
+  description: 
+    Server API for sock-vote.
+    This document lays out the APIs for the server component,
+    but doesn't include the websocket conneciton details.
+  version: 0.1.0
+  
+paths:
+  /room:
+    post:
+      summary: Creates a new room
+      description:
+        Creates a new room with the given options.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RoomCreationRequest"
+            example:
+              name: "PCSoc Annual General Meeting"
+      responses:
+        "200":
+          description:
+            The room was created successfully and was
+            registered with the server.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RoomCreationResponse"
+              example:
+                name: "PCSoc Annual General Meeting"
+                code: "123456"
+                token: "CDE33D83-EC29-4907-8EC0-C6FD9EB6CEFC"
+  /room/{code}:
+    get:
+      summary: Get information about a room
+      description:
+        Provides information about a room,
+        like whether the room code corresponds
+        to a valid room
+      parameters:
+        - in: path
+          name: code
+          required: true
+          schema:
+            type: string
+          description:
+            The room to get information on.
+      responses:
+        "200":
+          description:
+            The room exists and was found.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RoomInformation"
+        "404":
+          description:
+            The room does not exist.
+      
+components:
+  schemas:
+    RoomCreationRequest:
+      properties:
+        name:
+          type: string
+    RoomCreationResponse:
+      properties:
+        name:
+          type: string
+        code:
+          type: string
+        token:
+          type: string
+    RoomInformation:
+      properties:
+        name:
+          type: string
+        code:
+          type: string
