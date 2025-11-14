@@ -1,13 +1,17 @@
 import Hummingbird
 
 
-actor InMemoryRoomRepository: RoomRepository {
+actor InMemoryRoomRepository<Generator: RoomCode.Generator>: RoomRepository {
 
-    /// The maximum times a room code can be generated
-    /// 
-    /// This is to prevent an infinite loop in the rare case we run
-    /// out of room codes.
-    static let maxRoomCodeIterations = 100
+    var generator: Generator
+
+    init(generator: Generator) {
+        self.generator = generator
+    }
+
+    init() where Generator == RoomCode.DefaultGenerator {
+        self.generator = RoomCode.DefaultGenerator()
+    }
 
     private var rooms: [String: FullRoomInfo] = [:]
 
@@ -16,14 +20,16 @@ actor InMemoryRoomRepository: RoomRepository {
         // Attempt to find an unused room code
         var code: String = ""
         var codegenSuccess: Bool = false
-        for _ in 0..<Self.maxRoomCodeIterations {
-            code = FullRoomInfo.generateCode()
+        for _ in 0..<generator.limit {
+            code = generator.next()
             guard rooms.index(forKey: code) == nil else { continue }
             codegenSuccess = true
             break
         }
 
-        #warning("TODO: Handle error when codegen fails")
+        guard codegenSuccess else {
+            throw RoomError.FailedToGenerateCode()
+        }
 
         let room = FullRoomInfo(
             name: name,
@@ -35,9 +41,12 @@ actor InMemoryRoomRepository: RoomRepository {
         return room
     }
 
-    func findRoom(code: String) async throws -> RoomInfo? {
-        return rooms[code]?.publicInfo
-    }
+    func findRoom(code: String) async throws -> RoomInfo {
+        guard let roomInfo = rooms[code]?.publicInfo else {
+            throw RoomError.NotFound(code: code)
+        }
 
+        return roomInfo
+    }
     
 }

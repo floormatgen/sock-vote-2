@@ -1,11 +1,13 @@
 import Hummingbird
 import HummingbirdTesting
 import Logging
-import XCTest
+import Testing
 
 @testable import App
 
-final class AppTests: XCTestCase {
+@Suite("App Test")
+struct AppTests {
+
     struct TestArguments: AppArguments {
         let hostname = "127.0.0.1"
         let port = 0
@@ -17,8 +19,9 @@ final class AppTests: XCTestCase {
         let app = try await buildApplication(args)
         try await app.test(.router) { client in
             try await client.execute(uri: "/", method: .get) { response in
-                XCTAssertEqual(response.body, ByteBuffer(string: "Hello!"))
+                #expect(response.body == ByteBuffer(string: "Hello!"))
             }
         }
     }
+
 }

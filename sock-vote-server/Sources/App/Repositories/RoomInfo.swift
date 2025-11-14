@@ -36,28 +36,5 @@ struct FullRoomInfo {
     }
 }
 
-extension RoomInfo: ResponseCodable, Equatable, Hashable, Sendable { }
+extension RoomInfo:     ResponseCodable, Equatable, Hashable, Sendable { }
 extension FullRoomInfo: ResponseCodable, Equatable, Hashable, Sendable { }
-
-
-// MARK: - Code Generation
-
-extension FullRoomInfo {
-
-    /// The format for the string representation of a code
-    static let codeFormat = IntegerFormatStyle<Int>().precision(.integerLength(6))
-
-    /// Generates a random room code
-    static func generateCode() -> String {
-        var random = SystemRandomNumberGenerator()
-        return generateCode(using: &random)
-    }
-
-    /// Generates a random room code
-    static func generateCode(
-        using random: inout some RandomNumberGenerator
-    ) -> String {
-        return codeFormat.format(Int.random(in: 0..<1_000_000, using: &random))
-    }
-
-}

@@ -8,18 +8,14 @@ struct RoomController<Repository: RoomRepository> {
     var routes: RouteCollection<AppRequestContext> {
         return RouteCollection(context: AppRequestContext.self)
             .get(":code", use: self.getRoom)
+            .post(use: self.createRoom)
     }
 
     @Sendable
     func getRoom(request: Request, context: some RequestContext) async throws -> RoomInfo {
         let code = try context.parameters.require("code")
-
-        guard let room = try await repository.findRoom(code: code) else {
-            #warning("TODO: Create HTTPResponseError when a room can't be found")
-            fatalError()
-        }
-
-        return room
+        let room = try await repository.findRoom(code: code)
+        return room  
     }
 
     struct CreateRoomRequest: Decodable {

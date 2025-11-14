@@ -4,16 +4,16 @@ import Hummingbird
 protocol RoomRepository: Sendable {
 
     /// Creates a new room with the given name
+    /// 
+    /// - Throws:
+    ///     ``RoomErrors/FailedToGenerateCode`` when an available
+    ///     code can't be found.
     func addRoom(name: String) async throws -> FullRoomInfo
 
-    /// Tries to find a room
+    /// - Throws: 
+    ///     ``RoomErrors/NotFound`` when the room code doesn't 
+    ///     correspond to a registered room.
     /// 
-    /// - Parameter token:
-    ///     The token to search for the room
-    /// 
-    /// - Returns:
-    ///     A ``RoomInfo`` or `nil` if a room wasn't found
-    /// 
-    func findRoom(code: String) async throws -> RoomInfo?
+    func findRoom(code: String) async throws -> RoomInfo
     
 }

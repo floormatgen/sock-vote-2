@@ -3,6 +3,20 @@
 
 import PackageDescription
 
+
+// MARK: - Swift Settings
+
+let swiftSettings: [SwiftSetting] = [
+    .enableUpcomingFeature("StrictConcurrency"),
+    // .enableUpcomingFeature("StrictMemorySafety"),
+    .enableUpcomingFeature("NonisolatedNonsendingByDefault"),
+    .enableUpcomingFeature("ExistentialAny"),
+    .enableUpcomingFeature("MemberImportVisibility"),
+]
+
+
+// MARK: - Package
+
 let package = Package(
     name: "SockVoteServer",
     platforms: [.macOS(.v14), .iOS(.v17), .tvOS(.v17)],
@@ -19,14 +33,16 @@ let package = Package(
                 .product(name: "ArgumentParser", package: "swift-argument-parser"),
                 .product(name: "Hummingbird", package: "hummingbird"),
             ],
-            path: "Sources/App"
+            path: "Sources/App",
+            swiftSettings: swiftSettings
         ),
         .testTarget(name: "AppTests",
             dependencies: [
                 .byName(name: "App"),
                 .product(name: "HummingbirdTesting", package: "hummingbird")
             ],
-            path: "Tests/AppTests"
+            path: "Tests/AppTests",
+            swiftSettings: swiftSettings
         )
     ]
 )
