@@ -8,7 +8,7 @@ import PackageDescription
 
 let swiftSettings: [SwiftSetting] = [
     .enableUpcomingFeature("StrictConcurrency"),
-    // .enableUpcomingFeature("StrictMemorySafety"),
+    // .enableUpcomingFeature("StrictMemorySafety"), // Not supported in Swift 6.1
     .enableUpcomingFeature("NonisolatedNonsendingByDefault"),
     .enableUpcomingFeature("ExistentialAny"),
     .enableUpcomingFeature("MemberImportVisibility"),

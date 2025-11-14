@@ -46,7 +46,10 @@ func buildRouter() throws -> Router<AppRequestContext> {
         // logging middleware
         LogRequestsMiddleware(.info)
     }
+
+    // Route Registration
     let roomController = RoomController(repository: InMemoryRoomRepository())
     router.addRoutes(roomController.routes, atPath: "/room")
+    
     return router
 }

@@ -7,7 +7,7 @@ enum RoomCode {
     typealias Code = String
 
     /// The format for the string representation of a code
-    static let codeFormat = IntegerFormatStyle<Int>().precision(.integerLength(6))
+    static let codeFormat = IntegerFormatStyle<Int>().precision(.integerLength(6)).grouping(.never)
  
     /// Creates a new room code
     protocol Generator {

@@ -91,4 +91,19 @@ struct RoomTests {
         }
     }
 
+    @Test("Room info for nonexistent rooms cannot be found")
+    func roomInfoForNonexistentRoomCannotBeFound() async throws {
+        let name = "Mango"
+        try await app.test(.router) { client in 
+            let createResponse = try await Self.createRoom(withName: name, client: client)
+            #expect(createResponse.status == .ok)
+            let info = try Self.decoder.decode(FullRoomInfo.self, from: createResponse.body)
+            var code = try #require(Int(info.code))
+            code = (code + 1) % 1_000_000
+            let invalid = RoomCode.codeFormat.format(code)
+            let getResponse = try await Self.getRoomInfo(withCode: invalid, client: client)
+            #expect(getResponse.status == .notFound)
+        }
+    }
+
 }
