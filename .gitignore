@@ -1,1 +1,7 @@
 .vscode/
+
+# MacOS X
+.DS_Store
+
+# Xcode
+*.xcworkspace/

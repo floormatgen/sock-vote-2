@@ -1,7 +1,6 @@
 import Foundation
 import Hummingbird
 
-
 /// Information about a Room
 struct RoomInfo {
     /// The name of a room
@@ -25,7 +24,7 @@ struct FullRoomInfo {
     }
 
     /// Provides the public information about the room
-    /// 
+    ///
     /// ``FullRoomInfo`` contains the ``token``,
     /// which should not be shared publicly.
     var publicInfo: RoomInfo {
@@ -36,5 +35,5 @@ struct FullRoomInfo {
     }
 }
 
-extension RoomInfo:     ResponseCodable, Equatable, Hashable, Sendable { }
-extension FullRoomInfo: ResponseCodable, Equatable, Hashable, Sendable { }
+extension RoomInfo: ResponseCodable, Equatable, Hashable, Sendable {}
+extension FullRoomInfo: ResponseCodable, Equatable, Hashable, Sendable {}

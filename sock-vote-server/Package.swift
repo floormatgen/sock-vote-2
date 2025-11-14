@@ -43,6 +43,13 @@ let package = Package(
             ],
             path: "Tests/AppTests",
             swiftSettings: swiftSettings
-        )
+        ),
+        .testTarget(name: "ImplTests",
+            dependencies: [
+                .byName(name: "App"),
+            ],
+            path: "Tests/ImplTests",
+            swiftSettings: swiftSettings
+        ),
     ]
 )
