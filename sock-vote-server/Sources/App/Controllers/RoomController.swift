@@ -12,7 +12,7 @@ struct RoomController<Repository: RoomRepository> {
     }
 
     @Sendable
-    func getRoom(request: Request, context: some RequestContext) async throws -> RoomInfo {
+    func getRoom(request: Request, context: some RequestContext) async throws -> Room.Info {
         let code = try context.parameters.require("code")
         let room = try await repository.findRoom(code: code)
         return room  
@@ -23,7 +23,7 @@ struct RoomController<Repository: RoomRepository> {
     }
 
     @Sendable
-    func createRoom(request: Request, context: some RequestContext) async throws -> FullRoomInfo {
+    func createRoom(request: Request, context: some RequestContext) async throws -> Room.FullInfo {
         let createRequest = try await request.decode(as: CreateRoomRequest.self, context: context)
         return try await repository.addRoom(name: createRequest.name)
     }

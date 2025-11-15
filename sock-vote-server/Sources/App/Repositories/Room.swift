@@ -1,6 +1,7 @@
 import Foundation
 import Hummingbird
 
+/// A `namespace` for Room-related symbols
 enum Room {
 
     /// The type used for a room code
@@ -12,6 +13,12 @@ enum Room {
     /// The format for the string representation of a code
     static let codeFormat = IntegerFormatStyle<Int>().precision(.integerLength(6)).grouping(.never)
 
+}
+
+// MARK: - Code Generation
+
+extension Room {
+    
     /// Creates a new room code
     protocol CodeGenerator {
 
@@ -22,14 +29,14 @@ enum Room {
         mutating func next() -> Code
 
         /// Attempts to create a validated code
-        /// 
+        ///
         /// This function tries up to ``limit`` times to create a valid code.
-        /// 
+        ///
         /// - Parameter validation:
         ///     The closure to check if a code is valid
-        /// 
+        ///
         /// - Throws:
-        ///     ``RoomError/FailedToGenerateCode`` if the generator runs out of tries.
+        ///     ``Room/Error/FailedToGenerateCode`` if the generator runs out of tries.
         mutating func generationLoop(
             validation: (_ code: Code) throws -> Bool
         ) throws -> Code
@@ -46,7 +53,7 @@ enum Room {
         }
 
     }
-
+    
 }
 
 extension Room.CodeGenerator {
@@ -63,6 +70,49 @@ extension Room.CodeGenerator {
     }
 
 }
+
+// MARK: - Room Info
+
+extension Room {
+    
+    /// Information about a Room
+    struct Info {
+        /// The name of a room
+        let name: String
+        /// The code of a room
+        let code: Room.Code
+    }
+
+    struct FullInfo {
+        let name: String
+        let code: Room.Code
+        /// The private token to configure the room
+        let token: String
+
+        /// Creates a new roomInfo
+        init(name: String, code: Room.Code) {
+            self.name = name
+            self.code = code
+            #warning("TODO: There are likely more secure ways of making tokens instead of using UUIDs.")
+            self.token = UUID().uuidString
+        }
+
+        /// Provides the public information about the room
+        ///
+        /// ``Room/FullInfo`` contains the ``token``,
+        /// which should not be shared publicly.
+        var publicInfo: Info {
+            return Info(
+                name: self.name,
+                code: self.code
+            )
+        }
+    }
+    
+}
+
+extension Room.Info: ResponseCodable, Equatable, Hashable, Sendable {}
+extension Room.FullInfo: ResponseCodable, Equatable, Hashable, Sendable {}
 
 // MARK: - Errors
 

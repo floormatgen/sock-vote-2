@@ -6,14 +6,14 @@ protocol RoomRepository: Sendable {
     /// Creates a new room with the given name
     /// 
     /// - Throws:
-    ///     ``RoomErrors/FailedToGenerateCode`` when an available
+    ///     ``Room/Error/FailedToGenerateCode`` when an available
     ///     code can't be found.
-    func addRoom(name: String) async throws -> FullRoomInfo
+    func addRoom(name: String) async throws -> Room.FullInfo
 
     /// - Throws: 
-    ///     ``RoomErrors/NotFound`` when the room code doesn't 
+    ///     ``Room/Error/CodeNotFound`` when the room code doesn't
     ///     correspond to a registered room.
     /// 
-    func findRoom(code: String) async throws -> RoomInfo
+    func findRoom(code: String) async throws -> Room.Info
     
 }

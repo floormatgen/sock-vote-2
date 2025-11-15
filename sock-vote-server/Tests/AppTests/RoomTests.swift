@@ -50,7 +50,7 @@ struct RoomTests {
     ) async throws -> (response: TestResponse, code: String) {
         let creationResponse = try await Self.createRoom(withName: name, client: client)
         #expect(creationResponse.status == .ok)
-        let creationInfo = try Self.decoder.decode(FullRoomInfo.self, from: creationResponse.body)
+        let creationInfo = try Self.decoder.decode(Room.FullInfo.self, from: creationResponse.body)
         #expect(creationInfo.name == name)
         let code = creationInfo.code
         return (response: try await Self.getRoomInfo(withCode: code, client: client), code: code)
@@ -64,7 +64,7 @@ struct RoomTests {
         try await app.test(.router) { client in
             let response = try await Self.createRoom(withName: name, client: client)
             #expect(response.status == .ok)
-            let info = try Self.decoder.decode(FullRoomInfo.self, from: response.body)
+            let info = try Self.decoder.decode(Room.FullInfo.self, from: response.body)
             #expect(info.name == name)
         }
     }
@@ -74,7 +74,7 @@ struct RoomTests {
         let name = "Bar"
         try await app.test(.router) { client in
             let (response, code) = try await Self.roundTripCreateRoom(withName: name, client: client)
-            let roomInfo = try Self.decoder.decode(RoomInfo.self, from: response.body)
+            let roomInfo = try Self.decoder.decode(Room.Info.self, from: response.body)
             #expect(roomInfo.name == name)
             #expect(roomInfo.code == code)
         }
@@ -97,7 +97,7 @@ struct RoomTests {
         try await app.test(.router) { client in 
             let createResponse = try await Self.createRoom(withName: name, client: client)
             #expect(createResponse.status == .ok)
-            let info = try Self.decoder.decode(FullRoomInfo.self, from: createResponse.body)
+            let info = try Self.decoder.decode(Room.FullInfo.self, from: createResponse.body)
             var code = try #require(Int(info.code))
             code = (code + 1) % 1_000_000
             let invalid = Room.codeFormat.format(code)

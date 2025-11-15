@@ -12,14 +12,14 @@ actor InMemoryRoomRepository<Generator: Room.CodeGenerator>: RoomRepository {
         self.generator = Room.DefaultCodeGenerator()
     }
 
-    private var rooms: [String: FullRoomInfo] = [:]
+    private var rooms: [String: Room.FullInfo] = [:]
 
-    func addRoom(name: String) async throws -> FullRoomInfo {
+    func addRoom(name: String) async throws -> Room.FullInfo {
 
         // Attempt to find an unused room code
         let code = try generator.generationLoop { rooms.index(forKey: $0) == nil } 
 
-        let room = FullRoomInfo(
+        let room = Room.FullInfo(
             name: name,
             code: code
         )
@@ -28,7 +28,7 @@ actor InMemoryRoomRepository<Generator: Room.CodeGenerator>: RoomRepository {
         return room
     }
  
-    func findRoom(code: String) async throws -> RoomInfo {
+    func findRoom(code: String) async throws -> Room.Info {
         guard let roomInfo = rooms[code]?.publicInfo else {
             throw Room.Error.CodeNotFound(code: code)
         }
