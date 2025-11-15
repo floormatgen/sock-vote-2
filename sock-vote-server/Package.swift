@@ -3,7 +3,6 @@
 
 import PackageDescription
 
-
 // MARK: - Swift Settings
 
 let swiftSettings: [SwiftSetting] = [
@@ -14,21 +13,21 @@ let swiftSettings: [SwiftSetting] = [
     .enableUpcomingFeature("MemberImportVisibility"),
 ]
 
-
 // MARK: - Package
 
 let package = Package(
     name: "SockVoteServer",
     platforms: [.macOS(.v14), .iOS(.v17), .tvOS(.v17)],
     products: [
-        .executable(name: "App", targets: ["App"]),
+        .executable(name: "App", targets: ["App"])
     ],
     dependencies: [
         .package(url: "https://github.com/hummingbird-project/hummingbird.git", from: "2.0.0"),
         .package(url: "https://github.com/apple/swift-argument-parser.git", from: "1.3.0"),
     ],
     targets: [
-        .executableTarget(name: "App",
+        .executableTarget(
+            name: "App",
             dependencies: [
                 .product(name: "ArgumentParser", package: "swift-argument-parser"),
                 .product(name: "Hummingbird", package: "hummingbird"),
@@ -36,17 +35,19 @@ let package = Package(
             path: "Sources/App",
             swiftSettings: swiftSettings
         ),
-        .testTarget(name: "AppTests",
+        .testTarget(
+            name: "AppTests",
             dependencies: [
                 .byName(name: "App"),
-                .product(name: "HummingbirdTesting", package: "hummingbird")
+                .product(name: "HummingbirdTesting", package: "hummingbird"),
             ],
             path: "Tests/AppTests",
             swiftSettings: swiftSettings
         ),
-        .testTarget(name: "ImplTests",
+        .testTarget(
+            name: "ImplTests",
             dependencies: [
-                .byName(name: "App"),
+                .byName(name: "App")
             ],
             path: "Tests/ImplTests",
             swiftSettings: swiftSettings

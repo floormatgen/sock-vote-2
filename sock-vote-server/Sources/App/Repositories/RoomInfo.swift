@@ -6,17 +6,17 @@ struct RoomInfo {
     /// The name of a room
     let name: String
     /// The code of a room
-    let code: RoomCode.Code
+    let code: Room.Code
 }
 
 struct FullRoomInfo {
     let name: String
-    let code: RoomCode.Code
+    let code: Room.Code
     /// The private token to configure the room
     let token: String
 
     /// Creates a new roomInfo
-    init(name: String, code: RoomCode.Code) {
+    init(name: String, code: Room.Code) {
         self.name = name
         self.code = code
         #warning("TODO: There are likely more secure ways of making tokens instead of using UUIDs.")

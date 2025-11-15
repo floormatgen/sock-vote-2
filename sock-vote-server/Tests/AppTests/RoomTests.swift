@@ -100,7 +100,7 @@ struct RoomTests {
             let info = try Self.decoder.decode(FullRoomInfo.self, from: createResponse.body)
             var code = try #require(Int(info.code))
             code = (code + 1) % 1_000_000
-            let invalid = RoomCode.codeFormat.format(code)
+            let invalid = Room.codeFormat.format(code)
             let getResponse = try await Self.getRoomInfo(withCode: invalid, client: client)
             #expect(getResponse.status == .notFound)
         }

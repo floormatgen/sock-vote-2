@@ -8,15 +8,15 @@ import HTTPTypes
 @Suite("Room Tests")
 struct RoomTests {
 
-    struct ConstantGenerator: RoomCode.Generator {
+    struct ConstantGenerator: Room.CodeGenerator {
         var limit: Int { 5 }
-        let code: RoomCode.Code
+        let code: Room.Code
         
-        init(code: RoomCode.Code) {
+        init(code: Room.Code) {
             self.code = code
         }
 
-        func next() -> RoomCode.Code {
+        func next() -> Room.Code {
             return code
         }
         
@@ -26,14 +26,14 @@ struct RoomTests {
     func errorThrownWhenLimitExceeded() async throws {
         let repository = InMemoryRoomRepository(generator: ConstantGenerator(code: "676767"))
         _ = try await repository.addRoom(name: "First")
-        await #expect(throws: RoomCode.FailedToGenerateError.self) {
+        await #expect(throws: Room.Error.FailedToGenerateCode.self) {
             try await repository.addRoom(name: "Second")
         }
     }
 
     @Test("Generation failure has 500 status")
     func generationFailureHas500Status() async throws {
-        let error = RoomCode.FailedToGenerateError()
+        let error = Room.Error.FailedToGenerateCode()
         #expect(error.status == .internalServerError)
     }
 

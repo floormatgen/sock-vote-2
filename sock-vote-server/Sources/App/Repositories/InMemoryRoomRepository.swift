@@ -1,6 +1,6 @@
 import Hummingbird
 
-actor InMemoryRoomRepository<Generator: RoomCode.Generator>: RoomRepository {
+actor InMemoryRoomRepository<Generator: Room.CodeGenerator>: RoomRepository {
 
     var generator: Generator
 
@@ -8,8 +8,8 @@ actor InMemoryRoomRepository<Generator: RoomCode.Generator>: RoomRepository {
         self.generator = generator
     }
 
-    init() where Generator == RoomCode.DefaultGenerator {
-        self.generator = RoomCode.DefaultGenerator()
+    init() where Generator == Room.DefaultCodeGenerator {
+        self.generator = Room.DefaultCodeGenerator()
     }
 
     private var rooms: [String: FullRoomInfo] = [:]
@@ -27,10 +27,10 @@ actor InMemoryRoomRepository<Generator: RoomCode.Generator>: RoomRepository {
         rooms[code] = room
         return room
     }
-
+ 
     func findRoom(code: String) async throws -> RoomInfo {
         guard let roomInfo = rooms[code]?.publicInfo else {
-            throw RoomError.NotFound(code: code)
+            throw Room.Error.CodeNotFound(code: code)
         }
 
         return roomInfo
