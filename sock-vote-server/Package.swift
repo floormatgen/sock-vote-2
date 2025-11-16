@@ -11,6 +11,7 @@ let swiftSettings: [SwiftSetting] = [
     .enableUpcomingFeature("NonisolatedNonsendingByDefault"),
     .enableUpcomingFeature("ExistentialAny"),
     .enableUpcomingFeature("MemberImportVisibility"),
+    .enableUpcomingFeature("DefaultInternalImports"),
 ]
 
 // MARK: - Package
@@ -32,6 +33,7 @@ let package = Package(
             dependencies: [
                 .product(name: "ArgumentParser", package: "swift-argument-parser"),
                 .product(name: "Hummingbird", package: "hummingbird"),
+                .product(name: "HummingbirdWebSocket", package: "hummingbird-websocket"),
             ],
             path: "Sources/App",
             swiftSettings: swiftSettings

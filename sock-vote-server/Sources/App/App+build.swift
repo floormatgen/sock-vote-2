@@ -48,7 +48,7 @@ func buildRouter() throws -> Router<AppRequestContext> {
     }
 
     // Route Registration
-    let roomController = RoomController(repository: Room.InMemoryRepository())
+    let roomController = RoomController(repository: InMemoryRoomRepository())
     router.addRoutes(roomController.routes, atPath: "/room")
     
     return router
