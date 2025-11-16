@@ -1,6 +1,6 @@
 import Hummingbird
 
-struct RoomController<Repository: RoomRepository> {
+struct RoomController<Repository: Room.Repository> {
 
     /// The repository to use to find and access rooms
     let repository: Repository
