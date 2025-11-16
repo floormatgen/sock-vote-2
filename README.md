@@ -1,3 +1,3 @@
 # sock-vote-2
 
-The sequal to sock-vote.
+The sequel to sock-vote.
