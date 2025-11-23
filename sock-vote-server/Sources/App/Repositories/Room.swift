@@ -7,6 +7,9 @@ typealias RoomCode = String
 /// The type of the token used for authentication
 typealias RoomToken = String
 
+/// A list of additional information given about a participant
+typealias Fields = [String : String]
+
 /// The format for the string representation of a code
 let roomCodeFormat = IntegerFormatStyle<Int>().precision(.integerLength(6)).grouping(.never)
 
@@ -78,13 +81,11 @@ struct FullRoomInfo {
     let code: RoomCode
     /// The private token to configure the room
     let token: String
-
-    /// Creates a new roomInfo
-    init(name: String, code: RoomCode) {
-        self.name = name
-        self.code = code
-        #warning("TODO: There are likely more secure ways of making tokens instead of using UUIDs.")
-        self.token = UUID().uuidString
+    
+    init(name: String, code: RoomCode, token: RoomToken) {
+        self.name   = name
+        self.code   = code
+        self.token  = token
     }
 
     /// Provides the public information about the room

@@ -7,6 +7,7 @@ info:
   version: 0.1.0
   
 paths:
+
   /room/create:
     post:
       summary: Creates a new room
@@ -32,6 +33,7 @@ paths:
                 name: "PCSoc Annual General Meeting"
                 code: "123456"
                 token: "CDE33D83-EC29-4907-8EC0-C6FD9EB6CEFC"
+  
   /room/info/{code}:
     get:
       summary: Get information about a room
@@ -58,6 +60,31 @@ paths:
         "404":
           description:
             The room does not exist.
+  
+  /room/join/{code}:
+    post:
+      summary: Join a room
+      description:
+        This route only asks the room owner whether to allow you to join
+        the room, it doesn't actually open a connection to the room. 
+        To do that, use the `/room/connect/{code}` route.
+      parameters:
+        - in: path
+          name: code
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description:
+            The room does exist, and the client is permitted to enter.
+        "404":
+          description:
+            The room does not exist.
+        "403":
+          description:
+            The room does exist, but the client has been rejected.
+      
   /room/connect/{code}:
     get:
       summary: Connect to a room
@@ -81,6 +108,15 @@ paths:
           schema:
             type: string
             const: "WebSocket"
+        - in: header
+          name: X-participant-token
+          required: true
+          description:
+            A token that uniquely identifies each client.
+            This can be acquired by joining the room first
+            by using `/room/connect/{code}`.
+          schema:
+            type: string
       responses:
         "101":
           description:
@@ -88,7 +124,10 @@ paths:
             to a WebSocket connection.
         "404":
           description:
-            The room can't be found
+            The room can't be found.
+        "400":
+          description:
+            The token provided doesn't correspond to a registered user.
 
 components:
   schemas:
@@ -96,10 +135,23 @@ components:
       properties:
         name:
           type: string
+          description: 
+            The name of the room to create
+        fields:
+          type: array
+          description:
+            An optional list of questions to ask
+            each participant
+          items:
+            type: string
     RoomCreationResponse:
       properties:
         name:
           type: string
+        fields:
+          type: array
+          items:
+            type: string
         code:
           type: string
         token:

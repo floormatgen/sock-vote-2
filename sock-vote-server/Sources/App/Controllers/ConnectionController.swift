@@ -4,7 +4,7 @@ import HTTPTypes
 
 struct ConnectionController {
 
-    /// The context for 
+    /// The context for websocket connection
     typealias Context = WebSocketRequestContext & RequestContext
 
     struct ConnectionRequest: Decodable {
@@ -14,7 +14,7 @@ struct ConnectionController {
     func addRoutes(to router: inout Router<some Context>) {
 
         router.ws(
-            "room/connect",
+            "room/connect/:code",
             shouldUpgrade: self.shouldUpgradeToConnection,
             onUpgrade: self.onUpgradeToConnection
         )
