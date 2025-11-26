@@ -21,6 +21,9 @@ protocol ParticipantProtocol: Sendable, Equatable, Identifiable {
     /// > This doesn't need to be unqiue, only the ``id`` needs to be.
     var name: String { get }
 
+    /// When the participant joined the room
+    var joined: Date { get }
+
     /// The additional information provided by the participant
     /// 
     /// If there is no additional information, this should be equal

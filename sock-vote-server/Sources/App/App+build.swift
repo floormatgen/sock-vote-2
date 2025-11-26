@@ -1,4 +1,5 @@
 import Hummingbird
+import HummingbirdWebSocket
 import Logging
 
 /// Application arguments protocol. We use a protocol so we can call
@@ -26,15 +27,19 @@ func buildApplication(_ arguments: some AppArguments) async throws -> some Appli
             .info
         return logger
     }()
+    
     let router = try buildRouter()
+    let connectionRouter = try buildConnectionRouter()
     let app = Application(
         router: router,
+        server: .http1WebSocketUpgrade(webSocketRouter: connectionRouter),
         configuration: .init(
             address: .hostname(arguments.hostname, port: arguments.port),
             serverName: "SockVoteServer"
         ),
         logger: logger
     )
+    
     return app
 }
 
@@ -52,4 +57,16 @@ func buildRouter() throws -> Router<AppRequestContext> {
     router.addRoutes(roomController.routes, atPath: "/room")
     
     return router
+}
+
+/// Build Connection Router
+func buildConnectionRouter() throws -> Router<BasicWebSocketRequestContext> {
+    
+    // Websocket handler registration
+    let roomManager = InMemoryRoomManager()
+    let wsController = ConnectionController(roomManager: roomManager)
+    var wsRouter = Router(context: BasicWebSocketRequestContext.self)
+    wsController.addRoutes(to: &wsRouter)
+    
+    return wsRouter
 }

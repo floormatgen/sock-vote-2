@@ -4,6 +4,11 @@ import Hummingbird
 protocol RoomProtocol: Sendable, Equatable, Identifiable, AnyObject {
     associatedtype Participant: ParticipantProtocol
 
+    /// The room manager managing the room
+    /// 
+    /// This property will be set by the room manager
+    var manager: (any RoomManagerProtocol)? { get set }
+
     // MARK: - Room Information
 
     /// The name of the room
@@ -16,6 +21,8 @@ protocol RoomProtocol: Sendable, Equatable, Identifiable, AnyObject {
     var roomToken: RoomToken { get }
 
     /// Whether the room is alive
+    /// 
+    /// When the status changes, the room is expected to call
     var isAlive: Bool { get async }
 
 }

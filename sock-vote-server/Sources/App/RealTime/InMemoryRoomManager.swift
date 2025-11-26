@@ -2,7 +2,7 @@ import Foundation
 import Hummingbird
 
 /// A Room Manager that manages rooms in-memory, in-process
-actor InMemoryRoomManager<Participant: ParticipantProtocol, CodeGenerator: RoomCodeGenerator>: RoomRepository {
+actor InMemoryRoomManager<Participant: ParticipantProtocol, CodeGenerator: RoomCodeGenerator>: RoomRepository, RoomManagerProtocol {
 
     /// The rooms that the manager manages
     private var rooms: [RoomCode : InMemoryRoom<Participant>] = [:]
@@ -48,7 +48,7 @@ actor InMemoryRoomManager<Participant: ParticipantProtocol, CodeGenerator: RoomC
         return room.fullInfo
     }
     
-    func findRoom(code: RoomCode) async throws -> RoomInfo {
+    func roomInfo(forCode code: RoomCode) async throws -> RoomInfo {
         guard let room = rooms[code] else {
             throw RoomCodeError.codeNotFound(code: code)
         }
@@ -57,12 +57,12 @@ actor InMemoryRoomManager<Participant: ParticipantProtocol, CodeGenerator: RoomC
 
     // MARK: - Room Actions
 
-    func didBecomeAlive(code: RoomCode) async throws {
+    func roomDidBecomeAlive(code: RoomCode) async throws {
         roomTimeouts[code]?.cancel()
         roomTimeouts[code] = nil
     }
 
-    func didBecomeInactive(code: RoomCode) async throws {
+    func roomDidBecomeInactive(code: RoomCode) async throws {
         schedulePurge(forCode: code)
     }
 

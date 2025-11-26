@@ -5,6 +5,12 @@ actor InMemoryRoom<Participant: ParticipantProtocol>: RoomProtocol {
 
     #warning("TODO: Account for admin user(s).")
 
+    /// The manager that manages this room
+    /// 
+    /// This is marked `nonisolated(unsafe)` as this 
+    /// property should only be set once by the roomManager.
+    nonisolated(unsafe) var manager: (any RoomManagerProtocol)?
+
     /// The current participants in a room
     var participants: [UUID : Participant] = [:]
 

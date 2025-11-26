@@ -14,7 +14,7 @@ struct RoomController<Repository: RoomRepository> {
     @Sendable
     func getRoom(request: Request, context: some RequestContext) async throws -> RoomInfo {
         let code = try context.parameters.require("code")
-        let room = try await repository.findRoom(code: code)
+        let room = try await repository.roomInfo(forCode: code)
         return room  
     }
 

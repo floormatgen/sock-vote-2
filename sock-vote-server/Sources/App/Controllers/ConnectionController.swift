@@ -2,14 +2,16 @@ import Hummingbird
 import HummingbirdWebSocket
 import HTTPTypes
 
-struct ConnectionController {
+struct ConnectionController<RoomManager: RoomManagerProtocol> {
 
     /// The context for websocket connection
     typealias Context = WebSocketRequestContext & RequestContext
 
-    struct ConnectionRequest: Decodable {
-        let code: String
-    }
+    let roomManager: RoomManager
+    
+    init(roomManager: RoomManager) {
+        self.roomManager = roomManager
+    } 
 
     func addRoutes(to router: inout Router<some Context>) {
 
@@ -28,7 +30,8 @@ struct ConnectionController {
     ) async throws -> RouterShouldUpgrade {
         let code = try context.parameters.require("code")
 
-        #warning("TODO: Make sure the code corresponds to an existing room.")
+        // Make sure the room actually exists
+        let _ = try await roomManager.roomInfo(forCode: code)
 
         return .upgrade([:])
     }
@@ -39,7 +42,7 @@ struct ConnectionController {
         outbound: WebSocketOutboundWriter,
         context: WebSocketRouterContext<some Context>
     ) async throws {
-
+        
     }
 
 }

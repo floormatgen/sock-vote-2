@@ -78,6 +78,12 @@ paths:
         "200":
           description:
             The room does exist, and the client is permitted to enter.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RoomJoinInfo"
+              example:
+                participantToken: "CDE33D83-EC29-4907-8EC0-C6FD9EB6CEFC"
         "404":
           description:
             The room does not exist.
@@ -85,49 +91,49 @@ paths:
           description:
             The room does exist, but the client has been rejected.
       
-  /room/connect/{code}:
-    get:
-      summary: Connect to a room
-      description:
-        Connect to a room using WebSocket
-      parameters:
-        - in: path
-          name: code
-          required: true
-          schema:
-            type: string
-        - in: header
-          name: Connection
-          required: true
-          schema:
-            type: string
-            const: "upgrade"
-        - in: header
-          name: Upgrade
-          required: true
-          schema:
-            type: string
-            const: "WebSocket"
-        - in: header
-          name: X-participant-token
-          required: true
-          description:
-            A token that uniquely identifies each client.
-            This can be acquired by joining the room first
-            by using `/room/connect/{code}`.
-          schema:
-            type: string
-      responses:
-        "101":
-          description:
-            The room was found and the connection will be upgraded
-            to a WebSocket connection.
-        "404":
-          description:
-            The room can't be found.
-        "400":
-          description:
-            The token provided doesn't correspond to a registered user.
+  # /room/connect/{code}:
+  #   get:
+  #     summary: Connect to a room
+  #     description:
+  #       Connect to a room using WebSocket
+  #     parameters:
+  #       - in: path
+  #         name: code
+  #         required: true
+  #         schema:
+  #           type: string
+  #       - in: header
+  #         name: Connection
+  #         required: true
+  #         schema:
+  #           type: string
+  #           const: "upgrade"
+  #       - in: header
+  #         name: Upgrade
+  #         required: true
+  #         schema:
+  #           type: string
+  #           const: "WebSocket"
+  #       - in: header
+  #         name: X-participant-token
+  #         required: true
+  #         description:
+  #           A token that uniquely identifies each client.
+  #           This can be acquired by joining the room first
+  #           by using `/room/connect/{code}`.
+  #         schema:
+  #           type: string
+  #     responses:
+  #       "101":
+  #         description:
+  #           The room was found and the connection will be upgraded
+  #           to a WebSocket connection.
+  #       "404":
+  #         description:
+  #           The room can't be found.
+  #       "400":
+  #         description:
+  #           The token provided doesn't correspond to a registered user.
 
 components:
   schemas:
@@ -165,4 +171,8 @@ components:
     RoomConnectionRequest:
       properties:
         code:
+          type: string
+    RoomJoinInfo:
+      properties:
+        participantToken:
           type: string
