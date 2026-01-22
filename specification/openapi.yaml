@@ -19,13 +19,26 @@ paths:
       description:
         Creates a new room with the given options.
       tags:
-        - roomHandling
+        - Room Handling
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/RoomCreationRequest"
+              required:
+                - name
+              properties:
+                name:
+                  type: string
+                  description: 
+                    The name of the room to create
+                fields:
+                  type: array
+                  description:
+                    An optional list of questions to ask
+                    each participant
+                  items:
+                    type: string
             example:
               name: "PCSoc Annual General Meeting"
       responses:
@@ -36,7 +49,21 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/RoomCreationResponse"
+                required:
+                  - name
+                  - code
+                  - adminToken
+                properties:
+                  name:
+                    type: string
+                  fields:
+                    type: array
+                    items:
+                      type: string
+                  code:
+                    type: string
+                  adminToken:
+                    type: string
               example:
                 name: "PCSoc Annual General Meeting"
                 code: "123456"
@@ -60,7 +87,7 @@ paths:
         like whether the room code corresponds
         to a valid room
       tags:
-        - roomHandling
+        - Room Handling
       parameters:
         - in: path
           name: code
@@ -76,7 +103,14 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/RoomInformation"
+                required:
+                  - name
+                  - code
+                properties:
+                  name:
+                    type: string
+                  code:
+                    type: string
         "404":
           description:
             The room does not exist.
@@ -89,13 +123,25 @@ paths:
         the room, it doesn't actually open a connection to the room. 
         To do that, use the `/room/connect/{code}` route.
       tags:
-        - roomHandling
+        - Room Handling
       parameters:
         - in: path
           name: code
           required: true
           schema:
             type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              required:
+                - name
+              properties:
+                name:
+                  type: string
+                fields:
+                  $ref: '#/components/schemas/Fields'
       responses:
         "200":
           description:
@@ -103,72 +149,137 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/RoomJoinInfo"
+                required:
+                  - participantToken
+                properties:
+                  participantToken:
+                    type: string
               example:
                 participantToken: "CDE33D83-EC29-4907-8EC0-C6FD9EB6CEFC"
-        "404":
-          description:
-            The room does not exist.
         "403":
           description:
             The room does exist, but the client has been rejected.
+        "404":
+          description:
+            The room does not exist.
+  
+  /room/joinRequests/{code}:
+    get:
+      summary: Pending requests to join a room
+      description:
+        Allows an admin to view pending join requests for a room
+      tags:
+        - Room Handling
+        - Room Management
+      parameters:
+        - $ref: '#/components/parameters/AdminToken'
+      responses:
+        "200":
+          description: 
+            The room exists and the admin token is valid.
+          content:
+            application/json:
+              schema:
+                required:
+                  - lastUpdated
+                  - requests
+                properties:
+                  lastUpdated:
+                    type: string # timestamp
+                  requests:
+                    type: array
+                    items:
+                      type: object
+                      required:
+                        - name
+                      properties:
+                        name:
+                          type: string
+                        fields:
+                          type: object
+        "403":
+          description:
+            The room exists but either the admin token is missing
+            or it is invalid
+        "404":
+          description:
+            The room does not exist.
+    post:
+      summary: Handle join requests
+      description:
+        Allows a room admin to accept or reject join requests.
+      tags:
+        - Room Handling
+        - Room Management
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              properties:
+                accept:
+                  type: array
+                  items:
+                    type: string
+                reject:
+                  type: array
+                  items:
+                    type: string
+      parameters:
+        - $ref: '#/components/parameters/AdminToken'
+      responses:
+        "200":
+          description:
+            All accepts and rejects were handled correctly.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JoinRequestsResult'
+        "207":
+          description:
+            Some accepts and rejects were handled correctly.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JoinRequestsResult'
+        "400":
+          description:
+            All join requests were not handled correctly.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JoinRequestsResult'
+        "403":
+          description:
+            The admin token is either missing or invalid.
+        "404":
+          description:
+            The room does not exist.
 
 components:
-  schemas:
-    RoomCreationRequest:
-      required:
-        - name
-      properties:
-        name:
-          type: string
-          description: 
-            The name of the room to create
-        fields:
-          type: array
-          description:
-            An optional list of questions to ask
-            each participant
-          items:
-            type: string
-    RoomCreationResponse:
-      required:
-        - name
-        - code
-        - adminToken
-      properties:
-        name:
-          type: string
-        fields:
-          type: array
-          items:
-            type: string
-        code:
-          type: string
-        adminToken:
-          type: string
-    RoomInformation:
-      required:
-        - name
-        - code
-      properties:
-        name:
-          type: string
-        code:
-          type: string
-    RoomConnectionRequest:
-      required:
-        - code
-      properties:
-        code:
-          type: string
-    RoomJoinInfo:
-      required:
-        - participantToken
-      properties:
-        participantToken:
-          type: string
 
-    # MARK: - Errors
+  # MARK: - Schemas
+  schemas:
+    JoinRequestsResult:
+      properties:
+        accepted:
+          type: array
+          items:
+            type: string
+        rejected:
+          type: array
+          items:
+            type: string
+        failed:
+          type: array
+          items:
+            type: string
+    Fields:
+      type: object
+      additionalProperties:
+        type: string
+    
+    # MARK: Errors
     BasicError:
       required:
         - reason
@@ -176,7 +287,23 @@ components:
         reason:
           type: string
 
+  # MARK: - Parameters
+  parameters:
+    AdminToken:
+      in: header
+      name: Room-Admin-Token
+      description:
+        To ensure that only an admin is able to make privileged actions
+        to a room.
+        The token is provided to the room creator as a response
+        to the create request.
+      schema:
+        type: string
+
 tags:
-  - name: roomHandling
+  - name: Room Handling
     description:
       Routes related to room handing.
+  - name: Room Management
+    description:
+      Routes to manage rooms. These routes require an admin token.
