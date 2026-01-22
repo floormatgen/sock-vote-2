@@ -1,0 +1,9 @@
+generate:
+  - types
+  - server
+namingStrategy: idiomatic
+accessModifier: package
+
+filter:
+  tags:
+    - roomHandling
