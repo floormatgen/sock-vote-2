@@ -4,29 +4,32 @@ REPO_NAME="sock-vote-2"
 FOLDER_NAME="sock-vote-server"
 DOCS_DIRECTORY="../docs/${FOLDER_NAME}"
 HOSTING_BASE_PATH="/${REPO_NAME}/${FOLDER_NAME}"
+TARGETS=("SockVoteServer" "RoomHandling")
 
 echo "Clearing contents of ${DOCS_DIRECTORY} ..."
 rm -rd ${DOCS_DIRECTORY}/*
-
-swift package \
-    --allow-writing-to-directory '../docs' \
-    generate-documentation \
-    --transform-for-static-hosting \
-    --symbol-graph-minimum-access-level internal \
-    --hosting-base-path ${HOSTING_BASE_PATH} \
-    --output-path ${DOCS_DIRECTORY} \
-    --target "SockVoteServer" \
-    --target "RoomHandling"
+for target in ${TARGETS[@]}; do
+    output_path="${DOCS_DIRECTORY}/${target}"
+    mkdir -v "${output_path}"
+    swift package \
+        --allow-writing-to-directory '../docs' \
+        generate-documentation \
+        --transform-for-static-hosting \
+        --symbol-graph-minimum-access-level internal \
+        --hosting-base-path "${HOSTING_BASE_PATH}/${target}" \
+        --output-path "${output_path}" \
+        --target "${target}"
+done
 
 # Rename generated archives to remove extension
-echo "Renaming Archives..."
-archives=($(find ${DOCS_DIRECTORY} -maxdepth 1 -iname "*.doccarchive"))
-for archive_name in "${archives[@]}"; do
-    if [[ "${archive_name}" =~ ^(.+)\.doccarchive ]]; then
-        new_name=${BASH_REMATCH[1]}
-        # echo "Renaming: ${archive_name} -> ${new_name}"
-        mv -v "${archive_name}" "${new_name}"
-    else
-        echo "Invalid archive name: ${archive_name}"
-    fi
-done
+# echo "Renaming Archives..."
+# archives=($(find ${DOCS_DIRECTORY} -maxdepth 1 -iname "*.doccarchive"))
+# for archive_name in "${archives[@]}"; do
+#     if [[ "${archive_name}" =~ ^(.+)\.doccarchive ]]; then
+#         new_name=${BASH_REMATCH[1]}
+#         # echo "Renaming: ${archive_name} -> ${new_name}"
+#         mv -v "${archive_name}" "${new_name}"
+#     else
+#         echo "Invalid archive name: ${archive_name}"
+#     fi
+# done
