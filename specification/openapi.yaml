@@ -89,13 +89,7 @@ paths:
       tags:
         - Room Handling
       parameters:
-        - in: path
-          name: code
-          required: true
-          schema:
-            type: string
-          description:
-            The room to get information on.
+        - $ref: '#/components/parameters/RoomCode'
       responses:
         "200":
           description:
@@ -125,11 +119,7 @@ paths:
       tags:
         - Room Handling
       parameters:
-        - in: path
-          name: code
-          required: true
-          schema:
-            type: string
+        - $ref: '#/components/parameters/RoomCode'
       requestBody:
         required: true
         content:
@@ -173,6 +163,7 @@ paths:
         - Room Management
       parameters:
         - $ref: '#/components/parameters/AdminToken'
+        - $ref: '#/components/parameters/RoomCode'
       responses:
         "200":
           description: 
@@ -192,11 +183,17 @@ paths:
                       type: object
                       required:
                         - name
+                        - participantToken
+                        - timestamp
                       properties:
                         name:
                           type: string
+                        participantToken:
+                          type: string
+                        timestamp:
+                          type: string # timestamp
                         fields:
-                          type: object
+                          $ref: '#/components/schemas/Fields'
         "403":
           description:
             The room exists but either the admin token is missing
@@ -227,6 +224,7 @@ paths:
                     type: string
       parameters:
         - $ref: '#/components/parameters/AdminToken'
+        - $ref: '#/components/parameters/RoomCode'
       responses:
         "200":
           description:
@@ -292,11 +290,20 @@ components:
     AdminToken:
       in: header
       name: Room-Admin-Token
+      required: true
       description:
         To ensure that only an admin is able to make privileged actions
         to a room.
         The token is provided to the room creator as a response
         to the create request.
+      schema:
+        type: string
+    RoomCode:
+      in: path
+      name: code
+      required: true
+      description:
+        A code uniquely identifying an alive rooms.
       schema:
         type: string
 

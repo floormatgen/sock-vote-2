@@ -1,3 +1,4 @@
+import Foundation
 import OpenAPIRuntime
 
 package typealias DefaultRoomHandler = RoomHandler<DefaultRoomManager<DefaultRoomCodeGenerator>>
@@ -50,16 +51,44 @@ package extension RoomHandler {
             case .json(let joinRequest):
                 let name = joinRequest.name
                 let fields = joinRequest.fields?.additionalProperties
+                // NOTE: This can suspend for a very long time
+                let result = try await room.requestJoinRoom(name: name, fields: fields ?? [:])
+                switch result {
+                    case .success(let participantToken):
+                        return .ok(.init(body: .json(.init(participantToken: participantToken))))
+                    case .rejected:
+                        return .forbidden
+                    case .roomClosing:
+                        return .notFound
+                }
         }
-        
-        // let result = try await room.requestJoinRoom(name: , fields: [String : String])
-        fatalError()
     }
 
     func getRoomJoinRequestsCode(
         _ input: Operations.GetRoomJoinRequestsCode.Input
     ) async throws -> Operations.GetRoomJoinRequestsCode.Output {
-        fatalError()
+        let code = input.path.code
+        let adminToken = input.headers.roomAdminToken
+        guard let room = await roomManager.room(withCode: code) else {
+            return .notFound
+        }
+        guard room.verifyToken(adminToken) else {
+            return .forbidden
+        }
+        return .ok(.init(body: .json(.init(
+            lastUpdated: Date.now.ISO8601Format(), 
+            requests: await room.joinRequests.map {
+                let outFields = $0.1.fields.isEmpty 
+                    ? nil 
+                    : Components.Schemas.Fields(additionalProperties: $0.1.fields)
+                return .init(
+                    name: $0.1.name,
+                    participantToken: $0.0,
+                    timestamp: $0.1.timestamp.ISO8601Format(),
+                    fields: outFields
+                )
+            }
+        ))))
     }
 
     func postRoomJoinRequestsCode(

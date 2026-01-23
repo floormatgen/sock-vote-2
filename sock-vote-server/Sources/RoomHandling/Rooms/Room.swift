@@ -5,6 +5,8 @@ package protocol RoomProtocol: AnyObject {
     var code: String { get }
     var fields: [String] { get }
 
+    var joinRequests: [String : JoinRequest] { get async }
+
     /// Request to join the room
     /// 
     /// This request needs to be approved by an admin, this method will suspend until
@@ -12,6 +14,11 @@ package protocol RoomProtocol: AnyObject {
     /// 
     /// - Throws: ``RoomError/missingFields([String])`` if required fields are missing
     func requestJoinRoom(name: String, fields: [String : String]) async throws -> JoinResult
+
+    /// Verify a provided admin token
+    /// 
+    /// - Returns: `true` if the token is valid, otherwise `false`
+    func verifyToken(_ token: String) -> Bool
 }
 
 package extension RoomProtocol {
@@ -65,7 +72,7 @@ package final actor DefaultRoom: RoomProtocol {
 
     nonisolated private let adminToken: String
 
-    var joinRequests: [String : JoinRequest]
+    package var joinRequests: [String : JoinRequest]
 
     init(name: String, code: String, fields: [String] = [], adminToken: String) {
         self.name = name
@@ -81,23 +88,22 @@ package extension DefaultRoom {
 
     func requestJoinRoom(
         name: String, fields: [String : String]
-
     ) async throws -> JoinResult {
         var missingFields = [String]()
         var extraFields = [String]()
         guard validateFields(fields, missingFields: &missingFields, extraFields: &extraFields) else {
             throw RoomError.invalidFields(missing: missingFields, extra: extraFields)
         }
+        // TODO: Replace this
         let participantToken = UUID().uuidString
-        do {
-            try await withCheckedThrowingContinuation { continuation in
-                let joinRequest = JoinRequest(name: name, fields: fields, continuation: continuation)
-                addJoinRequest(joinRequest, participantToken: participantToken)
-                fatalError()
-            }
-        } catch {
+        return try await withCheckedThrowingContinuation { continuation in
+            let joinRequest = JoinRequest(name: name, fields: fields, continuation: continuation)
+            addJoinRequest(joinRequest, participantToken: participantToken)
         }
-        fatalError()
+    }
+
+    nonisolated func verifyToken(_ token: String) -> Bool {
+        return adminToken == token
     }
 
 }
@@ -113,7 +119,7 @@ private extension DefaultRoom {
 }
 
 package struct JoinRequest {
-    package typealias Continuation = CheckedContinuation<Bool, any Error>
+    package typealias Continuation = CheckedContinuation<JoinResult, any Error>
 
     package var name: String
     package var fields: [String : String]
@@ -134,5 +140,6 @@ package struct JoinRequest {
 
 package enum JoinResult {
     case success(participantToken: String)
+    case roomClosing
     case rejected
 }
