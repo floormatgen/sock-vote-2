@@ -8,4 +8,17 @@ enum Utilities {
         return date
     }
 
+    actor ActorBox<T> {
+        var value: T
+
+        init(value: T) {
+            self.value = value
+        }
+
+        func setValue(_ value: T) {
+            self.value = value
+        }
+
+    }
+    
 }

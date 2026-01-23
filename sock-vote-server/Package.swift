@@ -20,6 +20,7 @@ let package = Package(
         // Utility
         .package(url: "https://github.com/apple/swift-argument-parser", from: "1.0.0"),
         .package(url: "https://github.com/apple/swift-log", from: "1.6.0"),
+        .package(url: "https://github.com/apple/swift-http-types.git", from: "1.0.0"),
 
         // Server-related
         .package(url: "https://github.com/apple/swift-openapi-runtime", from: "1.0.0"),
@@ -55,14 +56,17 @@ let package = Package(
                 .plugin(name: "OpenAPIGenerator", package: "swift-openapi-generator"),
             ]
         ),
+
         // MARK: Tests
         .testTarget(
             name: "RoomHandlingImplTesting",
             dependencies: [
                 .target(name: "RoomHandling"),
                 .product(name: "OpenAPIRuntime", package: "swift-openapi-runtime"),
+                .product(name: "HTTPTypes", package: "swift-http-types"),
             ]
         ),
+
     ],
     swiftLanguageModes: [
         .v6, .v5,
@@ -71,12 +75,17 @@ let package = Package(
 
 // MARK: - Upcoming language features
 
-let upcomingFeatureSettings: [SwiftSetting] = [
+let swiftSettings: [SwiftSetting] = [
+    .defaultIsolation(nil),
+    .strictMemorySafety(),
+]
+
+let upcomingFeatures: [SwiftSetting] = [
     .enableUpcomingFeature("ExistentialAny"),
     .enableUpcomingFeature("MemberImportVisibility"),
     .enableUpcomingFeature("NonisolatedNonsendingByDefault"),
 ]
 
 for target in package.targets {
-    target.swiftSettings = (target.swiftSettings ?? []) + upcomingFeatureSettings
+    target.swiftSettings = (target.swiftSettings ?? []) + swiftSettings + upcomingFeatures
 }

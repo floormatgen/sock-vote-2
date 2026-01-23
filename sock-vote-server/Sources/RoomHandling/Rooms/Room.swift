@@ -12,13 +12,20 @@ package protocol RoomProtocol: AnyObject {
     /// This request needs to be approved by an admin, this method will suspend until
     /// this request is accepted or rejected.
     /// 
-    /// - Throws: ``RoomError/missingFields([String])`` if required fields are missing
+    /// - Throws: ``RoomError/invalidFields(missing:extra:)`` if required fields are missing
     func requestJoinRoom(name: String, fields: [String : String]) async throws -> JoinResult
 
     /// Verify a provided admin token
     /// 
     /// - Returns: `true` if the token is valid, otherwise `false`
-    func verifyToken(_ token: String) -> Bool
+    func verifyAdminToken(_ adminToken: String) -> Bool
+
+    /// Handle a join request
+    /// 
+    /// - Parameter accept: Whether to accept the request
+    /// - Parameter participantToken: The participant token to handle
+    /// 
+    func handleJoinRequest(_ accept: Bool, forToken participantToken: String) async -> JoinRequestResult
 }
 
 package extension RoomProtocol {
@@ -73,13 +80,24 @@ package final actor DefaultRoom: RoomProtocol {
     nonisolated private let adminToken: String
 
     package var joinRequests: [String : JoinRequest]
+    package var inactiveParticipants: [String : Task<Void, any Error>]
 
-    init(name: String, code: String, fields: [String] = [], adminToken: String) {
+    nonisolated private let participantTimeout: Duration
+
+    init(
+        name: String, 
+        code: String, 
+        fields: [String] = [], 
+        adminToken: String,
+        participantTimeout: Duration = .seconds(45)
+    ) {
         self.name = name
         self.code = code
         self.fields = fields
         self.adminToken = adminToken
         self.joinRequests = [:]
+        self.inactiveParticipants = [:]
+        self.participantTimeout = participantTimeout
     }
 
 }
@@ -94,7 +112,7 @@ package extension DefaultRoom {
         guard validateFields(fields, missingFields: &missingFields, extraFields: &extraFields) else {
             throw RoomError.invalidFields(missing: missingFields, extra: extraFields)
         }
-        // TODO: Replace this
+        // TODO: Find a better way to generate tokens
         let participantToken = UUID().uuidString
         return try await withCheckedThrowingContinuation { continuation in
             let joinRequest = JoinRequest(name: name, fields: fields, continuation: continuation)
@@ -102,8 +120,22 @@ package extension DefaultRoom {
         }
     }
 
-    nonisolated func verifyToken(_ token: String) -> Bool {
-        return adminToken == token
+    nonisolated func verifyAdminToken(_ adminToken: String) -> Bool {
+        return adminToken == adminToken
+    }
+
+    func handleJoinRequest(_ accept: Bool, forToken participantToken: String) -> JoinRequestResult {
+        guard var joinRequest = joinRequests[participantToken] else {
+            // TODO: Check active and inactive participants
+            return .missing
+        }
+        joinRequests.removeValue(forKey: participantToken)
+        if accept {
+            joinRequest.handleRequest(with: .success(participantToken: participantToken))
+        } else {
+            joinRequest.handleRequest(with: .rejected)
+        }
+        return .success
     }
 
 }
@@ -116,6 +148,23 @@ private extension DefaultRoom {
         // TODO: Notify admin
     }
 
+    func makeInactive(participantToken: String) {
+        assert(!joinRequests.keys.contains(participantToken))
+        assert(!inactiveParticipants.keys.contains(participantToken))
+
+        let timeout = Task {
+            try await Task.sleep(for: participantTimeout)
+            assert(inactiveParticipants.keys.contains(participantToken))
+            inactiveParticipants.removeValue(forKey: participantToken)
+        }
+
+        inactiveParticipants[participantToken] = timeout
+    }
+
+    func makeActive(participantToken: String) {
+        assert(!joinRequests.keys.contains(participantToken))
+    }
+
 }
 
 package struct JoinRequest {
@@ -124,7 +173,7 @@ package struct JoinRequest {
     package var name: String
     package var fields: [String : String]
     package var timestamp: Date
-    package var continuation: Continuation!
+    private var continuation: Continuation!
 
     package init(
         name: String, fields: [String : String],
@@ -136,10 +185,28 @@ package struct JoinRequest {
         self.timestamp = timestamp
         self.continuation = continuation
     }
+
+    mutating func handleRequest(with result: JoinResult) {
+        precondition(continuation != nil, "\(#function): Cannot handle request more than once.")
+        continuation.resume(returning: result)
+        continuation = nil
+    }
+
 }
 
 package enum JoinResult {
     case success(participantToken: String)
     case roomClosing
     case rejected
+}
+
+package enum JoinRequestResult {
+    /// The participant was accepted or rejected successfully
+    case success
+    /// The participant doesn't exist in the room
+    case missing
+    /// The participant was already accepted
+    /// 
+    /// The participant is in the active or inactive state
+    case alreadyAccepted
 }

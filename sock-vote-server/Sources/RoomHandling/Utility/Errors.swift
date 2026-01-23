@@ -8,7 +8,7 @@ package enum RoomError: Swift.Error {
     var localizedDescription: String {
         switch self {
             case .failedToGenerateCode:
-                return "An available room code could not be generated."
+                return "An available room code could not be generated"
             case .invalidFields(let missing, let extra):
                 return "Invalid fields: (missing: \(missing), extra: \(extra))"
         }

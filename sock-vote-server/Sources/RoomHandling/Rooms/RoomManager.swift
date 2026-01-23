@@ -11,7 +11,7 @@ package protocol RoomManagerProtocol: AnyObject, Sendable {
     /// Creates a new room
     /// 
     /// - Throws:
-    ///     ``RoomError.failedToGenerateCode`` if a valid code
+    ///     ``RoomError/failedToGenerateCode`` if a valid code
     ///     could not be generated.
     /// 
     /// - Returns: 

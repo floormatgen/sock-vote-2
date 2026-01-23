@@ -72,7 +72,7 @@ package extension RoomHandler {
         guard let room = await roomManager.room(withCode: code) else {
             return .notFound
         }
-        guard room.verifyToken(adminToken) else {
+        guard room.verifyAdminToken(adminToken) else {
             return .forbidden
         }
         return .ok(.init(body: .json(.init(
@@ -94,7 +94,52 @@ package extension RoomHandler {
     func postRoomJoinRequestsCode(
         _ input: Operations.PostRoomJoinRequestsCode.Input
     ) async throws -> Operations.PostRoomJoinRequestsCode.Output {
-        fatalError()
+        let code = input.path.code
+        let adminToken = input.headers.roomAdminToken
+        guard let room = await roomManager.room(withCode: code) else {
+            return .notFound
+        }
+        guard room.verifyAdminToken(adminToken) else {
+            return .forbidden
+        }
+        var accepted = [String]()
+        var rejected = [String]()
+        var failed = [String]()
+        switch input.body {
+            case .json(let payload):
+                if let toAccept = payload.accept {
+                    for token in toAccept {
+                        let result = await room.handleJoinRequest(true, forToken: token)
+                        if case .success = result {
+                            accepted.append(token)
+                        } else {
+                            failed.append(token)
+                        }
+                    }
+                }
+                if let toReject = payload.reject {
+                    for token in toReject {
+                        let result = await room.handleJoinRequest(false, forToken: token)
+                        if case .success = result {
+                            rejected.append(token)
+                        } else {
+                            failed.append(token)
+                        }
+                    }
+                }
+        }
+        let result = Components.Schemas.JoinRequestsResult(
+            accepted: accepted.isEmpty ? nil : accepted, 
+            rejected: rejected.isEmpty ? nil : rejected, 
+            failed: failed.isEmpty ? nil : failed
+        )
+        if failed.isEmpty {
+            return .ok(.init(body: .json(result)))
+        } else if !accepted.isEmpty || !rejected.isEmpty {
+            return .code207(.init(body: .json(result)))
+        } else {
+            return .badRequest(.init(body: .json(result)))
+        }
     }
 
 }

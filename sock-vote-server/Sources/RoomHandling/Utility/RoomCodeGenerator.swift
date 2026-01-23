@@ -11,7 +11,7 @@ package extension RoomCodeGeneratorProtocol {
     /// A valid room code is dictated by the `filter`.
     /// 
     /// - Parameter maxTries: The maximum times to invoke the filter. Must be at least `1`.
-    /// - Parameter filter: The predicate for the code. ``true`` indicates a valid code.
+    /// - Parameter filter: The predicate for the code. `true` indicates a valid code.
     /// 
     /// - Returns: A code or `nil` if it could not be generated.
     mutating func generateRoomCode<E: Error>(

@@ -1,6 +1,8 @@
 import Testing
 @testable import RoomHandling
 
+import HTTPTypes
+
 extension RoomHandler {
     
     // MARK: - Route Utilities
@@ -29,6 +31,46 @@ extension RoomHandler {
         let output = try await getRoomJoinRequestsCode(.init(path: .init(code: code), headers: .init(roomAdminToken: adminToken)))
         let body = try output.ok.body.json.requests
         return body.map { JoinRequest(name: $0.name, participantToken: $0.participantToken, timestamp: $0.timestamp, fields: $0.fields?.additionalProperties ?? [:]) }
+    }
+
+    func requestRoomJoin(
+        withCode code: String,
+        name: String, fields: [String : String]? = nil
+    ) async throws -> String {
+        let output = try await postRoomJoinCode(.init(path: .init(code: code), body: .json(.init(name: name, fields: .init(additionalProperties: fields ?? [:])))))
+        let body = try output.ok.body.json
+        return body.participantToken
+    }
+
+    func handleJoinRequests(
+        withCode code: String,
+        adminToken: String,
+        accept: [String]? = nil,
+        reject: [String]? = nil
+    ) async throws -> (accepted: [String]?, rejected: [String]?, failed: [String]?, status: HTTPResponse.Status) {
+        let output = try await postRoomJoinRequestsCode(.init(
+            path: .init(code: code), 
+            headers: .init(roomAdminToken: adminToken), 
+            body: .json(.init(accept: accept, reject: reject))
+        ))
+        switch output {
+            case .ok(let result):
+                let body = try result.body.json
+                return (body.accepted, body.rejected, body.failed, .ok)
+            case .code207(let result):
+                let body = try result.body.json
+                return (body.accepted, body.rejected, body.failed, .init(code: 207))
+            case .badRequest(let result):
+                let body = try result.body.json
+                return (body.accepted, body.rejected, body.failed, .badRequest)
+            case .notFound:
+                return (nil, nil, nil, .notFound)
+            case .forbidden:
+                return (nil, nil, nil, .forbidden)
+            case .undocumented(let code, _):
+                return (nil, nil, nil, .init(code: code))
+        }
+
     }
 
     struct JoinRequest {

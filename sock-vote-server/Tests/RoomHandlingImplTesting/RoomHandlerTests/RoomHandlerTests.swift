@@ -2,6 +2,7 @@ import Testing
 @testable import RoomHandling
 
 import Foundation
+import HTTPTypes
 
 @Suite
 struct RoomHandlerTests {
@@ -36,7 +37,7 @@ struct RoomHandlerTests {
     @Test("Can attempt to join existing room", arguments: Self.participantNames)
     func test_canAttemptToJoinExistingRoom(_ name: String) async throws {
         let (_, code, _, adminToken) = try await roomHandler.createRoom(withName: "Room")
-        Task.detached {
+        let joinRequestTask = Task.detached {
             try await roomHandler.postRoomJoinCode(
                 .init(path: .init(code: code), body: .json(.init(
                     name: name, 
@@ -51,6 +52,43 @@ struct RoomHandlerTests {
         #expect(request.name == name)
         let date = try Utilities.parseTimestamp(request.timestamp)
         #expect(date.distance(to: .now) < 1)
+        joinRequestTask.cancel()
+    }
+
+    @Test("Admin can accept join request")
+    func test_adminCanAcceptJoinRequest() async throws {
+        let name = "Foo"
+        let (_, code, _, adminToken) = try await roomHandler.createRoom(withName: "Room")
+        let participantTokenBox = Utilities.ActorBox<String?>(value: nil)
+        try await confirmation { c in
+            let requestJoinTask = Task {
+                let participantToken = try await roomHandler.requestRoomJoin(withCode: code, name: name)
+                await participantTokenBox.setValue(participantToken)
+                c.confirm()
+            }
+            try await Task.sleep(for: .milliseconds(10))
+            let requests = try await roomHandler.joinRequests(withCode: code, adminToken: adminToken)
+            #expect(requests.count == 1)
+            let request = try #require(requests.first)
+            #expect(request.name == name)
+            let date = try Utilities.parseTimestamp(request.timestamp)
+            #expect(date.distance(to: .now) < 1)
+            let participantToken = request.participantToken
+            let (accepted, rejected, failed, status) = try await roomHandler.handleJoinRequests(
+                withCode: code, adminToken: adminToken, 
+                accept: [participantToken]
+            )
+            #expect(status == .ok)
+            #expect(rejected?.isEmpty ?? true)
+            #expect(failed?.isEmpty ?? true)
+            try #require(accepted != nil)
+            #expect(accepted!.count == 1)
+            if let token = await participantTokenBox.value {
+                #expect(token == participantToken)
+            }
+            try await Task.sleep(for: .milliseconds(10))
+            requestJoinTask.cancel()
+        }
     }
 
 }
