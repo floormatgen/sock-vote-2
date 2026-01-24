@@ -1,0 +1,14 @@
+#! /bin/sh
+
+# Make sure this script is executing from the repo folder
+cd "$(dirname "$0")"
+
+# First copy the specification
+echo "Preparing Specification..."
+cd specification
+./update-specification
+
+# Then build server documentation
+echo "Preparing Server Documentation..." 
+cd ../sock-vote-server
+./generate-documentation

@@ -15,6 +15,8 @@ package struct RoomHandler<RoomManager: RoomManagerProtocol>: APIProtocol {
 
 package extension RoomHandler {
 
+    // MARK: - Room Management
+
     func postRoomCreate(
         _ input: Operations.PostRoomCreate.Input
     ) async throws -> Operations.PostRoomCreate.Output {
@@ -30,6 +32,8 @@ package extension RoomHandler {
                 }
         }
     }
+
+    // MARK: - Room Info
 
     func getRoomInfoCode(
         _ input: Operations.GetRoomInfoCode.Input
@@ -64,6 +68,8 @@ package extension RoomHandler {
                 }
         }
     }
+
+    // MARK: - Join Requests
 
     func getRoomJoinRequestsCode(
         _ input: Operations.GetRoomJoinRequestsCode.Input
@@ -141,6 +147,26 @@ package extension RoomHandler {
         } else {
             return .badRequest(.init(body: .json(result)))
         }
+    }
+
+    // MARK: - Question Handling 
+
+    func getRoomQuestionCode(
+        _ input: Operations.GetRoomQuestionCode.Input
+    ) async throws -> Operations.GetRoomQuestionCode.Output {
+        fatalError()
+    }
+
+    func postRoomQuestionCode(
+        _ input: Operations.PostRoomQuestionCode.Input
+    ) async throws -> Operations.PostRoomQuestionCode.Output {
+        fatalError()
+    }
+
+    func deleteRoomQuestionCode(
+        _ input: Operations.DeleteRoomQuestionCode.Input
+    ) async throws -> Operations.DeleteRoomQuestionCode.Output {
+        fatalError()
     }
 
 }

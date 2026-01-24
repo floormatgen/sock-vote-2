@@ -6,4 +6,5 @@ accessModifier: package
 
 filter:
   tags:
-    - Room Handling
+    - Participants
+    - Room Management

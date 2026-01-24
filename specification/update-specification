@@ -1,0 +1,9 @@
+#! /bin/sh
+
+DOCS_FOLDER="../docs"
+OPENAPI_FILE="./openapi.yaml"
+OPENAPI_OUTPUT_PATH="${DOCS_FOLDER}/specification/openapi"
+
+cd "$(dirname "$0")"
+mkdir -p "${OPENAPI_OUTPUT_PATH}"
+cp "${OPENAPI_FILE}" "${OPENAPI_OUTPUT_PATH}/${OPENAPI_FILE}"
