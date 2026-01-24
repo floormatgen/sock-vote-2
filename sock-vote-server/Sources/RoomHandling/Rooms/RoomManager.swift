@@ -17,7 +17,7 @@ package protocol RoomManagerProtocol: AnyObject, Sendable {
     /// - Returns: 
     ///     The `code` and `adminToken` for the room.
     ///     This is the only way to get the `adminToken`.
-    func createRoom(name: String) async throws -> (code: String, adminToken: String)
+    func createRoom(name: String, fields: [String]) async throws -> (code: String, adminToken: String)
 
 }
 
@@ -49,7 +49,7 @@ package extension DefaultRoomManager {
     }
 
     func createRoom(
-        name: String,
+        name: String, fields: [String]
     ) throws -> (code: String, adminToken: String) {
         guard let code = roomCodeGenerator.generateRoomCode(
             maxTries: codeGenMaxTries, 
@@ -59,7 +59,7 @@ package extension DefaultRoomManager {
         }
         // TODO: Find a more secure way to generate admin tokens
         let adminToken = UUID().uuidString
-        let room = Room(name: name, code: code, adminToken: adminToken)
+        let room = Room(name: name, code: code, fields: fields, adminToken: adminToken)
         assert(!rooms.keys.contains(code))
         rooms[code] = room
         return (code: code, adminToken: adminToken)

@@ -105,6 +105,10 @@ paths:
                     type: string
                   code:
                     type: string
+                  fields:
+                    type: array
+                    items:
+                      type: string
         "404":
           description:
             The room does not exist.

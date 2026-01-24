@@ -39,6 +39,7 @@ let package = Package(
         .executableTarget(
             name: "SockVoteServer",
             dependencies: [
+                .target(name: "RoomHandling"),
                 .product(name: "ArgumentParser", package: "swift-argument-parser"),
                 .product(name: "OpenAPIRuntime", package: "swift-openapi-runtime"),
                 .product(name: "OpenAPIHummingbird", package: "swift-openapi-hummingbird"),
@@ -66,6 +67,14 @@ let package = Package(
                 .product(name: "HTTPTypes", package: "swift-http-types"),
             ]
         ),
+        .testTarget(
+            name: "ServerTesting",
+            dependencies: [
+                .target(name: "SockVoteServer"),
+                .product(name: "Hummingbird", package: "hummingbird"),
+                .product(name: "HummingbirdTesting", package: "hummingbird"),
+            ]
+        )
 
     ],
     swiftLanguageModes: [

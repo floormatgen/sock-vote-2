@@ -87,7 +87,7 @@ package final actor DefaultRoom: RoomProtocol {
     init(
         name: String, 
         code: String, 
-        fields: [String] = [], 
+        fields: [String], 
         adminToken: String,
         participantTimeout: Duration = .seconds(45)
     ) {

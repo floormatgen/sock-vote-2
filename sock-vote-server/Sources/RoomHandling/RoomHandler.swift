@@ -22,8 +22,9 @@ package extension RoomHandler {
             case .json(let roomCreationRequest):
                 do {
                     let name = roomCreationRequest.name
-                    let (code, adminToken) = try await roomManager.createRoom(name: name)
-                    return .ok(.init(body: .json(.init(name: name, code: code, adminToken: adminToken))))
+                    let fields = roomCreationRequest.fields
+                    let (code, adminToken) = try await roomManager.createRoom(name: name, fields: fields ?? [])
+                    return .ok(.init(body: .json(.init(name: name, fields: fields, code: code, adminToken: adminToken))))
                 } catch let error as RoomError where .failedToGenerateCode == error {
                     return .internalServerError(.init(body: .json(.init(reason: error.localizedDescription))))
                 }
@@ -37,7 +38,7 @@ package extension RoomHandler {
         guard let room = await roomManager.room(withCode: code) else {
             return .notFound
         }
-        return .ok(.init(body: .json(.init(name: room.name, code: room.code))))
+        return .ok(.init(body: .json(.init(name: room.name, code: room.code, fields: room.fields))))
     }
 
     func postRoomJoinCode(
