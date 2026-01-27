@@ -1,9 +1,9 @@
-package protocol RoomCodeGeneratorProtocol {
+public protocol RoomCodeGeneratorProtocol {
     /// Generates a new room code
     mutating func next() -> String
 }
 
-package extension RoomCodeGeneratorProtocol {
+public extension RoomCodeGeneratorProtocol {
 
     /// Repeatedly generates a room code until valid
     /// 
@@ -40,14 +40,14 @@ package extension RoomCodeGeneratorProtocol {
 
 }
 
-package struct DefaultRoomCodeGenerator: RoomCodeGeneratorProtocol {
+public struct DefaultRoomCodeGenerator: RoomCodeGeneratorProtocol {
     private var generator: SystemRandomNumberGenerator
 
-    package init() {
+    public init() {
         self.generator = SystemRandomNumberGenerator()
     }
 
-    mutating package func next() -> String {
+    mutating public func next() -> String {
         return String(Int.random(in: 0...999_999, using: &generator))
     }
 }

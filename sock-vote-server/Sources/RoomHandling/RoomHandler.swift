@@ -1,19 +1,19 @@
 import Foundation
 import OpenAPIRuntime
 
-package typealias DefaultRoomHandler = RoomHandler<DefaultRoomManager<DefaultRoomCodeGenerator>>
+public typealias DefaultRoomHandler = RoomHandler<DefaultRoomManager<DefaultRoomCodeGenerator>>
 
-package struct RoomHandler<RoomManager: RoomManagerProtocol>: APIProtocol {
+public struct RoomHandler<RoomManager: RoomManagerProtocol>: APIProtocol {
 
     let roomManager: RoomManager
 
-    package init(roomManager: RoomManager = DefaultRoomManager()) {
+    public init(roomManager: RoomManager = DefaultRoomManager()) {
         self.roomManager = roomManager
     }
 
 }
 
-package extension RoomHandler {
+public extension RoomHandler {
 
     // MARK: - Room Management
 

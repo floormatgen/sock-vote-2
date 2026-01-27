@@ -1,7 +1,7 @@
 import Foundation
 import VoteHandling
 
-package protocol RoomProtocol: AnyObject {
+public protocol RoomProtocol: AnyObject {
     var name: String { get }
     var code: String { get }
     var fields: [String] { get }
@@ -35,7 +35,7 @@ package protocol RoomProtocol: AnyObject {
     func updateQuestion(prompt: String, options: [String], style: Question.VotingStyle) async
 }
 
-package extension RoomProtocol {
+public extension RoomProtocol {
 
     /// Checks if provided fields are valid
     /// 
@@ -79,15 +79,15 @@ package extension RoomProtocol {
 
 }
 
-package final actor DefaultRoom: RoomProtocol {
-    nonisolated package let name: String
-    nonisolated package let code: String
-    nonisolated package let fields: [String]
+public final actor DefaultRoom: RoomProtocol {
+    nonisolated public let name: String
+    nonisolated public let code: String
+    nonisolated public let fields: [String]
 
     nonisolated private let adminToken: String
 
-    package var joinRequests: [String : JoinRequest]
-    package var inactiveParticipants: [String : Task<Void, any Error>]
+    public var joinRequests: [String : JoinRequest]
+    public var inactiveParticipants: [String : Task<Void, any Error>]
 
     nonisolated private let participantTimeout: Duration
     private var currentQuestion: Question?
@@ -110,7 +110,7 @@ package final actor DefaultRoom: RoomProtocol {
 
 }
 
-package extension DefaultRoom {
+public extension DefaultRoom {
 
     func requestJoinRoom(
         name: String, fields: [String : String]
@@ -184,15 +184,15 @@ private extension DefaultRoom {
 
 }
 
-package struct JoinRequest {
-    package typealias Continuation = CheckedContinuation<JoinResult, any Error>
+public struct JoinRequest: Sendable {
+    public typealias Continuation = CheckedContinuation<JoinResult, any Error>
 
-    package var name: String
-    package var fields: [String : String]
-    package var timestamp: Date
+    public var name: String
+    public var fields: [String : String]
+    public var timestamp: Date
     private var continuation: Continuation!
 
-    package init(
+    public init(
         name: String, fields: [String : String],
         timestamp: Date = .now,
         continuation: Continuation
@@ -211,13 +211,13 @@ package struct JoinRequest {
 
 }
 
-package enum JoinResult {
+public enum JoinResult: Sendable {
     case success(participantToken: String)
     case roomClosing
     case rejected
 }
 
-package enum JoinRequestResult {
+public enum JoinRequestResult: Sendable {
     /// The participant was accepted or rejected successfully
     case success
     /// The participant doesn't exist in the room

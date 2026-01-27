@@ -1,10 +1,10 @@
 extension Question {
 
-    package struct PluralityVote {
+    public struct PluralityVote {
         var selection: String
     }
 
-    package struct PreferentialVote {
+    public struct PreferentialVote {
         var selectionOrder: [String]
     }
 

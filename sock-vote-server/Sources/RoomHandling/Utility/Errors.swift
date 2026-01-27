@@ -1,5 +1,5 @@
 /// Errors related to rooms
-package enum RoomError: Swift.Error {
+public enum RoomError: Swift.Error {
     /// When a valid code could not be generated for a room
     case failedToGenerateCode
     /// When a join request is missing required fields
@@ -17,7 +17,7 @@ package enum RoomError: Swift.Error {
 
 extension RoomError: Equatable {
 
-    package static func == (lhs: Self, rhs: Self) -> Bool {
+    public static func == (lhs: Self, rhs: Self) -> Bool {
         switch (lhs, rhs) {
             case (.failedToGenerateCode, .failedToGenerateCode):
                 return true

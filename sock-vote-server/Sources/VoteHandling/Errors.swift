@@ -1,6 +1,6 @@
 extension Question {
 
-    package enum Error: Swift.Error {
+    public enum Error: Swift.Error, Sendable {
         /// The vote style received was incorrect
         case voteStyleMismatch(expected: VotingStyle, received: VotingStyle)
 

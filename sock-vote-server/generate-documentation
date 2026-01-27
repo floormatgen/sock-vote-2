@@ -16,7 +16,6 @@ for target in ${TARGETS[@]}; do
         --allow-writing-to-directory '../docs' \
         generate-documentation \
         --transform-for-static-hosting \
-        --symbol-graph-minimum-access-level internal \
         --hosting-base-path "${HOSTING_BASE_PATH}/${target}" \
         --output-path "${output_path}" \
         --target "${target}"

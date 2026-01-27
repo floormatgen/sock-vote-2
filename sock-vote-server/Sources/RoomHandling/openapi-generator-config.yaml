@@ -2,7 +2,7 @@ generate:
   - types
   - server
 namingStrategy: idiomatic
-accessModifier: package
+accessModifier: public
 
 filter:
   tags:

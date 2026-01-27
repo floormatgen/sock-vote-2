@@ -1,6 +1,6 @@
 import Foundation
 
-package protocol RoomManagerProtocol: AnyObject, Sendable {
+public protocol RoomManagerProtocol: AnyObject, Sendable {
     associatedtype Room: RoomProtocol = DefaultRoom
 
     /// Returns the room with the specified code
@@ -21,7 +21,7 @@ package protocol RoomManagerProtocol: AnyObject, Sendable {
 
 }
 
-package final actor DefaultRoomManager<
+public final actor DefaultRoomManager<
     RoomCodeGenerator: RoomCodeGeneratorProtocol
 >: RoomManagerProtocol {
     private var rooms: [String : Room]
@@ -29,7 +29,7 @@ package final actor DefaultRoomManager<
     private var roomCodeGenerator: RoomCodeGenerator
     private var codeGenMaxTries: Int
 
-    init(
+    public init(
         roomCodeGenerator: RoomCodeGenerator = DefaultRoomCodeGenerator(),
         codeGenMaxTries: Int = 100
     ) {
@@ -40,7 +40,7 @@ package final actor DefaultRoomManager<
 
 }
 
-package extension DefaultRoomManager {
+public extension DefaultRoomManager {
 
     func room(
         withCode code: String

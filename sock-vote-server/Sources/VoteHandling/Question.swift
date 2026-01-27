@@ -4,10 +4,10 @@ import Foundation
 extension Question: @unchecked Sendable { }
 
 /// An active question
-package final class Question {
+public final class Question {
 
     /// The style of voting for the question
-    package enum VotingStyle {
+    public enum VotingStyle: Sendable {
         case plurality
         case preferential
     }
@@ -16,19 +16,19 @@ package final class Question {
     /// 
     /// This can be used to send information about a question through
     /// isolation domains, as ``Question`` is explicitly non-`Sendable`.
-    package struct Description: Sendable {
+    public struct Description: Sendable {
         let id: UUID
         let prompt: String
         let options: [String]
         let style: VotingStyle
     }
 
-    package let id: UUID
-    package let prompt: String
-    package let options: [String]
+    public let id: UUID
+    public let prompt: String
+    public let options: [String]
     private var votes: _VotesContainer
 
-    package init(
+    public init(
         id: UUID = .init(),
         prompt: String,
         options: [String],
@@ -40,19 +40,19 @@ package final class Question {
         self.votes = .init(votingStyle)
     }
 
-    package var questionDescription: Description {
+    public var questionDescription: Description {
         .init(id: id, prompt: prompt, options: options, style: votingStyle)
     }
 
-    package var votingStyle: VotingStyle {
+    public var votingStyle: VotingStyle {
         votes.votingStyle
     }
 
-    package var voteCount: Int {
+    public var voteCount: Int {
         votes.voteCount
     }
 
-    package func hasVoted(participantToken: String) -> Bool {
+    public func hasVoted(participantToken: String) -> Bool {
         votes.hasVoted(participantToken: participantToken)
     }
 
@@ -126,7 +126,7 @@ package final class Question {
         
     }
 
-    package enum VoteResult {
+    public enum VoteResult {
         case initialVote
         case replacingVote
 
@@ -139,7 +139,7 @@ package final class Question {
 
 extension Question.VotingStyle: LosslessStringConvertible {
 
-    package init?(_ description: some StringProtocol) {
+    public init?(_ description: some StringProtocol) {
         switch description {
             case "plurality": self = .plurality
             case "preferential": self = .preferential
@@ -147,7 +147,7 @@ extension Question.VotingStyle: LosslessStringConvertible {
         }
     }
 
-    package var description: String {
+    public var description: String {
         switch self {
             case .plurality: "plurality"
             case .preferential: "preferential"
