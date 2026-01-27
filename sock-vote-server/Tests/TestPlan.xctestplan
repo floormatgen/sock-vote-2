@@ -1,0 +1,38 @@
+{
+  "configurations" : [
+    {
+      "id" : "94E17384-3960-4561-890E-DC962802481A",
+      "name" : "Configuration 1",
+      "options" : {
+
+      }
+    }
+  ],
+  "defaultOptions" : {
+    "testTimeoutsEnabled" : true
+  },
+  "testTargets" : [
+    {
+      "target" : {
+        "containerPath" : "container:",
+        "identifier" : "RoomHandlingTests",
+        "name" : "RoomHandlingTests"
+      }
+    },
+    {
+      "target" : {
+        "containerPath" : "container:",
+        "identifier" : "ServerTests",
+        "name" : "ServerTests"
+      }
+    },
+    {
+      "target" : {
+        "containerPath" : "container:",
+        "identifier" : "VoteHandlingTests",
+        "name" : "VoteHandlingTests"
+      }
+    }
+  ],
+  "version" : 1
+}

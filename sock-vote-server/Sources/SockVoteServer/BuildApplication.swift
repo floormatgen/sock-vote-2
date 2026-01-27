@@ -2,12 +2,12 @@ import Hummingbird
 import OpenAPIHummingbird
 import RoomHandling
 
-typealias ApplicationType = Application<RouterResponder<BasicRequestContext>>
+typealias DefaultApplication = Application<RouterResponder<BasicRequestContext>>
 
 /// Build the default application using the provided options
 func buildApplication(
     options: some OptionsProvider
-) async throws -> ApplicationType {
+) async throws -> DefaultApplication {
     let router = Router()
 
     let roomHTTPAPI = RoomHandler()

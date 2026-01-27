@@ -28,15 +28,23 @@ public final class Question {
     public let options: [String]
     private var votes: _VotesContainer
 
+    /// Creates a new question
+    /// 
+    /// - Throws:
+    ///     ``Question/Error/noOptions`` when `options` is empty
     public init(
         id: UUID = .init(),
         prompt: String,
         options: [String],
         votingStyle: VotingStyle
-    ) {
+    ) throws {
+        guard options.count > 0 else {
+            throw Error.noOptions
+        }
+        self.options = options
+
         self.id = id
         self.prompt = prompt
-        self.options = options
         self.votes = .init(votingStyle)
     }
 
@@ -106,8 +114,8 @@ public final class Question {
                     d[participantToken] = vote
                     self = .plurality(d)
                     return .init(replacing: replacing)
-                default:
-                    throw Error.voteStyleMismatch(expected: .plurality, received: self.votingStyle)
+                case .preferential(_):
+                    throw Error.voteStyleMismatch(expected: .preferential, received: .plurality)
             }
         }
 
@@ -120,7 +128,7 @@ public final class Question {
                     self = .preferential(d)
                     return .init(replacing: replacing)
                 case .plurality(_):
-                    throw Error.voteStyleMismatch(expected: .preferential, received: self.votingStyle)
+                    throw Error.voteStyleMismatch(expected: .plurality, received: .preferential)
             }
         }
         
@@ -155,3 +163,5 @@ extension Question.VotingStyle: LosslessStringConvertible {
     }
 
 }
+
+extension Question.VotingStyle: CaseIterable { }

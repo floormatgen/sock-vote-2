@@ -32,7 +32,7 @@ public protocol RoomProtocol: AnyObject {
     var currentQuestionDescription: Question.Description? { get async }
 
     /// Updates the question
-    func updateQuestion(prompt: String, options: [String], style: Question.VotingStyle) async
+    func updateQuestion(prompt: String, options: [String], style: Question.VotingStyle) async throws
 }
 
 public extension RoomProtocol {
@@ -150,8 +150,8 @@ public extension DefaultRoom {
         currentQuestion?.questionDescription
     }
 
-    func updateQuestion(prompt: String, options: [String], style: Question.VotingStyle) {
-        let newQuestion = Question(prompt: prompt, options: options, votingStyle: style)
+    func updateQuestion(prompt: String, options: [String], style: Question.VotingStyle) throws {
+        let newQuestion = try Question(prompt: prompt, options: options, votingStyle: style)
         currentQuestion = newQuestion
     }
 

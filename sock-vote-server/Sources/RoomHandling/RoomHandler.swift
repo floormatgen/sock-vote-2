@@ -84,14 +84,14 @@ public extension RoomHandler {
         }
         return .ok(.init(body: .json(.init(
             lastUpdated: Date.now.ISO8601Format(), 
-            requests: await room.joinRequests.map {
-                let outFields = $0.1.fields.isEmpty 
-                    ? nil 
-                    : Components.Schemas.Fields(additionalProperties: $0.1.fields)
+            requests: await room.joinRequests.map { token, request in
+                let outFields = request.fields.isEmpty
+                    ? nil
+                    : Components.Schemas.Fields(additionalProperties: request.fields)
                 return .init(
-                    name: $0.1.name,
-                    participantToken: $0.0,
-                    timestamp: $0.1.timestamp.ISO8601Format(),
+                    name: request.name,
+                    participantToken: token,
+                    timestamp: request.timestamp.ISO8601Format(),
                     fields: outFields
                 )
             }

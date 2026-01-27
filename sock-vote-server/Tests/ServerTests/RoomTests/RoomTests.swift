@@ -8,7 +8,7 @@ import HTTPTypes
 
 @Suite
 struct RoomTests {
-    let app: ApplicationType
+    let app: DefaultApplication
 
     static let decoder = JSONDecoder()
     // static let encoder = JSONEncoder()

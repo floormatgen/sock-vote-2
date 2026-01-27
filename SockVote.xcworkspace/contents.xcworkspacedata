@@ -7,4 +7,16 @@
    <FileRef
       location = "group:sock-vote-server">
    </FileRef>
+   <FileRef
+      location = "group:specification">
+   </FileRef>
+   <FileRef
+      location = "group:docs">
+   </FileRef>
+   <FileRef
+      location = "group:update-docs">
+   </FileRef>
+   <FileRef
+      location = "group:README.md">
+   </FileRef>
 </Workspace>
