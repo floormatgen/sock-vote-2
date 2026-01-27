@@ -49,6 +49,7 @@ let package = Package(
         .target(
             name: "RoomHandling",
             dependencies: [
+                .target(name: "VoteHandling"),
                 .product(name: "OpenAPIRuntime", package: "swift-openapi-runtime"),
                 .product(name: "Hummingbird", package: "hummingbird"),
                 .product(name: "HummingbirdWebSocket", package: "hummingbird-websocket"),
@@ -57,10 +58,13 @@ let package = Package(
                 .plugin(name: "OpenAPIGenerator", package: "swift-openapi-generator"),
             ]
         ),
+        .target(
+            name: "VoteHandling"
+        ),
 
         // MARK: Tests
         .testTarget(
-            name: "RoomHandlingImplTesting",
+            name: "RoomHandlingTests",
             dependencies: [
                 .target(name: "RoomHandling"),
                 .product(name: "OpenAPIRuntime", package: "swift-openapi-runtime"),
@@ -68,11 +72,17 @@ let package = Package(
             ]
         ),
         .testTarget(
-            name: "ServerTesting",
+            name: "ServerTests",
             dependencies: [
                 .target(name: "SockVoteServer"),
                 .product(name: "Hummingbird", package: "hummingbird"),
                 .product(name: "HummingbirdTesting", package: "hummingbird"),
+            ]
+        ),
+        .testTarget(
+            name: "VoteHandlingTests",
+            dependencies: [
+                .target(name: "VoteHandling")
             ]
         )
 

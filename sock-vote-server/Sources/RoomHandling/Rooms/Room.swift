@@ -1,4 +1,5 @@
 import Foundation
+import VoteHandling
 
 package protocol RoomProtocol: AnyObject {
     var name: String { get }
@@ -26,6 +27,12 @@ package protocol RoomProtocol: AnyObject {
     /// - Parameter participantToken: The participant token to handle
     /// 
     func handleJoinRequest(_ accept: Bool, forToken participantToken: String) async -> JoinRequestResult
+
+    /// A description of the current question
+    var currentQuestionDescription: Question.Description? { get async }
+
+    /// Updates the question
+    func updateQuestion(prompt: String, options: [String], style: Question.VotingStyle) async
 }
 
 package extension RoomProtocol {
@@ -83,6 +90,7 @@ package final actor DefaultRoom: RoomProtocol {
     package var inactiveParticipants: [String : Task<Void, any Error>]
 
     nonisolated private let participantTimeout: Duration
+    private var currentQuestion: Question?
 
     init(
         name: String, 
@@ -136,6 +144,15 @@ package extension DefaultRoom {
             joinRequest.handleRequest(with: .rejected)
         }
         return .success
+    }
+
+    var currentQuestionDescription: Question.Description? {
+        currentQuestion?.questionDescription
+    }
+
+    func updateQuestion(prompt: String, options: [String], style: Question.VotingStyle) {
+        let newQuestion = Question(prompt: prompt, options: options, votingStyle: style)
+        currentQuestion = newQuestion
     }
 
 }

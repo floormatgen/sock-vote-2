@@ -4,7 +4,7 @@ REPO_NAME="sock-vote-2"
 FOLDER_NAME="sock-vote-server"
 DOCS_DIRECTORY="../docs/${FOLDER_NAME}"
 HOSTING_BASE_PATH="/${REPO_NAME}/${FOLDER_NAME}"
-TARGETS=("SockVoteServer" "RoomHandling")
+TARGETS=("SockVoteServer" "RoomHandling" "VoteHandling")
 
 cd "$(dirname "$0")"
 echo "Clearing contents of ${DOCS_DIRECTORY} ..."

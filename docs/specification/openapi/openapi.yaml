@@ -41,6 +41,10 @@ paths:
                     type: string
             example:
               name: "PCSoc Annual General Meeting"
+              fields:
+                items:
+                  - "Student ID"
+                  - "Email"
       responses:
         "200":
           description:
@@ -110,8 +114,7 @@ paths:
                     items:
                       type: string
         "404":
-          description:
-            The room does not exist.
+          $ref: '#/components/responses/InvalidRoomCode'
   
   /room/join/{code}:
     post:
@@ -154,8 +157,7 @@ paths:
           description:
             The room does exist, but the client has been rejected.
         "404":
-          description:
-            The room does not exist.
+          $ref: '#/components/responses/InvalidRoomCode'
   
   /room/join-requests/{code}:
     get:
