@@ -26,7 +26,8 @@ public final class Question {
     public let id: UUID
     public let prompt: String
     public let options: [String]
-    private var votes: _VotesContainer
+    public let optionsSet: Set<String>
+    private var _votes: _VotesContainer
 
     /// Creates a new question
     /// 
@@ -35,17 +36,18 @@ public final class Question {
     public init(
         id: UUID = .init(),
         prompt: String,
-        options: [String],
+        options: some Collection<String>,
         votingStyle: VotingStyle
     ) throws {
         guard options.count > 0 else {
             throw Error.noOptions
         }
-        self.options = options
+        self.options = .init(options)
+        self.optionsSet = .init(options)
 
         self.id = id
         self.prompt = prompt
-        self.votes = .init(votingStyle)
+        self._votes = .init(votingStyle)
     }
 
     public var questionDescription: Description {
@@ -53,25 +55,31 @@ public final class Question {
     }
 
     public var votingStyle: VotingStyle {
-        votes.votingStyle
+        _votes.votingStyle
     }
 
     public var voteCount: Int {
-        votes.voteCount
+        _votes.voteCount
     }
 
     public func hasVoted(participantToken: String) -> Bool {
-        votes.hasVoted(participantToken: participantToken)
+        _votes.hasVoted(participantToken: participantToken)
     }
 
     @discardableResult
-    func registerPluralityVote(_ vote: PluralityVote, participantToken: String) throws -> VoteResult {
-        try votes.registerPluralityVote(vote, participantToken: participantToken)
+    public func registerPluralityVote(_ vote: PluralityVote, participantToken: String) throws -> VoteResult {
+        guard vote.validate(usingOptions: optionsSet) else { throw Error.invalidVote }
+        let result = try _votes.registerPluralityVote(vote, participantToken: participantToken)
+        _invalidateResultCache()
+        return result
     }
 
     @discardableResult
-    func registerPreferentialVote(_ vote: PreferentialVote, participantToken: String) throws -> VoteResult {
-        try votes.registerPreferentialVote(vote, participantToken: participantToken)
+    public func registerPreferentialVote(_ vote: PreferentialVote, participantToken: String) throws -> VoteResult {
+        guard vote.validate(usingOptions: optionsSet) else { throw Error.invalidVote }
+        let result = try _votes.registerPreferentialVote(vote, participantToken: participantToken)
+        _invalidateResultCache()
+        return result
     }
 
     internal enum _VotesContainer {
@@ -141,6 +149,56 @@ public final class Question {
         internal init(replacing: Bool) {
             self = replacing ? .replacingVote : .initialVote
         }
+    }
+
+    // MARK: - Handling Voting Results
+
+    public enum Result {
+        case noVotes
+        case tie(winners: [String])
+        case hasWinner(String)
+
+        internal init(from modeResult: [String : Int].ModeResult?) {
+            switch modeResult {
+                case .single(let winner):
+                    self = .hasWinner(winner)
+                case .multiple(let winners):
+                    self = .tie(winners: winners)
+                case .none:
+                    self = .noVotes
+            }
+        }
+
+    }
+
+    private var _resultCache: Result?
+
+    private func _invalidateResultCache() {
+        _resultCache = nil
+    }
+
+    private func _updateResultCache() {
+        _resultCache = _calculateVoteResult()
+    }
+
+    internal func _calculateVoteResult() -> Result {
+        switch _votes {
+            case .plurality(let votes):
+                var counts = [String : Int](minimumCapacity: votes.keys.count)
+                for vote in votes.values {
+                    counts[vote.selection, default: 0] += 1
+                }
+                return .init(from: counts.mode())
+            case .preferential(let votes):
+                // TODO: Handle Preferential votes
+                return .noVotes
+        }
+    }
+
+    public var result: Result {
+        if let result = _resultCache { return result }
+        _updateResultCache()
+        return _resultCache!
     }
 
 }

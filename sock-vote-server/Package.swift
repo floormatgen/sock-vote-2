@@ -50,6 +50,7 @@ let package = Package(
             name: "RoomHandling",
             dependencies: [
                 .target(name: "VoteHandling"),
+                .product(name: "Logging", package: "swift-log"),
                 .product(name: "OpenAPIRuntime", package: "swift-openapi-runtime"),
                 .product(name: "Hummingbird", package: "hummingbird"),
                 .product(name: "HummingbirdWebSocket", package: "hummingbird-websocket"),
@@ -59,7 +60,10 @@ let package = Package(
             ]
         ),
         .target(
-            name: "VoteHandling"
+            name: "VoteHandling",
+            dependencies: [
+                .product(name: "Logging", package: "swift-log"),
+            ]
         ),
 
         // MARK: Tests
@@ -84,7 +88,7 @@ let package = Package(
             dependencies: [
                 .target(name: "VoteHandling")
             ]
-        )
+        ),
 
     ],
     swiftLanguageModes: [

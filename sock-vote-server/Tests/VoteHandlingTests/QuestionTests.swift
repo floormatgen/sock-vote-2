@@ -10,12 +10,12 @@ struct QuestionTests {
     func test_questionCreatedCorrectly(_ style: Question.VotingStyle) throws {
         let prompt = "John Question"
         let options = ["Foo", "Bar", "Baz"]
-        _ = try createQuestion(prompt: prompt, options: options, style: style)
+        _ = try Self.createQuestion(prompt: prompt, options: options, style: style)
     }
     
     @Test("Vote counted successfully", arguments: Question.VotingStyle.allCases)
     func test_voteCounted(_ style: Question.VotingStyle) throws {
-        let question = try createQuestion(prompt: "foo", options: ["bar", "baz"], style: style)
+        let question = try Self.createQuestion(prompt: "foo", options: ["bar", "baz"], style: style)
         let token = UUID().uuidString
         switch style {
             case .plurality:
@@ -31,7 +31,7 @@ struct QuestionTests {
     
     @Test("Cannot vote more than once", arguments: Question.VotingStyle.allCases)
     func test_cannotVoteMoreThanOnce(_ style: Question.VotingStyle) throws {
-        let question = try createQuestion(prompt: "foo", options: ["bar", "baz"], style: style)
+        let question = try Self.createQuestion(prompt: "foo", options: ["bar", "baz"], style: style)
         let token = UUID().uuidString
         
         func vote(flip: Bool) throws {
@@ -57,7 +57,7 @@ struct QuestionTests {
     func test_descriptionMatchesQuestion(_ style: Question.VotingStyle) throws {
         let prompt = "Question Name"
         let options = ["Option 1", "Option 2", "Option 3"]
-        let question = try createQuestion(prompt: prompt, options: options, style: style)
+        let question = try Self.createQuestion(prompt: prompt, options: options, style: style)
         let questionDescription = question.questionDescription
         #expect(questionDescription.prompt == prompt)
         #expect(questionDescription.id == question.id)
@@ -69,38 +69,10 @@ struct QuestionTests {
         // NOTE: Currently emits a warning due to a bug
         #expect(try style == #require(.init(style.description)))
     }
-
-    @Test("Attempting to add invalid vote throws", arguments: Question.VotingStyle.allCases) 
-    func test_attemptingToAddInvalidVoteThrows(_ style: Question.VotingStyle) throws {
-        let question = try createQuestion(style: style)
-        let token = UUID().uuidString
-        var actualStyle: Question.VotingStyle?
-        let error = try #require(throws: Question.Error.self) {
-            switch style {
-                case .plurality:
-                    actualStyle = .preferential
-                    let vote = Question.PreferentialVote(selectionOrder: question.options)
-                    try question.registerPreferentialVote(vote, participantToken: token)
-                case .preferential:
-                    actualStyle = .plurality
-                    let vote = Question.PluralityVote(selection: question.options.first!)
-                    try question.registerPluralityVote(vote, participantToken: token)
-            }
-        }
-        #expect(error == .voteStyleMismatch(expected: style, received: try #require(actualStyle)))
-    }
-
-    @Test("Creating question with no options throws", arguments: Question.VotingStyle.allCases)
-    func test_creatingQuestionWithNoOptionsThrows(_ style: Question.VotingStyle) throws {
-        let error = try #require(throws: Question.Error.self) {
-            try createQuestion(options: [], style: style)
-        }
-        #expect(error == .noOptions)
-    }
     
     // MARK: - Helpers
     
-    func createQuestion(
+    static func createQuestion(
         prompt: String = "Question Prompt", 
         options: [String] = ["Option 1", "Option 2", "Option 3"], 
         style: Question.VotingStyle

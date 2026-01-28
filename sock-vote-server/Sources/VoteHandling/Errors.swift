@@ -5,6 +5,8 @@ extension Question {
         case noOptions
         /// The vote style received was incorrect
         case voteStyleMismatch(expected: VotingStyle, received: VotingStyle)
+        /// The vote is ill-formed
+        case invalidVote
 
         var localizedDescription: String {
             switch self {
@@ -12,6 +14,8 @@ extension Question {
                     "A room must have at least one selectable option."
                 case let .voteStyleMismatch(expected, received):
                     "Invalid vote: expected \(expected) vote but instead got \(received) vote."
+                case .invalidVote:
+                    "Vote is ill-formed."
             }
         }
     }
