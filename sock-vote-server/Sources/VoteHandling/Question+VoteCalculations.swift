@@ -66,6 +66,13 @@ extension Question {
         var countingFirstNVotes = 1
         options.forEach { counts[$0] = 0 }
 
+        // Validation
+        try votes.forEach {
+            guard $0.validate(usingOptions: options) else {
+                throw Error.invalidVote
+            }
+        }
+
         // Loop
         while true {
             // Reset counts to 0

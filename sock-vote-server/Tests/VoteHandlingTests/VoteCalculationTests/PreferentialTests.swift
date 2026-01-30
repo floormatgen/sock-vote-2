@@ -12,6 +12,38 @@ extension VoteCalculationTests {
             #expect(result == .noVotes)
         }
 
+        @Test("Throws on invalid vote", arguments: [
+            .init(
+                "Too few options", 
+                votes: [
+                    [0, 1],
+                    [1, 2, 0],
+                ]),
+            .init(
+                "Too many options",
+                votes: [
+                    [0, 1, 2],
+                    [1, 2, 0, 0],
+                ]),
+            .init(
+                "Duplicate options",
+                votes: [
+                    [0, 0, 2],
+                    [0, 2, 1],
+                ]),
+            .init(
+                "Invalid options",
+                votes: [
+                    [0, 2, 3],
+                    [-1, 0, 1],
+                ]),
+        ] as [TestArgument])
+        func test_throwsOnInvalidVote(_ argument: TestArgument) throws {
+            try #require(throws: Question.Error.invalidVote) {
+                _ = try Question.preferentialResult(using: argument.votes, options: argument.options)
+            }
+        }
+
         @Test("Can find concrete winner", arguments: [
             .init(
                 "No ties",
@@ -72,7 +104,7 @@ extension VoteCalculationTests {
             let votes: [Question.PreferentialVote]
             let expectedResult: [String]
 
-            init(_ label: String? = nil, optionsCount: Int = 3, votes: [[Int]], expectedResult: Int) {
+            init(_ label: String? = nil, optionsCount: Int = 3, votes: [[Int]], expectedResult: Int = 0) {
                 self.init(label, optionsCount: optionsCount, votes: votes, expectedResult: [expectedResult])
             }
 
@@ -82,7 +114,16 @@ extension VoteCalculationTests {
                 let optionsArray = Array((0..<optionsCount).map(String.init))
                 self.optionsArray = optionsArray
                 self.options = Set(optionsArray)
-                self.votes = votes.map { .init(selectionOrder: $0.map { optionsArray[$0] }) }
+                self.votes = votes.map {
+                    .init(
+                        selectionOrder: $0.map {
+                            if optionsArray.indices.contains($0) {
+                                return optionsArray[$0]
+                            } else {
+                                return "Out of range: \($0)"
+                            }
+                        })
+                }
                 self.expectedResult = expectedResult.map { optionsArray[$0] }
             }
 

@@ -58,6 +58,13 @@ extension VoteCalculationTests {
             #expect(winner == optionsArray[0])
         }
 
+        @Test("Throws on invalid vote")
+        func test_throwsOnInvalidVote() throws {
+            try #require(throws: Question.Error.invalidVote) {
+                _ = try Question.pluralityResult(using: [.init(selection: "wrong")], options: defaultOptions)
+            }
+        }
+
     }
 
 }
