@@ -153,52 +153,31 @@ public final class Question {
 
     // MARK: - Handling Voting Results
 
-    public enum Result {
-        case noVotes
-        case tie(winners: [String])
-        case hasWinner(String)
-
-        internal init(from modeResult: [String : Int].ModeResult?) {
-            switch modeResult {
-                case .single(let winner):
-                    self = .hasWinner(winner)
-                case .multiple(let winners):
-                    self = .tie(winners: winners)
-                case .none:
-                    self = .noVotes
-            }
-        }
-
-    }
-
     private var _resultCache: Result?
 
     private func _invalidateResultCache() {
         _resultCache = nil
     }
 
-    private func _updateResultCache() {
-        _resultCache = _calculateVoteResult()
+    private func _updateResultCache() throws {
+        _resultCache = try _calculateVoteResult()
     }
 
-    internal func _calculateVoteResult() -> Result {
+    internal func _calculateVoteResult() throws -> Result {
         switch _votes {
             case .plurality(let votes):
-                var counts = [String : Int](minimumCapacity: votes.keys.count)
-                for vote in votes.values {
-                    counts[vote.selection, default: 0] += 1
-                }
-                return .init(from: counts.mode())
+                return try Question.pluralityResult(using: votes.values, options: optionsSet)
             case .preferential(let votes):
-                // TODO: Handle Preferential votes
-                return .noVotes
+                return try Question.preferentialResult(using: votes.values, options: optionsSet)
         }
     }
 
     public var result: Result {
-        if let result = _resultCache { return result }
-        _updateResultCache()
-        return _resultCache!
+        get throws {
+            if let result = _resultCache { return result }
+            try _updateResultCache()
+            return _resultCache!
+        }
     }
 
 }

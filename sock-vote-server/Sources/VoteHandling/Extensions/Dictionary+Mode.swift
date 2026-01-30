@@ -1,6 +1,8 @@
 internal extension Dictionary where Value: Comparable {
 
-    func mode() -> ModeResult? {
+    func mode<E: Error>(
+        using comp: (Value, Value) throws(E) -> Bool
+    ) throws(E) -> ModeResult? {
         guard let (firstKey, firstValue) = self.first else { return nil }
         var largestCountKey = ModeResult.single(firstKey)
         var largestCountValue = firstValue
@@ -20,7 +22,7 @@ internal extension Dictionary where Value: Comparable {
         }
         
         for (key, value) in self.dropFirst() {
-            if value > largestCountValue {
+            if try comp(value, largestCountValue) {
                 largestCountValue = value
                 replaceKey(key)
             } else if value == largestCountValue {
@@ -31,7 +33,17 @@ internal extension Dictionary where Value: Comparable {
         return largestCountKey
     }
 
-    enum ModeResult {
+    func mode(
+        largest: Bool = true
+    ) -> ModeResult? {
+        if largest {
+            mode(using: >)
+        } else {
+            mode(using: <)
+        }
+    }
+
+    enum ModeResult where Value: Comparable {
         case single(Key)
         case multiple([Key])
     }

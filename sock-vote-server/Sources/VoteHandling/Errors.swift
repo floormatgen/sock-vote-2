@@ -6,6 +6,9 @@ extension Question {
         /// The vote style received was incorrect
         case voteStyleMismatch(expected: VotingStyle, received: VotingStyle)
         /// The vote is ill-formed
+        /// 
+        /// This can be thrown when a vote is added to a quesiton, 
+        /// or (should not happen) when calculating the result and an invalid vote is detected
         case invalidVote
 
         var localizedDescription: String {
