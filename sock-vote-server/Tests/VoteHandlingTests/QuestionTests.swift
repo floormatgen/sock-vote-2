@@ -65,12 +65,66 @@ struct QuestionTests {
     }
 
     @Test("Question.VotingStyle LosslessStringConvertible round trip", arguments: Question.VotingStyle.allCases)
-    func test_QuestionVotingStyleLosslessStringConvertibleRoundTrip(_ style: Question.VotingStyle) throws {
+    func test_questionVotingStyleLosslessStringConvertibleRoundTrip(_ style: Question.VotingStyle) throws {
         // NOTE: Currently emits a warning due to a bug
         #expect(try style == #require(.init(style.description)))
     }
+
+    @Test("[plurality] Question.result is correct when queried")
+    func test_resultIsCorrect_plurality() throws {
+        let question = try Self.createQuestion(style: .plurality)
+
+        let votes = [
+            repeatElement("Option 1", count: 5),
+            repeatElement("Option 2", count: 10),
+            repeatElement("Option 3", count: 2),
+        ]
+        .flatMap(\.self)
+        .map { Question.PluralityVote(selection: $0) }
+
+        try votes.forEach { vote in 
+            let token = UUID().uuidString
+            try question.registerPluralityVote(vote, participantToken: token)
+        }
+
+        let result = try question.result
+        #expect(result == .hasWinner("Option 2"))
+    }
+
+    @Test("[preferential] Question.result is correct when queried", arguments: [
+        .init(
+            "Basic winner",
+            votes: [
+                [0, 1, 2],
+                [0, 1, 2],
+                [2, 1, 0],
+            ], expectedResult: 0),
+        .init(
+            "Basic tie",
+            votes: [
+                [0, 1, 2],
+                [1, 2, 0],
+                [2, 0, 1],
+            ], expectedResult: [0, 1, 2]),
+        .init(
+            "No votes",
+            votes: [],
+            expectedResult: [])
+    ] as [PreferentialArgument])
+    func test_resultIsCorrect_preferential(_ testArgument: PreferentialArgument) throws {
+        let question = try Self.createQuestion(options: testArgument.optionsArray, style: .preferential)
+        
+        try testArgument.votes.forEach { vote in
+            let token = UUID().uuidString
+            try question.registerPreferentialVote(vote, participantToken: token)
+        }
+
+        try testArgument.checkResult(try question.result)
+    }
     
     // MARK: - Helpers
+
+    typealias PreferentialArgument = VoteCalculationTests.PreferentialTests.TestArgument
     
     static func createQuestion(
         prompt: String = "Question Prompt", 
