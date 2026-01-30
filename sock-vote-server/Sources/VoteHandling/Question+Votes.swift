@@ -1,6 +1,6 @@
 extension Question {
 
-    public struct PluralityVote {
+    public struct PluralityVote: Sendable {
         public var selection: String
 
         public func validate(usingOptions options: borrowing Set<String>) -> Bool {
@@ -9,7 +9,7 @@ extension Question {
 
     }
 
-    public struct PreferentialVote {
+    public struct PreferentialVote: Sendable {
         public var selectionOrder: [String]
 
         public func validate(usingOptions options: borrowing Set<String>) -> Bool {

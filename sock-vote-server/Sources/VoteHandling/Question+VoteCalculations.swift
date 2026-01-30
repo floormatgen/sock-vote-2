@@ -68,6 +68,11 @@ extension Question {
 
         // Loop
         while true {
+            // Reset counts to 0
+            counts.keys.forEach { key in
+                counts[key] = 0
+            }
+            
             var minValue = Int.max
             var maxValue = Int.min
 
@@ -80,9 +85,12 @@ extension Question {
                 }
             }
 
+            // debugPrint(countingFirstNVotes)
+            // debugPrint(counts)
+
             for (k, v) in counts {
                 // If a candidate has more than 50% of the vote, end early.
-                guard v < winThreshold else { return .hasWinner(k) }
+                guard v < winThreshold || countingFirstNVotes > 1 else { return .hasWinner(k) }
                 minValue = min(minValue, v)
                 maxValue = max(maxValue, v)
             }

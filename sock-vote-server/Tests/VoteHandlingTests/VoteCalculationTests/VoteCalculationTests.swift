@@ -8,4 +8,8 @@ struct VoteCalculationTests {
         "foo", "bar", "baz"
     ]}
 
+    static var defaultOptionsArray: [String] {
+        .init(defaultOptions)
+    }
+
 }
