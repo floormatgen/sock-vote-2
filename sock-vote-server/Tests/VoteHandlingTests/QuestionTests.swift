@@ -61,7 +61,7 @@ struct QuestionTests {
         let questionDescription = question.questionDescription
         #expect(questionDescription.prompt == prompt)
         #expect(questionDescription.id == question.id)
-        #expect(questionDescription.style == style)
+        #expect(questionDescription.votingStyle == style)
     }
 
     @Test("Question.VotingStyle LosslessStringConvertible round trip", arguments: Question.VotingStyle.allCases)

@@ -1,6 +1,8 @@
 import Foundation
 import OpenAPIRuntime
 
+import VoteHandling
+
 public typealias DefaultRoomHandler = RoomHandler<DefaultRoomManager<DefaultRoomCodeGenerator>>
 
 public struct RoomHandler<RoomManager: RoomManagerProtocol>: APIProtocol {
@@ -154,13 +156,43 @@ public extension RoomHandler {
     func getRoomQuestionCode(
         _ input: Operations.GetRoomQuestionCode.Input
     ) async throws -> Operations.GetRoomQuestionCode.Output {
-        fatalError()
+        // TODO: Could provide more information to a client, such as a number of votes in the future
+        // if an admin token is provided.
+        let code = input.path.code
+        guard let room = await roomManager.room(withCode: code) else {
+            return .notFound
+        }
+        guard let questionDescription = await room.currentQuestionDescription else {
+            return .badRequest
+        }
+        return .ok(.init(body: .json(questionDescription.openAPIQuestion)))
     }
 
     func postRoomQuestionCode(
         _ input: Operations.PostRoomQuestionCode.Input
     ) async throws -> Operations.PostRoomQuestionCode.Output {
-        fatalError()
+        let code = input.path.code
+        let adminToken = input.headers.roomAdminToken
+        guard let room = await roomManager.room(withCode: code) else {
+            return .notFound
+        }
+        guard room.verifyAdminToken(adminToken) else {
+            return .forbidden
+        }
+        switch input.body {
+            case .json(let question):
+                try await room.updateQuestion(
+                    prompt: question.prompt, 
+                    options: question.options, 
+                    style: .init(question.votingStyle)
+                )
+                // We want to round trip the question to make sure it was created correctly
+                guard let questionDescription = await room.currentQuestionDescription else {
+                    let reason = "Could not add the question to the room."
+                    return .internalServerError(.init(body: .json(.init(reason: reason))))
+                }
+                return .ok(.init(body: .json(questionDescription.openAPIQuestion)))
+        }
     }
 
     func deleteRoomQuestionCode(

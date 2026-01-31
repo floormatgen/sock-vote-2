@@ -91,4 +91,27 @@ struct RoomHandlerTests {
         }
     }
 
+    // MARK: - Utility
+
+    static func createRoomWithResponse(
+        on roomHandler: RoomHandler<some RoomManagerProtocol>,
+        name: String = "Room",
+        fields: [String]? = nil 
+    ) async throws -> Operations.PostRoomCreate.Output {
+        try await roomHandler.postRoomCreate(.init(body: .json(.init(
+            name: name, fields: fields
+        ))))
+    }
+
+    static func createRoom(
+        on roomHandler: RoomHandler<some RoomManagerProtocol>,
+        name: String = "Room",
+        fields: [String]? = nil 
+    ) async throws -> (code: String, adminToken: String) {
+        let response = try await createRoomWithResponse(on: roomHandler, name: name, fields: fields)
+        let code = try response.ok.body.json.code
+        let adminToken = try response.ok.body.json.adminToken
+        return (code, adminToken)
+    }
+
 }

@@ -17,10 +17,10 @@ public final class Question {
     /// This can be used to send information about a question through
     /// isolation domains, as ``Question`` is explicitly non-`Sendable`.
     public struct Description: Sendable {
-        let id: UUID
-        let prompt: String
-        let options: [String]
-        let style: VotingStyle
+        public let id: UUID
+        public let prompt: String
+        public let options: [String]
+        public let votingStyle: VotingStyle
     }
 
     public let id: UUID
@@ -51,7 +51,7 @@ public final class Question {
     }
 
     public var questionDescription: Description {
-        .init(id: id, prompt: prompt, options: options, style: votingStyle)
+        .init(id: id, prompt: prompt, options: options, votingStyle: votingStyle)
     }
 
     public var votingStyle: VotingStyle {
