@@ -20,7 +20,7 @@ extension RoomHandlerTests {
             let prompt = "Question Prompt"
             let options = (0..<3).map { String($0) }
 
-            let questionResponse = try await Self.createQuestion(
+            let questionResponse = try await Self.createQuestionWithResponse(
                 on: roomHandler, 
                 roomCode: code, 
                 adminToken: adminToken,
@@ -37,7 +37,7 @@ extension RoomHandlerTests {
         func test_cannotUpdateQuestionWithInvalidAdminToken() async throws {
             let (code, _) = try await createRoom(on: roomHandler)
             let badAdminToken = UUID().uuidString
-            let response = try await Self.createQuestion(
+            let response = try await Self.createQuestionWithResponse(
                 on: roomHandler, 
                 roomCode: code, 
                 adminToken: badAdminToken
@@ -47,15 +47,51 @@ extension RoomHandlerTests {
 
         @Test("Cannot create question for nonexistent room")
         func test_cannotCreateQuestionForNonexistentRoom() async throws {
-            let response = try await Self.createQuestion(
+            let response = try await Self.createQuestionWithResponse(
                 on: roomHandler, 
-                roomCode: "417167", 
+                roomCode: "417167", // No room exists
                 adminToken: UUID().uuidString
             )
             _ = try response.notFound
         }
 
-        static func createQuestion(
+        @Test("Admin can delete question")
+        func test_adminCanDeleteQuestion() async throws {
+            let (code, adminToken) = try await createRoom(on: roomHandler)
+            try await Self.createQuestion(on: roomHandler, roomCode: code, adminToken: adminToken)
+            try await Self.deleteQuestion(on: roomHandler, roomCode: code, adminToken: adminToken)
+            #expect(try await !Self.checkQuestionExists(on: roomHandler, roomCode: code))
+        }
+
+        @Test("Admin cannot delete question from missing room")
+        func test_adminCannotDeleteQuestionFromMissingRoom() async throws {
+            let (code, adminToken) = try await createRoom(on: roomHandler)
+            try await Self.createQuestion(on: roomHandler, roomCode: code, adminToken: adminToken)
+            let response = try await Self.deleteQuestionWithResponse(on: roomHandler, roomCode: "bad", adminToken: adminToken)
+            #expect(throws: Never.self) { _ = try response.notFound }
+            #expect(try await Self.checkQuestionExists(on: roomHandler, roomCode: code))
+        }
+
+        @Test("Cannot delete question with invalid admin token")
+        func test_cannotDeleteQuestionWithInvalidAdminToken() async throws {
+            let (code, adminToken) = try await createRoom(on: roomHandler)
+            try await Self.createQuestion(on: roomHandler, roomCode: code, adminToken: adminToken)
+            let response = try await Self.deleteQuestionWithResponse(on: roomHandler, roomCode: code, adminToken: adminToken + "67")
+            #expect(throws: Never.self) { _ = try response.forbidden }
+            #expect(try await Self.checkQuestionExists(on: roomHandler, roomCode: code))
+        }
+
+        @Test("Cannot delete nonexistent question")
+        func test_cannotDeleteNonexistentQuestion() async throws {
+            let (code, adminToken) = try await createRoom(on: roomHandler)
+            let response = try await Self.deleteQuestionWithResponse(on: roomHandler, roomCode: code, adminToken: adminToken)
+            #expect(throws: Never.self) { _ = try response.badRequest }
+            #expect(try await !Self.checkQuestionExists(on: roomHandler, roomCode: code))
+        }
+
+        // MARK: - Utilities
+
+        static func createQuestionWithResponse(
             on roomHandler: RoomHandler<some RoomManagerProtocol>,
             roomCode: String,
             adminToken: String,
@@ -74,23 +110,73 @@ extension RoomHandlerTests {
             ))
         }
 
-        // static func createQuestion(
-        //     on roomHandler: RoomHandler<some RoomManagerProtocol>,
-        //     roomCode: String,
-        //     adminToken: String,
-        //     prompt: String = "Question",
-        //     options: [String] = ["Option 1", "Option 2", "Option 3"],
-        //     votingStyle: Question.VotingStyle = .plurality
-        // ) async throws {
-        //     _ = try await createQuestionWithResponse(
-        //         on: roomHandler, 
-        //         roomCode: roomCode, 
-        //         adminToken: adminToken, 
-        //         prompt: prompt, 
-        //         options: options, 
-        //         votingStyle: votingStyle
-        //     )
-        // }
+        static func createQuestion(
+            on roomHandler: RoomHandler<some RoomManagerProtocol>,
+            roomCode: String,
+            adminToken: String,
+            prompt: String = "Question",
+            options: [String] = ["Option 1", "Option 2", "Option 3"],
+            votingStyle: Question.VotingStyle = .plurality
+        ) async throws {
+            let response = try await createQuestionWithResponse(
+                on: roomHandler, 
+                roomCode: roomCode, 
+                adminToken: adminToken, 
+                prompt: prompt, 
+                options: options, 
+                votingStyle: votingStyle
+            )
+            let body = try response.ok.body.json
+            #expect(body.prompt == prompt)
+            #expect(body.options == options)
+            #expect(body.votingStyle == votingStyle.openAPIVotingStyle)
+            #expect(try await Self.checkQuestionExists(on: roomHandler, roomCode: roomCode))
+        }
+
+        static func checkQuestionExists(
+            on roomHandler: RoomHandler<some RoomManagerProtocol>,
+            roomCode: String
+        ) async throws -> Bool {
+            let response = try await roomHandler.getRoomQuestionCode(
+                .init(
+                    path: .init(code: roomCode)
+                )
+            )
+            return switch response {
+                case .ok: true
+                default: false
+            }
+        }
+
+        static func deleteQuestionWithResponse(
+            on roomHandler: RoomHandler<some RoomManagerProtocol>,
+            roomCode: String,
+            adminToken: String
+        ) async throws -> Operations.DeleteRoomQuestionCode.Output {
+            try await roomHandler.deleteRoomQuestionCode(
+                .init(
+                    path: .init(code: roomCode), 
+                    headers: .init(roomAdminToken: adminToken)
+                )
+            )
+        }
+
+        @discardableResult
+        static func deleteQuestion(
+            on roomHandler: RoomHandler<some RoomManagerProtocol>,
+            roomCode: String,
+            adminToken: String
+        ) async throws -> Bool {
+            let response = try await Self.deleteQuestionWithResponse(
+                on: roomHandler, 
+                roomCode: roomCode, 
+                adminToken: adminToken
+            )
+            return switch response {
+                case .ok: true
+                default: false
+            }
+        }
 
     }
 

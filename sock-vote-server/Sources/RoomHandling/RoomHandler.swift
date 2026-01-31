@@ -198,7 +198,19 @@ public extension RoomHandler {
     func deleteRoomQuestionCode(
         _ input: Operations.DeleteRoomQuestionCode.Input
     ) async throws -> Operations.DeleteRoomQuestionCode.Output {
-        fatalError()
+        let code = input.path.code
+        let adminToken = input.headers.roomAdminToken
+        guard let room = await roomManager.room(withCode: code) else {
+            return .notFound
+        }
+        guard room.verifyAdminToken(adminToken) else {
+            return .forbidden
+        }
+        guard let questionDescription = await room.currentQuestionDescription else {
+            return .badRequest
+        }
+        try await room.removeQuestion()
+        return .ok(.init(body: .json(questionDescription.openAPIQuestion)))
     }
 
 }

@@ -28,11 +28,24 @@ public protocol RoomProtocol: AnyObject {
     /// 
     func handleJoinRequest(_ accept: Bool, forToken participantToken: String) async -> JoinRequestResult
 
+    /// Whether the room has a current question
+    /// 
+    /// To remove a question, call ``removeQuestion()``
+    var hasCurrentQuestion: Bool { get async }
+
     /// A description of the current question
+    /// 
+    /// Returns `nil` when ``hasCurrentQuestion`` is `false`
     var currentQuestionDescription: Question.Description? { get async }
 
     /// Updates the question
     func updateQuestion(prompt: String, options: some Collection<String> & Sendable, style: Question.VotingStyle) async throws
+
+    /// Removes the current question
+    /// 
+    /// - Returns: `true` if a question was deleted, or `false` is there wasn't a question.
+    @discardableResult
+    func removeQuestion() async throws -> Bool
 }
 
 public extension RoomProtocol {
@@ -187,6 +200,10 @@ public extension DefaultRoom {
         return .success
     }
 
+    var hasCurrentQuestion: Bool {
+        currentQuestion != nil
+    }
+
     var currentQuestionDescription: Question.Description? {
         currentQuestion?.questionDescription
     }
@@ -194,6 +211,12 @@ public extension DefaultRoom {
     func updateQuestion(prompt: String, options: some Collection<String> & Sendable, style: Question.VotingStyle) async throws {
         let newQuestion = try Question(prompt: prompt, options: options, votingStyle: style)
         currentQuestion = newQuestion
+    }
+
+    func removeQuestion() async throws -> Bool {
+        if currentQuestion == nil { return false }
+        currentQuestion = nil
+        return true
     }
 
 }

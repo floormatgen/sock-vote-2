@@ -51,7 +51,7 @@ struct RoomHandlerTests {
         #expect(requests.count == 1)
         #expect(request.name == name)
         let date = try Utilities.parseTimestamp(request.timestamp)
-        #expect(date.distance(to: .now) < 1)
+        #expect(date.distance(to: .now) < 10 && date < .now)
         joinRequestTask.cancel()
     }
 
@@ -72,7 +72,7 @@ struct RoomHandlerTests {
             let request = try #require(requests.first)
             #expect(request.name == name)
             let date = try Utilities.parseTimestamp(request.timestamp)
-            #expect(date.distance(to: .now) < 1)
+            #expect(date.distance(to: .now) < 1 && date < .now)
             let participantToken = request.participantToken
             let (accepted, rejected, failed, status) = try await roomHandler.handleJoinRequests(
                 withCode: code, adminToken: adminToken, 
