@@ -282,6 +282,7 @@ paths:
         - $ref: '#/components/parameters/RoomCode'
         - $ref: '#/components/parameters/AdminToken'
       requestBody:
+        required: true
         content:
           application/json:
             schema:
@@ -294,10 +295,24 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Question'
+        "400":
+          description:
+            The question to create was invalid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BasicError'
         "403":
           $ref: '#/components/responses/InvalidAdminToken'
         "404":
           $ref: '#/components/responses/InvalidRoomCode'
+        "500":
+          description:
+            The question could not be updated correctly.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BasicError'
           
     delete:
       summary: Removes the current question

@@ -4,7 +4,7 @@ import Foundation
 extension Question: @unchecked Sendable { }
 
 /// An active question
-public final class Question {
+public final class Question: Identifiable {
 
     /// The style of voting for the question
     public enum VotingStyle: Sendable {

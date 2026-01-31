@@ -170,7 +170,7 @@ public extension DefaultRoom {
     }
 
     nonisolated func verifyAdminToken(_ adminToken: String) -> Bool {
-        return adminToken == adminToken
+        return self.adminToken == adminToken
     }
 
     func handleJoinRequest(_ accept: Bool, forToken participantToken: String) -> JoinRequestResult {

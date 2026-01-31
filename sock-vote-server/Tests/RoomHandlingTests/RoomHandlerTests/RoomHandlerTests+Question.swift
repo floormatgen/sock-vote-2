@@ -2,6 +2,7 @@ import Testing
 @testable import RoomHandling
 
 import VoteHandling
+import Foundation
 
 extension RoomHandlerTests {
 
@@ -30,6 +31,28 @@ extension RoomHandlerTests {
             let body = try questionResponse.ok.body.json
             #expect(body.prompt == prompt)
             #expect(body.options == options)
+        }
+
+        @Test("Cannot create question with invalid admin token")
+        func test_cannotUpdateQuestionWithInvalidAdminToken() async throws {
+            let (code, _) = try await createRoom(on: roomHandler)
+            let badAdminToken = UUID().uuidString
+            let response = try await Self.createQuestion(
+                on: roomHandler, 
+                roomCode: code, 
+                adminToken: badAdminToken
+            )
+            _ = try response.forbidden
+        }
+
+        @Test("Cannot create question for nonexistent room")
+        func test_cannotCreateQuestionForNonexistentRoom() async throws {
+            let response = try await Self.createQuestion(
+                on: roomHandler, 
+                roomCode: "417167", 
+                adminToken: UUID().uuidString
+            )
+            _ = try response.notFound
         }
 
         static func createQuestion(
