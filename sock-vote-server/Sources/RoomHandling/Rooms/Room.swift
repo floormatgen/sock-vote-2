@@ -54,8 +54,22 @@ public extension RoomProtocol {
         missingFields: inout [String], 
         extraFields: inout [String]
     ) -> Bool {
+        return validateFieldKeys(
+            fields.keys, 
+            missingFields: &missingFields, 
+            extraFields: &extraFields
+        )
+    }
+
+    func validateFieldKeys(
+        _ fieldKeys: some Collection<String>,
+        missingFields: inout [String],
+        extraFields: inout [String]
+    ) -> Bool {
+        missingFields = []
+        extraFields = []
         var fieldsSet = Set(self.fields)
-        for key in fields.keys {
+        for key in fieldKeys {
             if fieldsSet.contains(key) {
                 fieldsSet.remove(key)
             } else {
@@ -63,16 +77,25 @@ public extension RoomProtocol {
             }
         }
         if fieldsSet.isEmpty, extraFields.isEmpty { return true }
-        extraFields = Array(extraFields)
+        missingFields = Array(fieldsSet)
         return false
     }
 
+    /// Checks if the provided fields arae valid
+    /// 
+    /// ``validateFields(_:missingFields:extraFields:)``
     func validateFields(
         _ fields: [String : String],
     ) -> Bool {
-        guard fields.count == self.fields.count else { return false } // fastpath
+        return validateFieldKeys(fields.keys)
+    }
+
+    func validateFieldKeys(
+        _ fieldKeys: some Collection<String>,
+    ) -> Bool {
+        guard fieldKeys.count == self.fields.count else { return false } // fastpath
         for field in self.fields {
-            guard fields.keys.contains(field) else { return false }
+            guard fieldKeys.contains(field) else { return false }
         }
         return true
     }
@@ -89,7 +112,7 @@ public final actor DefaultRoom: RoomProtocol {
     public var joinRequests: [String : JoinRequest]
     public var inactiveParticipants: [String : Task<Void, any Error>]
 
-    nonisolated private let participantTimeout: Duration
+    nonisolated private let timeoutFunction: @Sendable () async throws -> Void
     private var currentQuestion: Question?
 
     init(
@@ -99,13 +122,29 @@ public final actor DefaultRoom: RoomProtocol {
         adminToken: String,
         participantTimeout: Duration = .seconds(45)
     ) {
+        self.init(
+            name: name,
+            code: code,
+            fields: fields,
+            adminToken: adminToken,
+            timeoutFunction: { try await Task.sleep(for: participantTimeout) }
+        )
+    }
+
+    init(
+        name: String,
+        code: String,
+        fields: [String],
+        adminToken: String,
+        timeoutFunction: @escaping @Sendable () async throws -> Void
+    ) {
         self.name = name
         self.code = code
         self.fields = fields
         self.adminToken = adminToken
         self.joinRequests = [:]
         self.inactiveParticipants = [:]
-        self.participantTimeout = participantTimeout
+        self.timeoutFunction = timeoutFunction
     }
 
 }
@@ -170,7 +209,7 @@ private extension DefaultRoom {
         assert(!inactiveParticipants.keys.contains(participantToken))
 
         let timeout = Task {
-            try await Task.sleep(for: participantTimeout)
+            try await timeoutFunction()
             assert(inactiveParticipants.keys.contains(participantToken))
             inactiveParticipants.removeValue(forKey: participantToken)
         }

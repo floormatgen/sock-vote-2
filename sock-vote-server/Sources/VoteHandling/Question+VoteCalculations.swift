@@ -20,8 +20,8 @@ extension Question {
 
     /// Generates a result using the plurality method
     /// 
-    /// The option that has the most votes will win. If multiple options have the same amount of votes, they will ``Qestion/Result/tie``.
-    /// 
+    /// The option that has the most votes will win. If multiple options have the same amount of votes, they will ``Question/Result/tie``.
+    ///
     /// - Throws:
     ///     ``Question/Error/invalidVote`` when an invalid vote is detected.
     public static func pluralityResult(
@@ -112,6 +112,8 @@ extension Question {
             }
 
         }
+
+        preconditionFailure("\(#function): Unreachable")
 
     }
 

@@ -66,7 +66,7 @@ struct QuestionTests {
 
     @Test("Question.VotingStyle LosslessStringConvertible round trip", arguments: Question.VotingStyle.allCases)
     func test_questionVotingStyleLosslessStringConvertibleRoundTrip(_ style: Question.VotingStyle) throws {
-        // NOTE: Currently emits a warning due to a bug
+        // NOTE: Currently emits a warning due to a compiler bug
         #expect(try style == #require(.init(style.description)))
     }
 
