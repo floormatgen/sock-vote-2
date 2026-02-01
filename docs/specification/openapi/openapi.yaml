@@ -229,14 +229,8 @@ paths:
       responses:
         "200":
           description:
-            All accepts and rejects were handled correctly.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/JoinRequestsResult'
-        "207":
-          description:
-            Some accepts and rejects were handled correctly.
+            At least some of the requests were handled correctly.
+            Checking the result is necessary to identify any that have failed.
           content:
             application/json:
               schema:
