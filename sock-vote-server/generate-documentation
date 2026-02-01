@@ -18,7 +18,10 @@ for target in ${TARGETS[@]}; do
         --transform-for-static-hosting \
         --hosting-base-path "${HOSTING_BASE_PATH}/${target}" \
         --output-path "${output_path}" \
-        --target "${target}"
+        --target "${target}" \
+        --source-service github \
+        --source-service-base-url "https://github.com/floormatgen/sock-vote-2/blob/main/sock-vote-server" \
+        --checkout-path "../"
 done
 
 # Rename generated archives to remove extension
