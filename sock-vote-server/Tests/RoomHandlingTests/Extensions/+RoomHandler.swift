@@ -58,9 +58,6 @@ extension RoomHandler {
             case .ok(let result):
                 let body = try result.body.json
                 return (body.accepted, body.rejected, body.failed, .ok)
-            case .code207(let result):
-                let body = try result.body.json
-                return (body.accepted, body.rejected, body.failed, .init(code: 207))
             case .badRequest(let result):
                 let body = try result.body.json
                 return (body.accepted, body.rejected, body.failed, .badRequest)

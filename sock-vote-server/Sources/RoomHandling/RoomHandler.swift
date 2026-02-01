@@ -47,6 +47,8 @@ public extension RoomHandler {
         return .ok(.init(body: .json(.init(name: room.name, code: room.code, fields: room.fields))))
     }
 
+    // MARK: - Join Requests
+
     func postRoomJoinCode(
         _ input: Operations.PostRoomJoinCode.Input
     ) async throws -> Operations.PostRoomJoinCode.Output {
@@ -70,8 +72,6 @@ public extension RoomHandler {
                 }
         }
     }
-
-    // MARK: - Join Requests
 
     func getRoomJoinRequestsCode(
         _ input: Operations.GetRoomJoinRequestsCode.Input
@@ -142,10 +142,8 @@ public extension RoomHandler {
             rejected: rejected.isEmpty ? nil : rejected, 
             failed: failed.isEmpty ? nil : failed
         )
-        if failed.isEmpty {
+        if !accepted.isEmpty || !rejected.isEmpty {
             return .ok(.init(body: .json(result)))
-        } else if !accepted.isEmpty || !rejected.isEmpty {
-            return .code207(.init(body: .json(result)))
         } else {
             return .badRequest(.init(body: .json(result)))
         }

@@ -6,6 +6,7 @@ public protocol RoomProtocol: AnyObject {
     var code: String { get }
     var fields: [String] { get }
 
+    /// Active join requests
     var joinRequests: [String : JoinRequest] { get async }
 
     /// Request to join the room
@@ -146,7 +147,9 @@ public extension RoomProtocol {
 
 }
 
-public final actor DefaultRoom: RoomProtocol {
+public typealias DefaultRoom = Room
+
+public final actor Room: RoomProtocol {
     nonisolated public let name: String
     nonisolated public let code: String
     nonisolated public let fields: [String]
@@ -154,6 +157,7 @@ public final actor DefaultRoom: RoomProtocol {
     nonisolated private let adminToken: String
 
     public typealias TimeoutFunction = @Sendable (Duration) async throws -> Void
+    public static let defaultTimeoutFunction: TimeoutFunction = { try await Task.sleep(for: $0) }
 
     public var joinRequests: [String : JoinRequest]
     private var joinRequestTimeouts: [String : Task<Void, any Error>]
@@ -180,9 +184,9 @@ public final actor DefaultRoom: RoomProtocol {
         fields: [String], 
         adminToken: String,
         participantTimeout: Duration = .seconds(45),
-        participantTimeoutFunction: @escaping TimeoutFunction = { try await Task.sleep(for: $0) },
+        participantTimeoutFunction: @escaping TimeoutFunction = defaultTimeoutFunction,
         joinRequestTimeout: Duration = .seconds(120),
-        joinRequestTimeoutFunction: @escaping TimeoutFunction = { try await Task.sleep(for: $0) }
+        joinRequestTimeoutFunction: @escaping TimeoutFunction = defaultTimeoutFunction
     ) {
         self.name = name
         self.code = code
@@ -199,7 +203,7 @@ public final actor DefaultRoom: RoomProtocol {
 
 }
 
-public extension DefaultRoom {
+public extension Room {
 
     func requestJoinRoom(
         name: String, fields: [String : String]
@@ -283,12 +287,12 @@ public extension DefaultRoom {
 }
 
 // MARK: - Private Helpers
-private extension DefaultRoom {
+private extension Room {
 
     func addJoinRequest(_ joinRequest: JoinRequest, participantToken: String) {
         joinRequests[participantToken] = joinRequest
         joinRequestTimeouts[participantToken] = Task {
-            try await participantTimeoutFunction(participantTimeout)
+            try await joinRequestTimeoutFunction(joinRequestTimeout)
             if var request = joinRequests[participantToken] {
                 request.handleRequest(with: .timeout)
                 joinRequests.removeValue(forKey: participantToken)
