@@ -75,7 +75,7 @@ public extension RoomProtocol {
             extraFields: &extraFields
         )
     }
-
+  
     func validateFieldKeys(
         _ fieldKeys: some Collection<String>,
         missingFields: inout [String],
@@ -124,42 +124,46 @@ public final actor DefaultRoom: RoomProtocol {
 
     nonisolated private let adminToken: String
 
-    public var joinRequests: [String : JoinRequest]
-    public var inactiveParticipants: [String : Task<Void, any Error>]
+    public typealias TimeoutFunction = @Sendable (Duration) async throws -> Void
 
-    nonisolated private let timeoutFunction: @Sendable () async throws -> Void
+    public var joinRequests: [String : JoinRequest]
+    private var joinRequestTimeouts: [String : Task<Void, any Error>]
+    nonisolated private let joinRequestTimeout: Duration
+    nonisolated private let joinRequestTimeoutFunction: TimeoutFunction
+
+    private var inactiveParticipants: [String : Task<Void, any Error>]
+    nonisolated private let participantTimeout: Duration
+    nonisolated private let participantTimeoutFunction: TimeoutFunction
+
     private var currentQuestion: Question?
 
-    init(
+    /// Creates a new room
+    /// 
+    /// > Important:
+    /// > The `Task` that surrounds the ``participantTimeoutFunction`` and the ``joinRequestTimeoutFunction`` will be cancelled
+    /// > if necessary, such as when a join request gets accepted or rejected.
+    /// 
+    public init(
         name: String, 
         code: String, 
         fields: [String], 
         adminToken: String,
-        participantTimeout: Duration = .seconds(45)
-    ) {
-        self.init(
-            name: name,
-            code: code,
-            fields: fields,
-            adminToken: adminToken,
-            timeoutFunction: { try await Task.sleep(for: participantTimeout) }
-        )
-    }
-
-    init(
-        name: String,
-        code: String,
-        fields: [String],
-        adminToken: String,
-        timeoutFunction: @escaping @Sendable () async throws -> Void
+        participantTimeout: Duration = .seconds(45),
+        participantTimeoutFunction: @escaping TimeoutFunction = { try await Task.sleep(for: $0) },
+        joinRequestTimeout: Duration = .seconds(120),
+        joinRequestTimeoutFunction: @escaping TimeoutFunction = { try await Task.sleep(for: $0) }
     ) {
         self.name = name
         self.code = code
         self.fields = fields
         self.adminToken = adminToken
         self.joinRequests = [:]
+        self.joinRequestTimeouts = [:]
         self.inactiveParticipants = [:]
-        self.timeoutFunction = timeoutFunction
+        self.participantTimeout = participantTimeout
+        self.participantTimeoutFunction = participantTimeoutFunction
+        self.joinRequestTimeout = joinRequestTimeout
+        self.joinRequestTimeoutFunction = joinRequestTimeoutFunction
     }
 
 }
@@ -226,6 +230,13 @@ private extension DefaultRoom {
 
     func addJoinRequest(_ joinRequest: JoinRequest, participantToken: String) {
         joinRequests[participantToken] = joinRequest
+        joinRequestTimeouts[participantToken] = Task {
+            try await participantTimeoutFunction(participantTimeout)
+            if var request = joinRequests[participantToken] {
+                request.handleRequest(with: .timeout)
+                joinRequests.removeValue(forKey: participantToken)
+            }
+        }
         // TODO: Notify admin
     }
 
@@ -234,7 +245,7 @@ private extension DefaultRoom {
         assert(!inactiveParticipants.keys.contains(participantToken))
 
         let timeout = Task {
-            try await timeoutFunction()
+            try await participantTimeoutFunction(participantTimeout)
             assert(inactiveParticipants.keys.contains(participantToken))
             inactiveParticipants.removeValue(forKey: participantToken)
         }
@@ -279,6 +290,7 @@ public enum JoinResult: Sendable {
     case success(participantToken: String)
     case roomClosing
     case rejected
+    case timeout
 }
 
 public enum JoinRequestResult: Sendable {

@@ -65,8 +65,7 @@ struct RoomTests {
         name: String = "Room",
         fields: [String] = ["Student ID", "Email"],
         code: String? = nil,
-        adminToken: String? = nil,
-        timeoutFunction: @escaping @Sendable () async throws -> Void = {}
+        adminToken: String? = nil
     ) throws -> DefaultRoom {
         let code = code ?? UUID().uuidString
         let adminToken = adminToken ?? UUID().uuidString
@@ -74,8 +73,7 @@ struct RoomTests {
             name: name, 
             code: code, 
             fields: fields, 
-            adminToken: adminToken,
-            timeoutFunction: timeoutFunction,
+            adminToken: adminToken
         )
         #expect(room.code == code)
         #expect(room.verifyAdminToken(adminToken))

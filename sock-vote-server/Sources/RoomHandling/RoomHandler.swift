@@ -63,7 +63,7 @@ public extension RoomHandler {
                 switch result {
                     case .success(let participantToken):
                         return .ok(.init(body: .json(.init(participantToken: participantToken))))
-                    case .rejected:
+                    case .rejected, .timeout:
                         return .forbidden
                     case .roomClosing:
                         return .notFound
