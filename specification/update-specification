@@ -1,6 +1,6 @@
 #! /bin/sh
 
-DOCS_FOLDER="../docs"
+DOCS_FOLDER="{$1}"
 OPENAPI_FILE="./openapi.yaml"
 OPENAPI_OUTPUT_PATH="${DOCS_FOLDER}/specification/openapi"
 

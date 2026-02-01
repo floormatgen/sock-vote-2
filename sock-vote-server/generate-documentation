@@ -2,7 +2,7 @@
 
 REPO_NAME="sock-vote-2"
 FOLDER_NAME="sock-vote-server"
-DOCS_DIRECTORY="../docs/${FOLDER_NAME}"
+DOCS_DIRECTORY="$1/${FOLDER_NAME}"
 HOSTING_BASE_PATH="/${REPO_NAME}/${FOLDER_NAME}"
 TARGETS=("SockVoteServer" "RoomHandling" "VoteHandling")
 
@@ -13,7 +13,7 @@ for target in ${TARGETS[@]}; do
     output_path="${DOCS_DIRECTORY}/${target}"
     mkdir -v "${output_path}"
     swift package \
-        --allow-writing-to-directory '../docs' \
+        --allow-writing-to-directory "${DOCS_DIRECTORY}" \
         generate-documentation \
         --transform-for-static-hosting \
         --hosting-base-path "${HOSTING_BASE_PATH}/${target}" \

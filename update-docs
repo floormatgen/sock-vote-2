@@ -1,24 +1,23 @@
 #! /bin/sh
 
+if [[ -z "$1" ]]; then
+    output_dir="../gh-pages/docs"
+else
+    output_dir="$1"
+fi
+
 # Make sure this script is executing from the repo folder
 cd "$(dirname "$0")"
 
 # Make the docs folder if it doesnt exist
-mkdir docs
+mkdir "${output_dir}"
 
 # First copy the specification
 echo "Preparing Specification..."
 cd specification
-./update-specification
+./update-specification "../${output_dir}"
 
 # Then build server documentation
 echo "Preparing Server Documentation..." 
 cd ../sock-vote-server
-./generate-documentation
-
-# Copy output into gh-pages
-git checkout gh-pages
-git checkout main -- ./docs
-git add ./docs
-git commit -m "Update docs $(date)"
-git checkout main
+./generate-documentation "../${output_dir}"
