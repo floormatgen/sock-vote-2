@@ -66,19 +66,19 @@ extension RoomHandlerTests {
         @Test("Admin cannot delete question from missing room")
         func test_adminCannotDeleteQuestionFromMissingRoom() async throws {
             let (code, adminToken) = try await createRoom(on: roomHandler)
-            try await Self.createQuestion(on: roomHandler, roomCode: code, adminToken: adminToken)
+            let id = try await Self.createQuestion(on: roomHandler, roomCode: code, adminToken: adminToken)
             let response = try await Self.deleteQuestionWithResponse(on: roomHandler, roomCode: "bad", adminToken: adminToken)
             #expect(throws: Never.self) { _ = try response.notFound }
-            #expect(try await Self.checkQuestionExists(on: roomHandler, roomCode: code))
+            #expect(try await Self.checkQuestionExists(on: roomHandler, roomCode: code, id: id))
         }
 
         @Test("Cannot delete question with invalid admin token")
         func test_cannotDeleteQuestionWithInvalidAdminToken() async throws {
             let (code, adminToken) = try await createRoom(on: roomHandler)
-            try await Self.createQuestion(on: roomHandler, roomCode: code, adminToken: adminToken)
+            let id = try await Self.createQuestion(on: roomHandler, roomCode: code, adminToken: adminToken)
             let response = try await Self.deleteQuestionWithResponse(on: roomHandler, roomCode: code, adminToken: adminToken + "67")
             #expect(throws: Never.self) { _ = try response.forbidden }
-            #expect(try await Self.checkQuestionExists(on: roomHandler, roomCode: code))
+            #expect(try await Self.checkQuestionExists(on: roomHandler, roomCode: code, id: id))
         }
 
         @Test("Cannot delete nonexistent question")
@@ -110,6 +110,7 @@ extension RoomHandlerTests {
             ))
         }
 
+        @discardableResult
         static func createQuestion(
             on roomHandler: RoomHandler<some RoomManagerProtocol>,
             roomCode: String,
@@ -117,7 +118,7 @@ extension RoomHandlerTests {
             prompt: String = "Question",
             options: [String] = ["Option 1", "Option 2", "Option 3"],
             votingStyle: Question.VotingStyle = .plurality
-        ) async throws {
+        ) async throws -> String {
             let response = try await createQuestionWithResponse(
                 on: roomHandler, 
                 roomCode: roomCode, 
@@ -131,20 +132,27 @@ extension RoomHandlerTests {
             #expect(body.options == options)
             #expect(body.votingStyle == votingStyle.openAPIVotingStyle)
             #expect(try await Self.checkQuestionExists(on: roomHandler, roomCode: roomCode))
+            return body.id
         }
 
         static func checkQuestionExists(
             on roomHandler: RoomHandler<some RoomManagerProtocol>,
-            roomCode: String
+            roomCode: String,
+            id: String? = nil
         ) async throws -> Bool {
             let response = try await roomHandler.getRoomQuestionCode(
                 .init(
                     path: .init(code: roomCode)
                 )
             )
-            return switch response {
-                case .ok: true
-                default: false
+            switch response {
+                case .ok(let output):
+                    if let id = id {
+                        #expect(try output.body.json.id == id)
+                    }
+                    return true
+                default:
+                    return false
             }
         }
 

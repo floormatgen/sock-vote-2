@@ -286,7 +286,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Question'
+              $ref: '#/components/schemas/QuestionCreateRequest'
       responses:
         "200":
           description:
@@ -355,13 +355,7 @@ components:
           type: array
           items:
             type: string
-
-    # MARK: Data Types
-    Fields:
-      type: object
-      additionalProperties:
-        type: string
-    Question:
+    QuestionCreateRequest:
       type: object
       required:
         - prompt
@@ -375,6 +369,21 @@ components:
           type: array
           items:
             type: string
+
+    # MARK: Data Types
+    Fields:
+      type: object
+      additionalProperties:
+        type: string
+    Question:
+      allOf:
+        - $ref: '#/components/schemas/QuestionCreateRequest'
+        - type: object 
+          required: 
+            - id
+          properties:
+            id:
+              type: string
     VotingStyle:
       type: string
       enum:
