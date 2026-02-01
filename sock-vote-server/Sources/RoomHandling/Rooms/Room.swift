@@ -46,6 +46,19 @@ public protocol RoomProtocol: AnyObject {
     /// - Returns: `true` if a question was deleted, or `false` is there wasn't a question.
     @discardableResult
     func removeQuestion() async throws -> Bool
+
+    /// Whether the room has a participant with the specified token
+    func hasParticipant(withParticipantToken participantToken: String) async -> Bool
+
+    func registerPluralityVote(
+        _ vote: Question.PluralityVote, 
+        forParticipant participantToken: String
+    ) async throws
+
+    func registerPreferentialVote(
+        _ vote: Question.PreferentialVote, 
+        forParticipant participantToken: String
+    ) async throws
 }
 
 public extension RoomProtocol {
@@ -115,6 +128,22 @@ public extension RoomProtocol {
         return true
     }
 
+    /// - Throws:
+    ///     ``Question/Error/voteStyleMismatch`` when the vote type doesn't match the question.
+    /// - Throws:
+    ///     ``Question/Error/invalidVote`` when the vote is invalid.
+    func registerVote(
+        _ vote: Components.Schemas.AnyVote,
+        forParticipant participantToken: String
+    ) async throws {
+        switch vote {
+            case .PluralityVote(let v):
+                try await registerPluralityVote(.init(v), forParticipant: participantToken)
+            case .PreferentialVote(let v):
+                try await registerPreferentialVote(.init(v), forParticipant: participantToken)
+        }
+    }
+
 }
 
 public final actor DefaultRoom: RoomProtocol {
@@ -128,12 +157,14 @@ public final actor DefaultRoom: RoomProtocol {
 
     public var joinRequests: [String : JoinRequest]
     private var joinRequestTimeouts: [String : Task<Void, any Error>]
-    nonisolated private let joinRequestTimeout: Duration
+    nonisolated public let joinRequestTimeout: Duration
     nonisolated private let joinRequestTimeoutFunction: TimeoutFunction
 
     private var inactiveParticipants: [String : Task<Void, any Error>]
-    nonisolated private let participantTimeout: Duration
+    nonisolated public let participantTimeout: Duration
     nonisolated private let participantTimeoutFunction: TimeoutFunction
+
+    // TODO: Handle Participant and Admin connections
 
     private var currentQuestion: Question?
 
@@ -197,6 +228,7 @@ public extension DefaultRoom {
         }
         joinRequests.removeValue(forKey: participantToken)
         if accept {
+            makeInactive(participantToken: participantToken)
             joinRequest.handleRequest(with: .success(participantToken: participantToken))
         } else {
             joinRequest.handleRequest(with: .rejected)
@@ -221,6 +253,31 @@ public extension DefaultRoom {
         if currentQuestion == nil { return false }
         currentQuestion = nil
         return true
+    }
+
+    func hasParticipant(withParticipantToken participantToken: String) -> Bool {
+        // TODO: Handle Active participants
+        return inactiveParticipants.keys.contains(participantToken)
+    }
+
+    func registerPluralityVote(
+        _ vote: Question.PluralityVote, 
+        forParticipant participantToken: String
+    ) throws {
+        guard let question = self.currentQuestion else {
+            throw RoomError.missingQuestion
+        }
+        try question.registerPluralityVote(vote, participantToken: participantToken)
+    }
+
+    func registerPreferentialVote(
+        _ vote: Question.PreferentialVote, 
+        forParticipant participantToken: String
+    ) throws {
+        guard let question = self.currentQuestion else {
+            throw RoomError.missingQuestion
+        }
+        try question.registerPreferentialVote(vote, participantToken: participantToken)
     }
 
 }

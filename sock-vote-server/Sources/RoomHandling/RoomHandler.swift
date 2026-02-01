@@ -213,4 +213,38 @@ public extension RoomHandler {
         return .ok(.init(body: .json(questionDescription.openAPIQuestion)))
     }
 
+    // MARK: - Voting
+
+    func postRoomVoteCodeQuestionID(
+        _ input: Operations.PostRoomVoteCodeQuestionID.Input
+    ) async throws -> Operations.PostRoomVoteCodeQuestionID.Output {
+        let code = input.path.code
+        let questionID = input.path.questionID
+        let participantToken = input.headers.participantToken
+        guard 
+            let room = await roomManager.room(withCode: code),
+            await questionID == room.currentQuestionDescription?.id.uuidString
+        else {
+            return .notFound
+        }
+        guard await room.hasParticipant(withParticipantToken: participantToken) else {
+            return .forbidden
+        }
+        switch input.body {
+            case .json(let anyVote):
+                do {
+                    try await room.registerVote(anyVote, forParticipant: participantToken)
+                    return .ok
+                } catch let questionError as Question.Error {
+                    switch questionError {
+                        case .invalidVote, .voteStyleMismatch:
+                            return .badRequest
+                        default:
+                            throw questionError
+                    }
+                }
+                
+        }
+    }
+
 }

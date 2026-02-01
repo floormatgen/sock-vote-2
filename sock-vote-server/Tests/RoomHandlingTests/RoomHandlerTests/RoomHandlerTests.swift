@@ -114,4 +114,147 @@ struct RoomHandlerTests {
         return (code, adminToken)
     }
 
+    static func handleJoinRequestsWithResponse(
+        on roomHandler: RoomHandler<some RoomManagerProtocol>,
+        roomCode: String,
+        adminToken: String,
+        accept: [String]? = [],
+        reject: [String]? = []
+    ) async throws -> Operations.PostRoomJoinRequestsCode.Output {
+        try await roomHandler.postRoomJoinRequestsCode(
+            .init(
+                path: .init(
+                    code: roomCode
+                ), 
+                headers: .init(
+                    roomAdminToken: adminToken
+                ), 
+                body: .json(.init(
+                    accept: accept, reject: reject
+                ))
+            )
+        )
+    }
+
+    static func handleJoinRequest(
+        on roomHandler: RoomHandler<some RoomManagerProtocol>,
+        roomCode: String,
+        adminToken: String,
+        accept: [String]? = [],
+        reject: [String]? = []
+    ) async throws {
+        let response = try await handleJoinRequestsWithResponse(
+            on: roomHandler, 
+            roomCode: roomCode, 
+            adminToken: adminToken, 
+            accept: accept, 
+            reject: reject
+        )
+        let body = try response.ok.body.json
+        #expect((body.accepted ?? []) == (accept ?? []))
+        #expect((body.rejected ?? []) == (reject ?? []))
+        #expect((body.failed ?? []).isEmpty)
+    }
+
+    static func listJoinRequestsWithResponse(
+        on roomHandler: RoomHandler<some RoomManagerProtocol>,
+        roomCode: String,
+        adminToken: String
+    ) async throws -> Operations.GetRoomJoinRequestsCode.Output {
+        try await roomHandler.getRoomJoinRequestsCode(
+            .init(
+                path: .init(
+                    code: roomCode
+                ), 
+                headers: .init(
+                    roomAdminToken: adminToken
+                )
+            )
+        )
+    }
+
+    typealias PendingJoinRequest = Operations.GetRoomJoinRequestsCode.Output.Ok.Body.JsonPayload.RequestsPayloadPayload
+
+    static func listJoinRequests(
+        on roomHandler: RoomHandler<some RoomManagerProtocol>,
+        roomCode: String,
+        adminToken: String
+    ) async throws -> [PendingJoinRequest] {
+        let response = try await listJoinRequestsWithResponse(
+            on: roomHandler, 
+            roomCode: roomCode, 
+            adminToken: adminToken
+        )
+        let body = try response.ok.body.json
+        return body.requests
+    }
+
+    static func joinRoomWithResponse(
+        on roomHandler: RoomHandler<some RoomManagerProtocol>,
+        roomCode: String,
+        name: String = "Participant",
+        fields: [String : String]? = nil
+    ) async throws -> Operations.PostRoomJoinCode.Output {
+        try await roomHandler.postRoomJoinCode(
+            .init(
+                path: .init(
+                    code: roomCode
+                ),
+                body: .json(.init(
+                    name: name,
+                    fields: fields.map { .init(additionalProperties: $0) }
+                ))
+            )
+        )
+    }
+
+    static func joinRoom(
+        on roomHandler: RoomHandler<some RoomManagerProtocol>,
+        roomCode: String,
+        name: String = "Participant",
+        fields: [String : String]? = nil
+    ) async throws -> String {
+        let response = try await joinRoomWithResponse(
+            on: roomHandler, 
+            roomCode: roomCode, 
+            name: name, 
+            fields: fields
+        )
+        let body = try response.ok.body.json
+        return body.participantToken
+    }
+
+    static func forceJoinRoom(
+        on roomHandler: RoomHandler<some RoomManagerProtocol>,
+        roomCode: String,
+        adminToken: String,
+        name: String = "Participant",
+        fields: [String : String]? = nil
+    ) async throws -> String {
+        async let returnedParticipantToken = joinRoom(
+            on: roomHandler, 
+            roomCode: roomCode, 
+            name: name, 
+            fields: fields
+        )
+        try await Task.sleep(for: .milliseconds(10))
+        let requests = try await Self.listJoinRequests(
+            on: roomHandler, 
+            roomCode: roomCode, 
+            adminToken: adminToken
+        )
+        let participantToken = try #require(requests.first { 
+            $0.name == name &&
+            $0.fields?.additionalProperties == fields
+        }).participantToken
+        try await Self.handleJoinRequest(
+            on: roomHandler, 
+            roomCode: roomCode, 
+            adminToken: adminToken,
+            accept: [participantToken]
+        )
+        #expect(try await participantToken == returnedParticipantToken)
+        return participantToken
+    }
+
 }

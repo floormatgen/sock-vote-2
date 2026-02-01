@@ -3,6 +3,7 @@ import Testing
 
 import HTTPTypes
 
+@available(*, deprecated, message: "Use convenience functions defined on test suites instead")
 extension RoomHandler {
     
     // MARK: - Route Utilities

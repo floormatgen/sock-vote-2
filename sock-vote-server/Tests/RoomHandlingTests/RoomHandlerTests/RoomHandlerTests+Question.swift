@@ -91,12 +91,20 @@ extension RoomHandlerTests {
 
         // MARK: - Utilities
 
+        static var defaultQuestionName: String {
+            "Question"
+        }
+
+        static var defaultQuestionOptions: [String] {
+            ["Option 1", "Option 2", "Option 3"]
+        }
+
         static func createQuestionWithResponse(
             on roomHandler: RoomHandler<some RoomManagerProtocol>,
             roomCode: String,
             adminToken: String,
-            prompt: String = "Question",
-            options: [String] = ["Option 1", "Option 2", "Option 3"],
+            prompt: String = Self.defaultQuestionName,
+            options: [String] = Self.defaultQuestionOptions,
             votingStyle: Question.VotingStyle = .plurality
         ) async throws -> Operations.PostRoomQuestionCode.Output {
             try await roomHandler.postRoomQuestionCode(.init(
@@ -115,8 +123,8 @@ extension RoomHandlerTests {
             on roomHandler: RoomHandler<some RoomManagerProtocol>,
             roomCode: String,
             adminToken: String,
-            prompt: String = "Question",
-            options: [String] = ["Option 1", "Option 2", "Option 3"],
+            prompt: String = Self.defaultQuestionName,
+            options: [String] = Self.defaultQuestionOptions,
             votingStyle: Question.VotingStyle = .plurality
         ) async throws -> String {
             let response = try await createQuestionWithResponse(
