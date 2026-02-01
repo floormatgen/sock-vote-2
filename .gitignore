@@ -1,7 +1,2 @@
 .DS_Store
 .vscode/
-
-# Source Directories
-sock-vote-server/
-sock-vote/
-specification/
