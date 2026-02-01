@@ -286,7 +286,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Question'
+              $ref: '#/components/schemas/QuestionCreateRequest'
       responses:
         "200":
           description:
@@ -312,8 +312,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/BasicError'
-          
+                $ref: '#/components/schemas/BasicError' 
     delete:
       summary: Removes the current question
       tags:
@@ -336,6 +335,33 @@ paths:
           $ref: '#/components/responses/InvalidAdminToken'
         "404":
           $ref: '#/components/responses/InvalidRoomCode'
+  
+  /room/vote/{code}/{questionID}:
+    post:
+      summary: Vote on a question
+      tags:
+        - Participants
+      parameters:
+        - $ref: '#/components/parameters/ParticipantToken'
+        - $ref: '#/components/parameters/RoomCode'
+        - $ref: '#/components/parameters/QuestionID'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AnyVote'
+      responses:
+        "200":
+          description:
+            The vote was counted successfully
+        "400":
+          description:
+            The vote doesn't match the question
+        "403":
+          $ref: '#/components/responses/InvalidParticipantToken'
+        "404":
+          $ref: '#/components/responses/InvalidRoomCode'
 
 components:
 
@@ -355,13 +381,7 @@ components:
           type: array
           items:
             type: string
-
-    # MARK: Data Types
-    Fields:
-      type: object
-      additionalProperties:
-        type: string
-    Question:
+    QuestionCreateRequest:
       type: object
       required:
         - prompt
@@ -375,12 +395,65 @@ components:
           type: array
           items:
             type: string
+
+    # MARK: - Data Types
+    Fields:
+      type: object
+      additionalProperties:
+        type: string
+    Question:
+      allOf:
+        - $ref: '#/components/schemas/QuestionCreateRequest'
+        - type: object 
+          required: 
+            - id
+          properties:
+            id:
+              type: string
     VotingStyle:
       type: string
       enum:
         - plurality
         - preferential
-    
+
+    # MARK: Votes
+    Vote:
+      type: object
+      required:
+        - type
+      properties:
+        type:
+          $ref: '#/components/schemas/VotingStyle'
+      discriminator:
+        propertyName: type
+        mapping:
+          PluralityVote: plurality
+          PreferentialVote: preferential
+    PluralityVote:
+      allOf: 
+        - $ref: '#/components/schemas/Vote'
+        - type: object
+          required:
+            - selection
+          properties:
+            selection:
+              type: string
+    PreferentialVote:
+      allOf:
+        - $ref: '#/components/schemas/Vote'
+        - type: object
+          required:
+            - selectionOrder
+          properties:
+            selectionOrder:
+              type: array
+              items:
+                type: string
+    AnyVote:
+      oneOf:
+        - $ref: '#/components/schemas/PluralityVote'
+        - $ref: '#/components/schemas/PreferentialVote'
+
     # MARK: Errors
     BasicError:
       required:
@@ -410,11 +483,32 @@ components:
         A code uniquely identifying an alive room.
       schema:
         type: string
+    QuestionID:
+      in: path
+      name: questionID
+      required: true
+      description:
+        The id uniquely identifying the question.
+        This is used to make sure that the client is voting on the question they expect.
+      schema:
+        type: string
+    ParticipantToken:
+      in: header
+      name: Participant-Token
+      required: true
+      description:
+        A token that uniquely identifies a participant.
+      schema:
+        type: string
 
   responses:
     InvalidAdminToken:
       description:
         The admin token is either missing or incorrect
+    InvalidParticipantToken:
+      description:
+        The participant token is either missing or doesn't correspond to
+        a room participant
     InvalidRoomCode:
       description:
         The room does not exist
