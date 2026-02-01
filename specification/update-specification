@@ -1,8 +1,10 @@
 #! /bin/sh
 
-DOCS_FOLDER="{$1}"
+DOCS_FOLDER="$1"
 OPENAPI_FILE="./openapi.yaml"
 OPENAPI_OUTPUT_PATH="${DOCS_FOLDER}/specification/openapi"
+
+echo "Outputting OpenAPI file to ${OPENAPI_OUTPUT_PATH}"
 
 cd "$(dirname "$0")"
 mkdir -p "${OPENAPI_OUTPUT_PATH}"
