@@ -4,7 +4,7 @@ import Foundation
 extension Question: @unchecked Sendable { }
 
 /// An active question
-public final class Question: Identifiable {
+public /* abstract */ class Question: Identifiable {
 
     /// The style of voting for the question
     public enum VotingStyle: Sendable {
@@ -27,17 +27,33 @@ public final class Question: Identifiable {
     public let prompt: String
     public let options: [String]
     public let optionsSet: Set<String>
-    private var _votes: _VotesContainer
 
     /// Creates a new question
     /// 
     /// - Throws:
     ///     ``Question/Error/noOptions`` when `options` is empty
-    public init(
+    public static func create(
         id: UUID = .init(),
         prompt: String,
         options: some Collection<String>,
         votingStyle: VotingStyle
+    ) throws -> Question {
+        switch votingStyle {
+            case .plurality:
+                return try PluralityQuestion(
+                    id: id, prompt: prompt, options: options
+                )
+            case .preferential:
+                return try PreferentialQuestion(
+                    id: id, prompt: prompt, options: options
+                )
+        }
+    }
+
+    internal init(
+        id: UUID = .init(),
+        prompt: String,
+        options: some Collection<String>
     ) throws {
         guard options.count > 0 else {
             throw Error.noOptions
@@ -47,101 +63,14 @@ public final class Question: Identifiable {
 
         self.id = id
         self.prompt = prompt
-        self._votes = .init(votingStyle)
+        #if DEBUG
+        let meta = type(of: self as Any)
+        precondition(meta != Question.self, "\(#function): Cannot create instace of abstract class Question")
+        #endif
     }
 
-    public var questionDescription: Description {
-        .init(id: id, prompt: prompt, options: options, votingStyle: votingStyle)
-    }
-
-    public var votingStyle: VotingStyle {
-        _votes.votingStyle
-    }
-
-    public var voteCount: Int {
-        _votes.voteCount
-    }
-
-    public func hasVoted(participantToken: String) -> Bool {
-        _votes.hasVoted(participantToken: participantToken)
-    }
-
-    @discardableResult
-    public func registerPluralityVote(_ vote: PluralityVote, participantToken: String) throws -> VoteResult {
-        guard vote.validate(usingOptions: optionsSet) else { throw Error.invalidVote }
-        let result = try _votes.registerPluralityVote(vote, participantToken: participantToken)
-        _invalidateResultCache()
-        return result
-    }
-
-    @discardableResult
-    public func registerPreferentialVote(_ vote: PreferentialVote, participantToken: String) throws -> VoteResult {
-        guard vote.validate(usingOptions: optionsSet) else { throw Error.invalidVote }
-        let result = try _votes.registerPreferentialVote(vote, participantToken: participantToken)
-        _invalidateResultCache()
-        return result
-    }
-
-    internal enum _VotesContainer {
-        case plurality([String : PluralityVote])
-        case preferential([String : PreferentialVote])
-
-        init(_ votingStyle: VotingStyle) {
-            switch votingStyle {
-                case .plurality: self = .plurality(.init())
-                case .preferential: self = .preferential(.init())
-            }
-        }
-
-        var votingStyle: VotingStyle {
-            switch self {
-                case .plurality: .plurality
-                case .preferential: .preferential
-            }
-        }
-
-        var voteCount: Int {
-            switch self {
-                case let .plurality(c): c.count
-                case let .preferential(c): c.count
-            }
-        }
-
-        func hasVoted(participantToken: String) -> Bool {
-            switch self {
-                case let .plurality(d): d.keys.contains(participantToken)
-                case let .preferential(d): d.keys.contains(participantToken)
-            }
-        }
-
-        @discardableResult
-        mutating func registerPluralityVote(_ vote: PluralityVote, participantToken: String) throws -> VoteResult {
-            switch self {
-                case .plurality(var d):
-                    let replacing = d.keys.contains(participantToken)
-                    d[participantToken] = vote
-                    self = .plurality(d)
-                    return .init(replacing: replacing)
-                case .preferential(_):
-                    throw Error.voteStyleMismatch(expected: .preferential, received: .plurality)
-            }
-        }
-
-        @discardableResult
-        mutating func registerPreferentialVote(_ vote: PreferentialVote, participantToken: String) throws -> VoteResult {
-            switch self {
-                case .preferential(var d):
-                    let replacing = d.keys.contains(participantToken)
-                    d[participantToken] = vote
-                    self = .preferential(d)
-                    return .init(replacing: replacing)
-                case .plurality(_):
-                    throw Error.voteStyleMismatch(expected: .plurality, received: .preferential)
-            }
-        }
-        
-    }
-
+    // MARK: - Question Information
+    
     public enum VoteResult {
         case initialVote
         case replacingVote
@@ -149,6 +78,40 @@ public final class Question: Identifiable {
         internal init(replacing: Bool) {
             self = replacing ? .replacingVote : .initialVote
         }
+    }
+
+    public var questionDescription: Description {
+        .init(id: id, prompt: prompt, options: options, votingStyle: votingStyle)
+    }
+
+    public var votingStyle: VotingStyle {
+        _requiresConcreteImplementation()
+    }
+
+    public var voteCount: Int {
+        _requiresConcreteImplementation()
+    }
+
+    public func hasVoted(participantToken: String) -> Bool {
+        _requiresConcreteImplementation()
+    }
+
+    // MARK: - Voting
+
+    @discardableResult 
+    public func registerPluralityVote(_ vote: PluralityVote, participantToken: String) throws -> VoteResult {
+        guard let pluralityQuestion = self as? PluralityQuestion else {
+            throw Error.voteStyleMismatch(expected: self.votingStyle, received: .plurality)
+        }
+        return try pluralityQuestion.registerVote(vote, participantToken: participantToken)
+    }
+
+    @discardableResult
+    public func registerPreferentialVote(_ vote: PreferentialVote, participantToken: String) throws -> VoteResult {
+        guard let preferentialQuestion = self as? PreferentialQuestion else {
+            throw Error.voteStyleMismatch(expected: self.votingStyle, received: .preferential)
+        }
+        return try preferentialQuestion.registerVote(vote, participantToken: participantToken)
     }
 
     // MARK: - Handling Voting Results
@@ -164,12 +127,7 @@ public final class Question: Identifiable {
     }
 
     internal func _calculateVoteResult() throws -> Result {
-        switch _votes {
-            case .plurality(let votes):
-                return try Question.pluralityResult(using: votes.values, options: optionsSet)
-            case .preferential(let votes):
-                return try Question.preferentialResult(using: votes.values, options: optionsSet)
-        }
+        _requiresConcreteImplementation()
     }
 
     public var result: Result {
@@ -180,9 +138,21 @@ public final class Question: Identifiable {
         }
     }
 
+    private func _requiresConcreteImplementation(
+        function: StaticString = #function,
+        file: StaticString = #file,
+        line: UInt = #line
+    ) -> Never {
+        preconditionFailure(
+            "\(function): Abstract method requires implmementation",
+            file: file,
+            line: line
+        )
+    }
+
 }
 
-extension Question.VotingStyle: LosslessStringConvertible {
+extension Question.VotingStyle: LosslessStringConvertible, CaseIterable {
 
     public init?(_ description: some StringProtocol) {
         switch description {
@@ -201,4 +171,96 @@ extension Question.VotingStyle: LosslessStringConvertible {
 
 }
 
-extension Question.VotingStyle: CaseIterable { }
+// MARK: - Custom Question Types
+
+public final class PluralityQuestion: Question {
+    private var _votes: [String : Vote]
+
+    public typealias Vote = PluralityVote
+
+    public override init(
+        id: UUID = .init(), 
+        prompt: String, 
+        options: some Collection<String>
+    ) throws {
+        _votes = [:]
+        try super.init(
+            id: id, 
+            prompt: prompt, 
+            options: options
+        )
+    }
+
+    public override var votingStyle: Question.VotingStyle {
+        .plurality
+    }
+
+    public override var voteCount: Int {
+        _votes.count
+    }
+
+    public override func hasVoted(participantToken: String) -> Bool {
+        _votes.keys.contains(participantToken)
+    }
+
+    @discardableResult
+    public func registerVote(_ vote: Vote, participantToken: String) throws -> VoteResult {
+        guard vote.validate(usingOptions: optionsSet) else {
+            throw Error.invalidVote
+        }
+        let replacing = _votes.keys.contains(participantToken)
+        _votes[participantToken] = vote
+        return .init(replacing: replacing)
+    }
+
+    internal override func _calculateVoteResult() throws -> Question.Result {
+        return try Question.pluralityResult(using: _votes.values, options: optionsSet)
+    }
+
+}
+
+public final class PreferentialQuestion: Question {
+    private var _votes: [String : Vote]
+
+    public typealias Vote = PreferentialVote
+
+    public override init(
+        id: UUID = .init(),
+        prompt: String,
+        options: some Collection<String>
+    ) throws {
+        _votes = [:]
+        try super.init(
+            id: id,
+            prompt: prompt,
+            options: options
+        )
+    }
+
+    public override var votingStyle: Question.VotingStyle {
+        .preferential
+    }
+
+    public override var voteCount: Int {
+        _votes.count
+    }
+
+    public override func hasVoted(participantToken: String) -> Bool {
+        _votes.keys.contains(participantToken)
+    }
+
+    @discardableResult
+    public func registerVote(_ vote: Vote, participantToken: String) throws -> VoteResult {
+        guard vote.validate(usingOptions: optionsSet) else {
+            throw Error.invalidVote
+        }
+        let replacing = _votes.keys.contains(participantToken)
+        _votes[participantToken] = vote
+        return .init(replacing: replacing)
+    }
+
+    internal override func _calculateVoteResult() throws -> Question.Result {
+        return try Question.preferentialResult(using: _votes.values, options: optionsSet)
+    }
+
+}

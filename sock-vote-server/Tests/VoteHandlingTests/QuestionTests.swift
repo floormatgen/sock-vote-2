@@ -131,7 +131,7 @@ struct QuestionTests {
         options: [String] = ["Option 1", "Option 2", "Option 3"], 
         style: Question.VotingStyle
     ) throws -> Question {
-        let question = try Question(prompt: prompt, options: options, votingStyle: style)
+        let question = try Question.create(prompt: prompt, options: options, votingStyle: style)
         #expect(question.prompt == prompt)
         #expect(question.options == options)
         #expect(question.votingStyle == style)

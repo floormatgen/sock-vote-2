@@ -249,7 +249,7 @@ public extension Room {
     }
 
     func updateQuestion(prompt: String, options: some Collection<String> & Sendable, style: Question.VotingStyle) async throws {
-        let newQuestion = try Question(prompt: prompt, options: options, votingStyle: style)
+        let newQuestion = try Question.create(prompt: prompt, options: options, votingStyle: style)
         currentQuestion = newQuestion
     }
 
