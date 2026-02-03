@@ -24,7 +24,7 @@ extension RoomTests {
                     }
                 )
                 async let joinResult = Self.joinRequest(on: room)
-                try await Task.sleep(for: .milliseconds(10))
+                try await Task.sleep(for: .milliseconds(5))
                 let (participantToken, _) = try #require(await room.joinRequests.first {
                     $0.value.name == Self.defaultParticipantName &&
                     $0.value.fields == Self.defaultFields

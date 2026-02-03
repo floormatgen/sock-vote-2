@@ -11,9 +11,6 @@
       location = "group:specification">
    </FileRef>
    <FileRef
-      location = "group:docs">
-   </FileRef>
-   <FileRef
       location = "group:update-docs">
    </FileRef>
    <FileRef

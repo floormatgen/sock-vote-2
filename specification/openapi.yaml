@@ -281,6 +281,7 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/QuestionCreateRequest'
+
       responses:
         "200":
           description:
