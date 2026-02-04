@@ -21,7 +21,9 @@ public protocol RoomManagerProtocol: AnyObject, Sendable {
 
 }
 
-public final actor DefaultRoomManager<
+public typealias DefaultRoomManager = RoomManager<DefaultRoomCodeGenerator>
+
+public final actor RoomManager<
     RoomCodeGenerator: RoomCodeGeneratorProtocol
 >: RoomManagerProtocol {
     private var rooms: [String : Room]
@@ -40,7 +42,7 @@ public final actor DefaultRoomManager<
 
 }
 
-public extension DefaultRoomManager {
+public extension RoomManager {
 
     func room(
         withCode code: String

@@ -10,6 +10,10 @@ extension Question {
         /// This can be thrown when a vote is added to a quesiton, 
         /// or (should not happen) when calculating the result and an invalid vote is detected
         case invalidVote
+        /// The question is not in the correct state to perform this action
+        case illegalAction(required: State, current: State)
+        /// Changing from the `current` to the `new` state is not allowed
+        case illegalStateChange(current: State, new: State)
 
         var localizedDescription: String {
             switch self {
@@ -19,6 +23,10 @@ extension Question {
                     "Invalid vote: expected \(expected) vote but instead got \(received) vote."
                 case .invalidVote:
                     "Vote is ill-formed."
+                case let .illegalAction(required, current):
+                    "This action cannot be performed while the question is in the \(current) state, it must be in the \(required) state."
+                case let .illegalStateChange(current, new):
+                    "Changing from the \(current) state to the \(new) state is not allowed."
             }
         }
     }

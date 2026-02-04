@@ -307,7 +307,8 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/BasicError' 
+                $ref: '#/components/schemas/BasicError'
+  /room/question/{code}/{questionID}:
     delete:
       summary: Removes the current question
       tags:
@@ -315,6 +316,7 @@ paths:
       parameters:
         - $ref: '#/components/parameters/RoomCode'
         - $ref: '#/components/parameters/AdminToken'
+        - $ref: '#/components/parameters/QuestionID'
       responses:
         "200":
           description:
@@ -328,6 +330,33 @@ paths:
             There is no room to delete
         "403":
           $ref: '#/components/responses/InvalidAdminToken'
+        "404":
+          $ref: '#/components/responses/InvalidRoomCode'
+    put:
+      summary: Edits the current question
+      description:
+        Modify attributes of the current question
+      tags:
+        - Room Management
+      parameters:
+        - $ref: '#/components/parameters/RoomCode'
+        - $ref: '#/components/parameters/AdminToken'
+        - $ref: '#/components/parameters/QuestionID'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/QuestionModifyRequest'
+      responses:
+        "200":
+          description:
+            The operation was processed successfully
+        "400":
+          description:
+            The modify request was invalid
+        "403":
+          $ref: '#/components/responses/InvalidParticipantToken'
         "404":
           $ref: '#/components/responses/InvalidRoomCode'
   
@@ -349,7 +378,8 @@ paths:
       responses:
         "200":
           description:
-            The vote was counted successfully
+            The vote was counted successfully. 
+            If this participant already voted, the new vote replaces the old one.
         "400":
           description:
             The vote doesn't match the question
@@ -390,6 +420,45 @@ components:
           type: array
           items:
             type: string
+    QuestionModifyRequest:
+      oneOf:
+        - $ref: '#/components/schemas/QuestionOpenRequest'
+        - $ref: '#/components/schemas/QuestionCloseRequest'
+        - $ref: '#/components/schemas/QuestionFinalizeRequest'
+      discriminator:
+        propertyName: type
+        mapping:
+          open: '#/components/schemas/QuestionOpenRequest'
+          close: '#/components/schemas/QuestionCloseRequest'
+          finalize: '#/components/schemas/QuestionFinalizeRequest'
+    QuestionOpenRequest:
+      type: object
+      description:
+        Open the question for voting. This allows participants to cast their votes.
+      required:
+        - type
+      properties:
+        type:
+          type: string
+    QuestionCloseRequest:
+      type: object
+      description:
+        Close the question for voting. This prevents participants from casting their votes.
+      required:
+        - type
+      properties:
+        type:
+          type: string
+    QuestionFinalizeRequest:
+      type: object
+      description:
+        Closes the question from voting, and prevents any further votes from being casted.
+        After this is sent, results should be available.
+      required:
+        - type
+      properties:
+        type:
+          type: string
 
     # MARK: - Data Types
     Fields:
@@ -410,6 +479,12 @@ components:
       enum:
         - plurality
         - preferential
+    QuestionModifyOperation:
+      type: string
+      enum:
+        - open
+        - close
+        - finalize
 
     # MARK: Votes
     Vote:
@@ -513,7 +588,7 @@ components:
 tags:
   - name: Participants
     description:
-      Routes used by participants
+      Routes used by participants. They can also be used by room managers
   - name: Room Management
     description:
       Routes to manage rooms. 

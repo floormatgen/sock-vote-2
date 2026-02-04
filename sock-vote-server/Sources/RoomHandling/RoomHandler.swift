@@ -3,7 +3,7 @@ import OpenAPIRuntime
 
 import VoteHandling
 
-public typealias DefaultRoomHandler = RoomHandler<DefaultRoomManager<DefaultRoomCodeGenerator>>
+public typealias DefaultRoomHandler = RoomHandler<DefaultRoomManager>
 
 public struct RoomHandler<RoomManager: RoomManagerProtocol>: APIProtocol {
 
@@ -193,10 +193,11 @@ public extension RoomHandler {
         }
     }
 
-    func deleteRoomQuestionCode(
-        _ input: Operations.DeleteRoomQuestionCode.Input
-    ) async throws -> Operations.DeleteRoomQuestionCode.Output {
+    func deleteRoomQuestionCodeQuestionID(
+        _ input: Operations.DeleteRoomQuestionCodeQuestionID.Input
+    ) async throws -> Operations.DeleteRoomQuestionCodeQuestionID.Output {
         let code = input.path.code
+        let questionID = input.path.questionID
         let adminToken = input.headers.roomAdminToken
         guard let room = await roomManager.room(withCode: code) else {
             return .notFound
@@ -207,8 +208,51 @@ public extension RoomHandler {
         guard let questionDescription = await room.currentQuestionDescription else {
             return .badRequest
         }
+        guard questionDescription.id.uuidString == questionID else {
+            return .badRequest
+        }
         try await room.removeQuestion()
         return .ok(.init(body: .json(questionDescription.openAPIQuestion)))
+    }
+
+    func putRoomQuestionCodeQuestionID(
+        _ input: Operations.PutRoomQuestionCodeQuestionID.Input
+    ) async throws -> Operations.PutRoomQuestionCodeQuestionID.Output {
+        let code = input.path.code
+        let questionID = input.path.questionID
+        let adminToken = input.headers.roomAdminToken
+        guard let room = await roomManager.room(withCode: code) else {
+            return .notFound
+        }
+        guard room.verifyAdminToken(adminToken) else {
+            return .forbidden
+        }
+        guard
+            let questionUUID = UUID(uuidString: questionID),
+            await room.hasQuestion(with: questionUUID)
+        else {
+            return .badRequest
+        }
+        let newState: Question.State
+        switch input.body {
+            case .json(let body):
+                switch body {
+                    case .open:
+                        newState = .opened
+                    case .close:
+                        newState = .closed
+                    case .finalize:
+                        newState = .finalized
+                }
+        }
+        do {
+            try await room.setCurrentQuestionState(to: newState)
+        } catch Room.Error.missingActiveQuestion {
+            return .notFound
+        } catch Question.Error.illegalStateChange(_, _) {
+            return .badRequest
+        }
+        return .ok
     }
 
     // MARK: - Voting

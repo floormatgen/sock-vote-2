@@ -12,6 +12,20 @@ public /* abstract */ class Question: Identifiable {
         case preferential
     }
 
+    /// The current state of the question
+    /// 
+    /// The question state affects what actions are permitted to take on a question
+    public enum State: Sendable {
+        /// The question is accepting votes
+        case opened
+        /// The question is not accepting votes
+        case closed
+        /// The question is marked final and cannot be modified
+        /// 
+        /// Reopening this question is not allowed, as is casting new votes.
+        case finalized
+    }
+
     /// Immtable data about a question
     /// 
     /// This can be used to send information about a question through
@@ -22,11 +36,6 @@ public /* abstract */ class Question: Identifiable {
         public let options: [String]
         public let votingStyle: VotingStyle
     }
-
-    public let id: UUID
-    public let prompt: String
-    public let options: [String]
-    public let optionsSet: Set<String>
 
     /// Creates a new question
     /// 
@@ -61,6 +70,7 @@ public /* abstract */ class Question: Identifiable {
         self.options = .init(options)
         self.optionsSet = .init(options)
 
+        self.state = .opened
         self.id = id
         self.prompt = prompt
         #if DEBUG
@@ -70,6 +80,11 @@ public /* abstract */ class Question: Identifiable {
     }
 
     // MARK: - Question Information
+
+    public let id: UUID
+    public let prompt: String
+    public let options: [String]
+    public let optionsSet: Set<String>
     
     public enum VoteResult {
         case initialVote
@@ -96,7 +111,31 @@ public /* abstract */ class Question: Identifiable {
         _requiresConcreteImplementation()
     }
 
+    public var canVote: Bool {
+        state == .opened
+    }
+
+    // MARK: - State Machine
+
+    public private(set) final var state: State
+
+    public final func setState(_ newState: State) throws {
+        guard self.state != newState else { return }
+        switch self.state {
+            case .opened, .closed:
+                self.state = newState
+            case .finalized:
+                throw Error.illegalStateChange(current: state, new: newState)
+        }
+    }
+
     // MARK: - Voting
+
+    internal final func _ensureCanVote() throws {
+        guard self.state == .opened else {
+            throw Error.illegalAction(required: .opened, current: state)
+        }
+    }
 
     @discardableResult 
     public func registerPluralityVote(_ vote: PluralityVote, participantToken: String) throws -> VoteResult {
@@ -171,6 +210,27 @@ extension Question.VotingStyle: LosslessStringConvertible, CaseIterable {
 
 }
 
+extension Question.State: LosslessStringConvertible, CaseIterable {
+
+    public init?(_ description: some StringProtocol) {
+        switch description {
+            case "open": self = .opened
+            case "closed": self = .closed
+            case "finalized": self = .finalized
+            default: return nil
+        }
+    }
+
+    public var description: String {
+        switch self {
+            case .opened: "open"
+            case .closed: "closed"
+            case .finalized: "finalized"
+        }
+    }
+
+}
+
 // MARK: - Custom Question Types
 
 public final class PluralityQuestion: Question {
@@ -205,6 +265,7 @@ public final class PluralityQuestion: Question {
 
     @discardableResult
     public func registerVote(_ vote: Vote, participantToken: String) throws -> VoteResult {
+        try _ensureCanVote()
         guard vote.validate(usingOptions: optionsSet) else {
             throw Error.invalidVote
         }
@@ -251,6 +312,7 @@ public final class PreferentialQuestion: Question {
 
     @discardableResult
     public func registerVote(_ vote: Vote, participantToken: String) throws -> VoteResult {
+        try _ensureCanVote()
         guard vote.validate(usingOptions: optionsSet) else {
             throw Error.invalidVote
         }

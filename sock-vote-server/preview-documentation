@@ -3,5 +3,4 @@
 swift package \
     --disable-sandbox \
     preview-documentation \
-    --symbol-graph-minimum-access-level internal \
     --target $1

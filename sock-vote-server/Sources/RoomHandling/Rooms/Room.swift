@@ -34,6 +34,12 @@ public protocol RoomProtocol: AnyObject {
     /// To remove a question, call ``removeQuestion()``
     var hasCurrentQuestion: Bool { get async }
 
+    /// Checks if the current room has a question matching the id provided
+    func hasQuestion(with id: UUID) async -> Bool
+
+    /// Change the state of the current question
+    func setCurrentQuestionState(to state: Question.State) async throws
+
     /// A description of the current question
     /// 
     /// Returns `nil` when ``hasCurrentQuestion`` is `false`
@@ -130,9 +136,9 @@ public extension RoomProtocol {
     }
 
     /// - Throws:
-    ///     ``Question/Error/voteStyleMismatch`` when the vote type doesn't match the question.
+    ///     ``VoteHanding/Question/Error/voteStyleMismatch`` when the vote type doesn't match the question.
     /// - Throws:
-    ///     ``Question/Error/invalidVote`` when the vote is invalid.
+    ///     ``VoteHanding/Question/Error/invalidVote`` when the vote is invalid.
     func registerVote(
         _ vote: Components.Schemas.AnyVote,
         forParticipant participantToken: String
@@ -160,13 +166,15 @@ public final actor Room: RoomProtocol {
     public static let defaultTimeoutFunction: TimeoutFunction = { try await Task.sleep(for: $0) }
 
     public var joinRequests: [String : JoinRequest]
-    private var joinRequestTimeouts: [String : Task<Void, any Error>]
+    private var joinRequestTimeouts: [String : Task<Void, any Swift.Error>]
     nonisolated public let joinRequestTimeout: Duration
     nonisolated private let joinRequestTimeoutFunction: TimeoutFunction
 
-    private var inactiveParticipants: [String : Task<Void, any Error>]
+    private var inactiveParticipants: [String : Task<Void, any Swift.Error>]
     nonisolated public let participantTimeout: Duration
     nonisolated private let participantTimeoutFunction: TimeoutFunction
+
+    typealias Error = RoomError
 
     // TODO: Handle Participant and Admin connections
 
@@ -244,19 +252,30 @@ public extension Room {
         currentQuestion != nil
     }
 
+    func hasQuestion(with id: UUID) -> Bool {
+        currentQuestion?.id == id
+    }
+
     var currentQuestionDescription: Question.Description? {
         currentQuestion?.questionDescription
     }
 
-    func updateQuestion(prompt: String, options: some Collection<String> & Sendable, style: Question.VotingStyle) async throws {
+    func updateQuestion(prompt: String, options: some Collection<String> & Sendable, style: Question.VotingStyle) throws {
         let newQuestion = try Question.create(prompt: prompt, options: options, votingStyle: style)
         currentQuestion = newQuestion
     }
 
-    func removeQuestion() async throws -> Bool {
+    func removeQuestion() throws -> Bool {
         if currentQuestion == nil { return false }
         currentQuestion = nil
         return true
+    }
+
+    func setCurrentQuestionState(to newState: Question.State) throws {
+        guard let question = self.currentQuestion else {
+            throw Error.missingActiveQuestion
+        }
+        try question.setState(newState)
     }
 
     func hasParticipant(withParticipantToken participantToken: String) -> Bool {
@@ -269,7 +288,7 @@ public extension Room {
         forParticipant participantToken: String
     ) throws {
         guard let question = self.currentQuestion else {
-            throw RoomError.missingQuestion
+            throw RoomError.missingActiveQuestion
         }
         try question.registerPluralityVote(vote, participantToken: participantToken)
     }
@@ -279,7 +298,7 @@ public extension Room {
         forParticipant participantToken: String
     ) throws {
         guard let question = self.currentQuestion else {
-            throw RoomError.missingQuestion
+            throw RoomError.missingActiveQuestion
         }
         try question.registerPreferentialVote(vote, participantToken: participantToken)
     }
