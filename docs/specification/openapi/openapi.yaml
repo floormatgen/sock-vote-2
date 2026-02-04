@@ -307,7 +307,8 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/BasicError' 
+                $ref: '#/components/schemas/BasicError'
+  /room/question/{code}/{questionID}:
     delete:
       summary: Removes the current question
       tags:
@@ -315,6 +316,7 @@ paths:
       parameters:
         - $ref: '#/components/parameters/RoomCode'
         - $ref: '#/components/parameters/AdminToken'
+        - $ref: '#/components/parameters/QuestionID'
       responses:
         "200":
           description:
@@ -328,6 +330,33 @@ paths:
             There is no room to delete
         "403":
           $ref: '#/components/responses/InvalidAdminToken'
+        "404":
+          $ref: '#/components/responses/InvalidRoomCode'
+    put:
+      summary: Edits the current question
+      description:
+        Modify attributes of the current question
+      tags:
+        - Room Management
+      parameters:
+        - $ref: '#/components/parameters/RoomCode'
+        - $ref: '#/components/parameters/AdminToken'
+        - $ref: '#/components/parameters/QuestionID'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/QuestionModifyRequest'
+      responses:
+        "200":
+          description:
+            The operation was processed successfully
+        "400":
+          description:
+            The modify request was invalid
+        "403":
+          $ref: '#/components/responses/InvalidParticipantToken'
         "404":
           $ref: '#/components/responses/InvalidRoomCode'
   
@@ -349,7 +378,8 @@ paths:
       responses:
         "200":
           description:
-            The vote was counted successfully
+            The vote was counted successfully. 
+            If this participant already voted, the new vote replaces the old one.
         "400":
           description:
             The vote doesn't match the question
@@ -357,6 +387,41 @@ paths:
           $ref: '#/components/responses/InvalidParticipantToken'
         "404":
           $ref: '#/components/responses/InvalidRoomCode'
+  
+  /room/question-result/{code}/{questionID}:
+    get:
+      summary: Check the result of the question
+      tags:
+        - Participants
+        - Room Management
+      parameters:
+        - $ref: '#/components/parameters/RoomCode'
+        - $ref: '#/components/parameters/QuestionID'
+      responses:
+        "200":
+          description:
+            The result was found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/QuestionFinalInfo'
+        "400":
+          description:
+            The question does not have a result
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/QuestionStateError'
+        "404":
+          # TODO: More structured error handling
+          description:
+            Either the room or question was not found
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/RoomError'
+                  - $ref: '#/components/schemas/QuestionError'
 
 components:
 
@@ -390,21 +455,132 @@ components:
           type: array
           items:
             type: string
+    QuestionModifyRequest:
+      oneOf:
+        - $ref: '#/components/schemas/QuestionOpenRequest'
+        - $ref: '#/components/schemas/QuestionCloseRequest'
+        - $ref: '#/components/schemas/QuestionFinalizeRequest'
+      discriminator:
+        propertyName: type
+        mapping:
+          open: '#/components/schemas/QuestionOpenRequest'
+          close: '#/components/schemas/QuestionCloseRequest'
+          finalize: '#/components/schemas/QuestionFinalizeRequest'
+    QuestionOpenRequest:
+      type: object
+      description:
+        Open the question for voting. This allows participants to cast their votes.
+      required:
+        - type
+      properties:
+        type:
+          type: string
+    QuestionCloseRequest:
+      type: object
+      description:
+        Close the question for voting. This prevents participants from casting their votes.
+      required:
+        - type
+      properties:
+        type:
+          type: string
+    QuestionFinalizeRequest:
+      type: object
+      description:
+        Closes the question from voting, and prevents any further votes from being casted.
+        After this is sent, results should be available.
+      required:
+        - type
+      properties:
+        type:
+          type: string
 
     # MARK: - Data Types
     Fields:
       type: object
       additionalProperties:
         type: string
+      
     Question:
       allOf:
         - $ref: '#/components/schemas/QuestionCreateRequest'
         - type: object 
           required: 
             - id
+            - state
           properties:
             id:
               type: string
+            state:
+              $ref: '#/components/schemas/QuestionState'
+    QuestionFinalInfo:
+      allOf:
+        - $ref: '#/components/schemas/Question'
+        - type: object
+          required:
+            - voteCount
+            - result
+          properties:
+            voteCount:
+              type: integer
+            result:
+              $ref: '#/components/schemas/QuestionResult'
+    QuestionState:
+      type: string
+      enum:
+        - open
+        - closed
+        - finalized
+
+    QuestionResult:
+      oneOf:
+        - $ref: '#/components/schemas/QuestionResultSingleWinner'
+        - $ref: '#/components/schemas/QuestionResultTie'
+        - $ref: '#/components/schemas/QuestionResultNoVotes'
+      discriminator:
+        propertyName: type
+        mapping:
+          singleWinner: '#/components/schemas/QuestionResultSingleWinner'
+          tie: '#/components/schemas/QuestionResultTie'
+          noVotes: '#/components/schemas/QuestionResultNoVotes'
+    QuestionResultType:
+      type: string
+      enum:
+        - singleWinner
+        - tie
+        - noVotes
+    QuestionResultBase:
+      type: object
+      required:
+        - type
+      properties:
+        type:
+          $ref: '#/components/schemas/QuestionResultType'
+
+    QuestionResultSingleWinner:
+      allOf:
+        - $ref: '#/components/schemas/QuestionResultBase'
+        - type: object
+          required:
+            - winner
+          properties:
+            winner:
+              type: string
+    QuestionResultTie:
+      allOf:
+        - $ref: '#/components/schemas/QuestionResultBase'
+        - type: object
+          required:
+            - winners
+          properties:
+            winners:
+              type: array
+              items:
+                type: string
+    QuestionResultNoVotes:
+      allOf:
+        - $ref: '#/components/schemas/QuestionResultBase'
+
     VotingStyle:
       type: string
       enum:
@@ -422,8 +598,8 @@ components:
       discriminator:
         propertyName: type
         mapping:
-          PluralityVote: plurality
-          PreferentialVote: preferential
+          plurality: '#/components/schemas/PluralityVote'
+          preferential: '#/components/schemas/PreferentialVote'
     PluralityVote:
       allOf: 
         - $ref: '#/components/schemas/Vote'
@@ -449,8 +625,84 @@ components:
         - $ref: '#/components/schemas/PluralityVote'
         - $ref: '#/components/schemas/PreferentialVote'
 
-    # MARK: Errors
+    # MARK: - Errors
+    ErrorType:
+      type: string
+      enum:
+        - roomNotFound
+        - questionNotFound
+        - questionNotFinalized
+      description: >
+        ## Error Types
+        
+        The type of error can be queried by checking the `type` property on the returned object.
+          * `roomNotFound` - 
+            A room could not be found with the provided code
+          * `questionNotFound` -
+            A question could not be found with the provided id
+          * `questionNotFinalized` -
+            The current state of the question doesn't permit the requested operation.
+
+    BaseError:
+      required:
+        - type
+        - description
+      properties:
+        type:
+          type: string
+          description:
+            The type of the error. See `ErrorType` for the list of
+            possible values.
+        description:
+          type: string
+          description:
+            A user facing description of the error
+    
+    RoomError:
+      allOf:
+        - $ref: '#/components/schemas/BaseError'
+        - type: object
+          required:
+            - roomCode
+          properties:
+            roomCode:
+              type: string
+              description:
+                The room code uniquely identifying the room
+    
+    QuestionError:
+      allOf:
+        - $ref: '#/components/schemas/RoomError'
+        - type: object
+          required:
+            - questionID
+          properties:
+            questionID:
+              type: string
+              description:
+                The question `id` that uniquely identifies the Question
+
+    QuestionStateError:
+      allOf:
+        - $ref: '#/components/schemas/QuestionError'
+        - type: object
+          required:
+            - currentState
+            - allowedStates
+          properties:
+            currentState:
+              $ref: '#/components/schemas/QuestionState'
+              description:
+                The current question state
+            allowedStates:
+              type: array
+              items:
+                $ref: '#/components/schemas/QuestionState'
+              description:
+                The required question states for this action
+
     BasicError:
+      deprecated: true
       required:
         - reason
       properties:
@@ -513,7 +765,7 @@ components:
 tags:
   - name: Participants
     description:
-      Routes used by participants
+      Routes used by participants. They can also be used by room managers
   - name: Room Management
     description:
       Routes to manage rooms. 
