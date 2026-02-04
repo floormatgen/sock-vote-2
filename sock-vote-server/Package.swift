@@ -96,7 +96,7 @@ let package = Package(
     ]
 )
 
-// MARK: - Upcoming language features
+// MARK: - Swift Settings
 
 let swiftSettings: [SwiftSetting] = [
     .defaultIsolation(nil),
@@ -110,5 +110,7 @@ let upcomingFeatures: [SwiftSetting] = [
 ]
 
 for target in package.targets {
-    target.swiftSettings = (target.swiftSettings ?? []) + swiftSettings + upcomingFeatures
+    target.swiftSettings = (target.swiftSettings ?? []) 
+        + swiftSettings 
+        + upcomingFeatures
 }

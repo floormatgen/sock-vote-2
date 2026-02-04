@@ -11,7 +11,8 @@ public extension Question.Description {
                 options: options
             ),
             value2: .init(
-                id: id.uuidString
+                id: id.uuidString,
+                state: state.openAPIQuestionState
             )
         )
     }

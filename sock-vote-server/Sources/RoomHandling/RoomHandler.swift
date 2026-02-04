@@ -238,7 +238,7 @@ public extension RoomHandler {
             case .json(let body):
                 switch body {
                     case .open:
-                        newState = .opened
+                        newState = .open
                     case .close:
                         newState = .closed
                     case .finalize:

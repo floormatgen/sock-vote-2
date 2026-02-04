@@ -471,20 +471,33 @@ components:
         - type: object 
           required: 
             - id
+            - state
           properties:
             id:
               type: string
+            state:
+              $ref: '#/components/schemas/QuestionState'
+    QuestionPrivateInfo:
+      allOf:
+        - $ref: '#/components/schemas/Question'
+        - type: object
+          properties:
+            voteCount:
+              type: integer
+            result:
+              type: string
+    QuestionState:
+      type: string
+      enum:
+        - open
+        - closed
+        - finalized
+        
     VotingStyle:
       type: string
       enum:
         - plurality
         - preferential
-    QuestionModifyOperation:
-      type: string
-      enum:
-        - open
-        - close
-        - finalize
 
     # MARK: Votes
     Vote:
@@ -497,8 +510,8 @@ components:
       discriminator:
         propertyName: type
         mapping:
-          PluralityVote: plurality
-          PreferentialVote: preferential
+          plurality: '#/components/schemas/PluralityVote'
+          preferential: '#/components/schemas/PreferentialVote'
     PluralityVote:
       allOf: 
         - $ref: '#/components/schemas/Vote'

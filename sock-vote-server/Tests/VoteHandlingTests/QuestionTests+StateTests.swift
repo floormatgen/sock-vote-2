@@ -9,16 +9,16 @@ extension QuestionTests {
         @Test("Starts in opened state", arguments: Question.VotingStyle.allCases)
         func test_startsInOpenedState(_ style: Question.VotingStyle) throws {
             let question = try createQuestion(style: style)
-            #expect(question.state == .opened)
+            #expect(question.state == .open)
         }
 
         @Test(
             "Can switch between opened and closed", 
             arguments: Question.VotingStyle.allCases,
             [
-                (.opened, .opened),
-                (.opened, .closed),
-                (.closed, .opened),
+                (.open, .open),
+                (.open, .closed),
+                (.closed, .open),
                 (.closed, .closed),
             ] as [(Question.State, Question.State)]
         )
@@ -36,7 +36,7 @@ extension QuestionTests {
         @Test(
             "Can change from any state to finalized",
             arguments: Question.VotingStyle.allCases,
-            [.opened, .closed] as [Question.State]
+            [.open, .closed] as [Question.State]
         )
         func test_canChangeFromAnyStateToFinalized(
             _ style: Question.VotingStyle,
@@ -52,7 +52,7 @@ extension QuestionTests {
         @Test(
             "Cannot change from finalized",
             arguments: Question.VotingStyle.allCases,
-            [.opened, .closed] as [Question.State]
+            [.open, .closed] as [Question.State]
         )
         func test_cannotChangeFromFinalized(
             _ style: Question.VotingStyle, 

@@ -17,7 +17,7 @@ public /* abstract */ class Question: Identifiable {
     /// The question state affects what actions are permitted to take on a question
     public enum State: Sendable {
         /// The question is accepting votes
-        case opened
+        case open
         /// The question is not accepting votes
         case closed
         /// The question is marked final and cannot be modified
@@ -35,6 +35,7 @@ public /* abstract */ class Question: Identifiable {
         public let prompt: String
         public let options: [String]
         public let votingStyle: VotingStyle
+        public let state: State
     }
 
     /// Creates a new question
@@ -70,7 +71,7 @@ public /* abstract */ class Question: Identifiable {
         self.options = .init(options)
         self.optionsSet = .init(options)
 
-        self.state = .opened
+        self.state = .open
         self.id = id
         self.prompt = prompt
         #if DEBUG
@@ -96,7 +97,13 @@ public /* abstract */ class Question: Identifiable {
     }
 
     public var questionDescription: Description {
-        .init(id: id, prompt: prompt, options: options, votingStyle: votingStyle)
+        .init(
+            id: id, 
+            prompt: prompt, 
+            options: options, 
+            votingStyle: votingStyle,
+            state: state
+        )
     }
 
     public var votingStyle: VotingStyle {
@@ -112,7 +119,7 @@ public /* abstract */ class Question: Identifiable {
     }
 
     public var canVote: Bool {
-        state == .opened
+        state == .open
     }
 
     // MARK: - State Machine
@@ -122,7 +129,7 @@ public /* abstract */ class Question: Identifiable {
     public final func setState(_ newState: State) throws {
         guard self.state != newState else { return }
         switch self.state {
-            case .opened, .closed:
+            case .open, .closed:
                 self.state = newState
             case .finalized:
                 throw Error.illegalStateChange(current: state, new: newState)
@@ -132,8 +139,8 @@ public /* abstract */ class Question: Identifiable {
     // MARK: - Voting
 
     internal final func _ensureCanVote() throws {
-        guard self.state == .opened else {
-            throw Error.illegalAction(required: .opened, current: state)
+        guard self.state == .open else {
+            throw Error.illegalAction(required: .open, current: state)
         }
     }
 
@@ -214,7 +221,7 @@ extension Question.State: LosslessStringConvertible, CaseIterable {
 
     public init?(_ description: some StringProtocol) {
         switch description {
-            case "open": self = .opened
+            case "open": self = .open
             case "closed": self = .closed
             case "finalized": self = .finalized
             default: return nil
@@ -223,7 +230,7 @@ extension Question.State: LosslessStringConvertible, CaseIterable {
 
     public var description: String {
         switch self {
-            case .opened: "open"
+            case .open: "open"
             case .closed: "closed"
             case .finalized: "finalized"
         }
