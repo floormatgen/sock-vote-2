@@ -113,6 +113,45 @@ extension RoomHandlerTests {
             #expect(try await !Self.checkQuestionExists(on: roomHandler, roomCode: code))
         }
 
+        @Test("Question starts with open state")
+        func test_questionStartsWithOpenState() async throws {
+            let (code, adminToken) = try await createRoom(on: roomHandler)
+            let questionID = try await Self.createQuestion(
+                on: roomHandler, 
+                roomCode: code, 
+                adminToken: adminToken
+            )
+            let state = try await Self.getQuestionState(
+                on: roomHandler, 
+                roomCode: code, 
+                questionID: questionID
+            )
+            #expect(state == .open)
+        }
+
+        @Test("Result is noVotes when question has no votes")
+        func test_canGetQuestionResultWhenFinalized() async throws {
+            let (code, adminToken) = try await createRoom(on: roomHandler)
+            let questionID = try await Self.createQuestion(
+                on: roomHandler, 
+                roomCode: code, 
+                adminToken: adminToken
+            )
+            try await Self.changeQuestionState(
+                on: roomHandler, 
+                roomCode: code, 
+                questionID: questionID,
+                adminToken: adminToken, 
+                state: .finalized
+            )
+            let result = try await Self.getQuestionResult(
+                on: roomHandler, 
+                roomCode: code, 
+                questionID: questionID
+            )
+            #expect(result == .noVotes)
+        }
+
         // MARK: - Utilities
 
         static var defaultQuestionName: String {
@@ -224,6 +263,104 @@ extension RoomHandlerTests {
                 case .ok: true
                 default: false
             }
+        }
+
+        static func changeQuestionStateWithResponse(
+            on roomHandler: RoomHandler<some RoomManagerProtocol>,
+            roomCode: String,
+            questionID: String,
+            adminToken: String,
+            state: Question.State
+        ) async throws -> Operations.PutRoomQuestionCodeQuestionID.Output {
+            try await roomHandler.putRoomQuestionCodeQuestionID(
+                .init(
+                    path: .init(
+                        code: roomCode,
+                        questionID: questionID
+                    ), 
+                    headers: .init(
+                        roomAdminToken: adminToken
+                    ),
+                    body: .json(.init(
+                        from: state
+                    ))
+                )
+            )
+        }
+
+        static func changeQuestionState(
+            on roomHandler: RoomHandler<some RoomManagerProtocol>,
+            roomCode: String,
+            questionID: String,
+            adminToken: String,
+            state: Question.State
+        ) async throws {
+            let response = try await Self.changeQuestionStateWithResponse(
+                on: roomHandler, 
+                roomCode: roomCode, 
+                questionID: questionID, 
+                adminToken: adminToken, 
+                state: state
+            )
+            _ = try response.ok
+        }
+
+        static func getQuestionDescriptionWithResponse(
+            on roomHandler: RoomHandler<some RoomManagerProtocol>,
+            roomCode: String,
+            questionID: String
+        ) async throws -> Operations.GetRoomQuestionCode.Output {
+            try await roomHandler.getRoomQuestionCode(
+                .init(
+                    path: .init(
+                        code: roomCode
+                    )
+                )
+            )
+        }
+
+        static func getQuestionState(
+            on roomHandler: RoomHandler<some RoomManagerProtocol>,
+            roomCode: String,
+            questionID: String
+        ) async throws -> Question.State {
+            let response = try await Self.getQuestionDescriptionWithResponse(
+                on: roomHandler,
+                roomCode: roomCode, 
+                questionID: questionID
+            )
+            let state = try response.ok.body.json.state
+            return .init(state)
+        }
+
+        static func getQuestionResultWithResponse(
+            on roomHandler: RoomHandler<some RoomManagerProtocol>,
+            roomCode: String,
+            questionID: String
+        ) async throws -> Operations.GetRoomQuestionResultCodeQuestionID.Output {
+            try await roomHandler.getRoomQuestionResultCodeQuestionID(
+                .init(
+                    path: .init(
+                        code: roomCode,
+                        questionID: questionID
+                    )
+                )
+            )
+        }
+
+        static func getQuestionResult(
+            on roomHandler: RoomHandler<some RoomManagerProtocol>,
+            roomCode: String,
+            questionID: String
+        ) async throws -> Question.Result {
+            let response = try await Self.getQuestionResultWithResponse(
+                on: roomHandler, 
+                roomCode: roomCode, 
+                questionID: questionID
+            )
+            let body = try response.ok.body.json
+            #expect(body.id == questionID)
+            return .init(body.result)
         }
 
     }

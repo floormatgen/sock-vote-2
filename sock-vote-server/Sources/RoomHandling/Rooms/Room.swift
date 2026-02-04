@@ -40,10 +40,21 @@ public protocol RoomProtocol: AnyObject {
     /// Change the state of the current question
     func setCurrentQuestionState(to state: Question.State) async throws
 
+    /// The state of the current question
+    var currentQuestionState: Question.State? { get async }
+
     /// A description of the current question
     /// 
-    /// Returns `nil` when ``hasCurrentQuestion`` is `false`
+    /// - Returns: `nil` when ``hasCurrentQuestion`` is `false`
     var currentQuestionDescription: Question.Description? { get async }
+
+    /// The result of the current question
+    /// 
+    /// - Returns: `nil` when ``hasCurrentQuestion`` is `false`
+    var currentQuestionResult: Question.Result? { get async throws }
+
+    /// The number of votes cast for the current question
+    var currentQuestionVoteCount: Int? { get async }
 
     /// Updates the question
     func updateQuestion(prompt: String, options: some Collection<String> & Sendable, style: Question.VotingStyle) async throws
@@ -276,6 +287,23 @@ public extension Room {
             throw Error.missingActiveQuestion
         }
         try question.setState(newState)
+    }
+
+    var currentQuestionState: Question.State? {
+        guard let question = self.currentQuestion else { return nil }
+        return question.state
+    }
+
+    var currentQuestionResult: Question.Result? {
+        get throws {
+            guard let question = self.currentQuestion else { return nil }
+            return try question.result
+        } 
+    }
+
+    var currentQuestionVoteCount: Int? {
+        guard let question = self.currentQuestion else { return nil }
+        return question.voteCount
     }
 
     func hasParticipant(withParticipantToken participantToken: String) -> Bool {

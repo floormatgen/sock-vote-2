@@ -1,14 +1,14 @@
 extension Question {
 
-    public enum Result: Equatable {
+    public enum Result: Sendable, Equatable {
         case noVotes
         case tie(winners: [String])
-        case hasWinner(String)
+        case singleWinner(String)
 
         internal init(from modeResult: [String : some Comparable].ModeResult?) {
             switch modeResult {
                 case .single(let winner):
-                    self = .hasWinner(winner)
+                    self = .singleWinner(winner)
                 case .multiple(let winners):
                     self = .tie(winners: winners)
                 case .none:
@@ -97,7 +97,7 @@ extension Question {
 
             for (k, v) in counts {
                 // If a candidate has more than 50% of the vote, end early.
-                guard v < winThreshold || countingFirstNVotes > 1 else { return .hasWinner(k) }
+                guard v < winThreshold || countingFirstNVotes > 1 else { return .singleWinner(k) }
                 minValue = min(minValue, v)
                 maxValue = max(maxValue, v)
             }

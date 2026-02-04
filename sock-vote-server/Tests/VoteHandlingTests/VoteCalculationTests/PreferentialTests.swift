@@ -129,7 +129,7 @@ extension VoteCalculationTests {
 
             func checkResult(_ result: Question.Result) throws {
                 switch result {
-                    case .hasWinner(let winner):
+                    case .singleWinner(let winner):
                         try #require(expectedResult.count == 1)
                         let expectedWinner = try #require(expectedResult.first)
                         try #require(expectedWinner == winner, 

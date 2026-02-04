@@ -255,6 +255,51 @@ public extension RoomHandler {
         return .ok
     }
 
+    func getRoomQuestionResultCodeQuestionID(
+        _ input: Operations.GetRoomQuestionResultCodeQuestionID.Input
+    ) async throws -> Operations.GetRoomQuestionResultCodeQuestionID.Output {
+        let code = input.path.code
+        let questionID = input.path.questionID
+        guard let room = await roomManager.room(withCode: code) else {
+            return .notFound(.init(body: .json(.RoomError(.roomNotFound(roomCode: code)))))
+        }
+        // TODO: When questions are stored, check the question id of past questions
+        guard
+            let questionUUID = UUID(uuidString: questionID),
+            await room.hasQuestion(with: questionUUID) 
+        else {
+            return .notFound(.init(body: .json(.QuestionError(.questionNotFound(
+                roomCode: code, 
+                questionID: questionID
+            )))))
+        }
+        guard let currentQuestionState = await room.currentQuestionState else {
+            assertionFailure("\(#function): Question exists but currentQuestionState return nil")
+            return .undocumented(statusCode: 500, .init())
+        }
+        guard currentQuestionState == .finalized else {
+            return .badRequest(.init(body: .json(.questionNotFinalized(
+                roomCode: code, 
+                questionID: questionID, 
+                currentState: currentQuestionState.openAPIQuestionState
+            ))))
+        }
+        // This should not throw, as we already checked that the question state is finalized
+        guard
+            let description = await room.currentQuestionDescription,
+            let result = try await room.currentQuestionResult,
+            let voteCount = await room.currentQuestionVoteCount
+        else {
+            assertionFailure("\(#function): Question exists and is finalized but has no result")
+            return .undocumented(statusCode: 500, .init())
+        }
+        return .ok(.init(body: .json(.init(
+            description: description, 
+            voteCount: voteCount, 
+            result: result
+        ))))
+    }
+
     // MARK: - Voting
 
     func postRoomVoteCodeQuestionID(
@@ -285,7 +330,6 @@ public extension RoomHandler {
                             throw questionError
                     }
                 }
-                
         }
     }
 

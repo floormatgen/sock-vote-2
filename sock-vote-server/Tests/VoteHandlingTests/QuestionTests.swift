@@ -87,8 +87,9 @@ struct QuestionTests {
             try question.registerPluralityVote(vote, participantToken: token)
         }
 
+        try question.setState(.finalized)
         let result = try question.result
-        #expect(result == .hasWinner("Option 2"))
+        #expect(result == .singleWinner("Option 2"))
     }
 
     @Test("[preferential] Question.result is correct when queried", arguments: [
@@ -119,6 +120,7 @@ struct QuestionTests {
             try question.registerPreferentialVote(vote, participantToken: token)
         }
 
+        try question.setState(.finalized)
         try testArgument.checkResult(try question.result)
     }
     

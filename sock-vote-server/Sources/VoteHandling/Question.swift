@@ -172,12 +172,19 @@ public /* abstract */ class Question: Identifiable {
         _resultCache = try _calculateVoteResult()
     }
 
+    internal func _ensureAllowedToGetResult() throws {
+        guard state == .finalized else {
+            throw Error.illegalAction(required: .finalized, current: self.state)
+        }
+    }
+
     internal func _calculateVoteResult() throws -> Result {
         _requiresConcreteImplementation()
     }
 
     public var result: Result {
         get throws {
+            try _ensureAllowedToGetResult()
             if let result = _resultCache { return result }
             try _updateResultCache()
             return _resultCache!

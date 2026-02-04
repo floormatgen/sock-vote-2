@@ -16,4 +16,8 @@ public extension Components.Schemas.Question {
         value2.id
     }
 
+    var state: Components.Schemas.QuestionState {
+        value2.state
+    }
+
 }

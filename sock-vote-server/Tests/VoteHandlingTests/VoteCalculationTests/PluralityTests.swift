@@ -51,7 +51,7 @@ extension VoteCalculationTests {
             .flatMap(\.self)
             .map { Question.PluralityVote(selection: $0) }
             let result = try Question.pluralityResult(using: votes, options: defaultOptions)
-            guard case .hasWinner(let winner) = result else {
+            guard case .singleWinner(let winner) = result else {
                 Issue.record("\(#function): result (\(result)) not equal to .hasWinner(_:)")
                 return
             }
