@@ -9,14 +9,18 @@ extension RoomHandlerTests {
     @Suite
     struct QuestionTests {
         let roomHandler: DefaultRoomHandler
+        let code: String
+        let adminToken: String
 
         init() async throws {
-            roomHandler = DefaultRoomHandler()
+            self.roomHandler = DefaultRoomHandler()
+            let (code, adminToken) = try await createRoom(on: roomHandler)
+            self.code = code
+            self.adminToken = adminToken
         }
 
         @Test("Admin can create question")
         func test_adminCanCreateQuestion() async throws {
-            let (code, adminToken) = try await createRoom(on: roomHandler)
             let prompt = "Question Prompt"
             let options = (0..<3).map { String($0) }
 
@@ -35,7 +39,6 @@ extension RoomHandlerTests {
 
         @Test("Cannot create question with invalid admin token")
         func test_cannotUpdateQuestionWithInvalidAdminToken() async throws {
-            let (code, _) = try await createRoom(on: roomHandler)
             let badAdminToken = UUID().uuidString
             let response = try await Self.createQuestionWithResponse(
                 on: roomHandler, 
@@ -57,7 +60,6 @@ extension RoomHandlerTests {
 
         @Test("Admin can delete question")
         func test_adminCanDeleteQuestion() async throws {
-            let (code, adminToken) = try await createRoom(on: roomHandler)
             let id = try await Self.createQuestion(
                 on: roomHandler, 
                 roomCode: code, 
@@ -74,7 +76,6 @@ extension RoomHandlerTests {
 
         @Test("Admin cannot delete question from missing room")
         func test_adminCannotDeleteQuestionFromMissingRoom() async throws {
-            let (code, adminToken) = try await createRoom(on: roomHandler)
             let id = try await Self.createQuestion(on: roomHandler, roomCode: code, adminToken: adminToken)
             let response = try await Self.deleteQuestionWithResponse(
                 on: roomHandler, 
@@ -102,7 +103,6 @@ extension RoomHandlerTests {
 
         @Test("Cannot delete nonexistent question")
         func test_cannotDeleteNonexistentQuestion() async throws {
-            let (code, adminToken) = try await createRoom(on: roomHandler)
             let response = try await Self.deleteQuestionWithResponse(
                 on: roomHandler, 
                 roomCode: code,
@@ -115,7 +115,6 @@ extension RoomHandlerTests {
 
         @Test("Question starts with open state")
         func test_questionStartsWithOpenState() async throws {
-            let (code, adminToken) = try await createRoom(on: roomHandler)
             let questionID = try await Self.createQuestion(
                 on: roomHandler, 
                 roomCode: code, 
@@ -129,9 +128,42 @@ extension RoomHandlerTests {
             #expect(state == .open)
         }
 
+        @Test(
+            "Can switch state between open and closed",
+            arguments: [
+                (.open, .closed),
+                (.closed, .open),
+            ] as [(Question.State, Question.State)]
+        )
+        func test_canSwitchStateBetweenOpenAndClosed(
+            _ first: Question.State, 
+            _ second: Question.State
+        ) async throws {
+            let questionID = try await Self.createQuestion(
+                on: roomHandler, 
+                roomCode: code, 
+                adminToken: adminToken
+            )
+            let firstState = try await Self.changeQuestionState(
+                on: roomHandler, 
+                roomCode: code, 
+                questionID: questionID, 
+                adminToken: adminToken, 
+                state: first
+            )
+            #expect(firstState == first)
+            let secondState = try await Self.changeQuestionState(
+                on: roomHandler, 
+                roomCode: code, 
+                questionID: questionID, 
+                adminToken: adminToken, 
+                state: second
+            )
+            #expect(secondState == second)
+        }
+
         @Test("Result is noVotes when question has no votes")
         func test_canGetQuestionResultWhenFinalized() async throws {
-            let (code, adminToken) = try await createRoom(on: roomHandler)
             let questionID = try await Self.createQuestion(
                 on: roomHandler, 
                 roomCode: code, 
@@ -150,6 +182,80 @@ extension RoomHandlerTests {
                 questionID: questionID
             )
             #expect(result == .noVotes)
+        }
+
+        @Test(
+            "Getting result not allowed when not finalized",
+            arguments: [
+                .open,
+                .closed
+            ] as [Question.State]
+        )
+        func test_gettingResultNotAllowedwhenNotFinalized(_ state: Question.State) async throws {
+            let questionID = try await Self.createQuestion(
+                on: roomHandler, 
+                roomCode: code, 
+                adminToken: adminToken
+            )
+            try await Self.changeQuestionState(
+                on: roomHandler, 
+                roomCode: code, 
+                questionID: questionID, 
+                adminToken: adminToken, 
+                state: state
+            )
+            let response = try await Self.getQuestionResultWithResponse(
+                on: roomHandler, 
+                roomCode: code, 
+                questionID: questionID
+            )
+            let body = try response.badRequest.body.json
+            #expect(body._type == .questionNotFinalized)
+            #expect(!body.description.isEmpty)
+            #expect(body.roomCode == code)
+            #expect(body.questionID == questionID)
+            #expect(body.currentState == state.openAPIQuestionState)
+            #expect(Set(body.allowedStates) == [.finalized])
+        }
+
+        @Test("Cannot get question result with invalid question id")
+        func test_cannotGetQuestionResultWithInvalidQuestionID() async throws {
+            let questionID = "bad"
+            let response = try await Self.getQuestionResultWithResponse(
+                on: roomHandler, 
+                roomCode: code, 
+                questionID: questionID
+            )
+            let body = try response.notFound.body.json
+            guard case .QuestionError(let questionError) = body else {
+                Issue.record("\(#function): Unexpected response body \(body)")
+                return
+            }
+            #expect(questionError._type == .questionNotFound)
+            #expect(!questionError.description.isEmpty)
+            #expect(questionError.questionID == questionID)
+        }
+
+        @Test("Cannot get question result with invalid room code")
+        func test_cannotGetQuestionResultWithInvalidRoomCode() async throws {
+            let badRoomCode = "414141"
+            let questionID = try await Self.createQuestion(
+                on: roomHandler, 
+                roomCode: code, 
+                adminToken: adminToken
+            )
+            let response = try await Self.getQuestionResultWithResponse(
+                on: roomHandler, 
+                roomCode: badRoomCode, 
+                questionID: questionID
+            )
+            let body = try response.notFound.body.json
+            guard case .RoomError(let roomError) = body else {
+                Issue.record("\(#function): Unexpected response body \(body)")
+                return
+            }
+            #expect(roomError._type == .roomNotFound)
+            #expect(!roomError.description.isEmpty)
         }
 
         // MARK: - Utilities
@@ -288,13 +394,14 @@ extension RoomHandlerTests {
             )
         }
 
+        @discardableResult
         static func changeQuestionState(
             on roomHandler: RoomHandler<some RoomManagerProtocol>,
             roomCode: String,
             questionID: String,
             adminToken: String,
             state: Question.State
-        ) async throws {
+        ) async throws -> Question.State {
             let response = try await Self.changeQuestionStateWithResponse(
                 on: roomHandler, 
                 roomCode: roomCode, 
@@ -303,6 +410,13 @@ extension RoomHandlerTests {
                 state: state
             )
             _ = try response.ok
+            let newState = try await Self.getQuestionState(
+                on: roomHandler,
+                roomCode: roomCode,
+                questionID: questionID
+            )
+            #expect(newState == state)
+            return state
         }
 
         static func getQuestionDescriptionWithResponse(

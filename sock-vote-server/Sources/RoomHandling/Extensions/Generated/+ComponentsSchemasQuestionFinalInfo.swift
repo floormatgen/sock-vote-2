@@ -57,7 +57,11 @@ public extension Components.Schemas.QuestionFinalInfo {
     }
 
     var state: Components.Schemas.QuestionState {
-        value1.state
+        assert(
+            value1.state == .finalized,
+            "\(#function): Question must be finalized to create RoomFinalInfo"
+        )
+        return value1.state
     }
 
     var voteCount: Int {

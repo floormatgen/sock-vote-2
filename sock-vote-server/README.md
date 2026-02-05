@@ -1,7 +1,29 @@
 # SockVoteServer
 The server component to sock-vote
 
-## Room Lifecycle
+## Object Lifecycles
+
+Some of the server objects, such as a `Question`, `Participant` and `Room` are modeled using state machines in order to track their lifecycle.
+
+## Question Lifecycle
+
+```mermaid
+stateDiagram-v2
+    [*] --> Open
+    Open --> Closed
+    Closed --> Open
+    Open --> Finalized
+    Closed --> Finalized
+    Finalized --> [*]
+```
+
+| Stage         | Description                                                                               |
+| ------------- | ----------------------------------------------------------------------------------------- |
+| **Open**      | The question is currently accepting votes. Results are **not available**.                 |
+| **Closed**    | The question is not accepting votes, but can be reopened. Results are **not available**.  |
+| **Finalized** | The question is not accepting votes and cannot be reopened. Results are **available**.    |
+
+### Room Lifecycle
 
 ```mermaid
 stateDiagram-v2
@@ -19,11 +41,11 @@ stateDiagram-v2
 | **Active**   | Active admin connection      |
 | **Cleanup**  | The room is being cleaned up |
 
-### Notes
+#### Notes
 - The room can move from the ``Inactive`` to the ``Cleanup`` stage automatically due to inactivity from the room admin.
 - The room can also be manually closed by the admin, moving it from the ``Active`` state to the ``Cleanup`` stage.
 
-## Participant Lifecycle
+### Participant Lifecycle
 
 ```mermaid
 stateDiagram-v2
@@ -46,5 +68,5 @@ stateDiagram-v2
 | **Active**   | Active connection     |
 | **Removed**  | Removed from the room |
 
-### Notes
+#### Notes
 - The ``Removed`` state can be caused by either getting kicked from the room, or the room closing.

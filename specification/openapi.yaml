@@ -649,10 +649,7 @@ components:
         - description
       properties:
         type:
-          type: string
-          description:
-            The type of the error. See `ErrorType` for the list of
-            possible values.
+          $ref: '#/components/schemas/ErrorType'
         description:
           type: string
           description:
