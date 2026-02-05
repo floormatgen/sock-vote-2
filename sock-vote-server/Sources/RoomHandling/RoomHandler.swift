@@ -300,6 +300,12 @@ public extension RoomHandler {
         ))))
     }
 
+    func getRoomQuestionVoteCountCodeQuestionID(
+        _ input: Operations.GetRoomQuestionVoteCountCodeQuestionID.Input
+    ) async throws -> Operations.GetRoomQuestionVoteCountCodeQuestionID.Output {
+        fatalError()
+    }
+
     // MARK: - Voting
 
     func postRoomVoteCodeQuestionID(
