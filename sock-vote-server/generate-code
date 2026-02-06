@@ -1,0 +1,8 @@
+#! /bin/sh
+
+cd "$(dirname $0)"
+
+swift \
+    package plugin \
+    generate-code-from-openapi \
+    --target "RoomHandling"

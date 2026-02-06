@@ -55,8 +55,9 @@ let package = Package(
                 .product(name: "Hummingbird", package: "hummingbird"),
                 .product(name: "HummingbirdWebSocket", package: "hummingbird-websocket"),
             ],
-            plugins: [
-                .plugin(name: "OpenAPIGenerator", package: "swift-openapi-generator"),
+            resources: [
+                .process("openapi.yaml"),
+                .process("openapi-generator-config.yaml"),
             ]
         ),
         .target(
@@ -95,6 +96,22 @@ let package = Package(
         .v6, .v5,
     ]
 )
+
+// MARK: - Code Generation
+
+//! FIXME: Workaround for YAMS bug on windows. Using the package plugin is preferrable 
+// This tries to work around the fact that the OpenAPI generator doesn't work properly on windows
+// let roomHandlingTarget = package.targets.first { $0.name == "RoomHandling" }
+// #if !os(windows)
+// roomHandlingTarget?.exclude += [
+//     "GeneratedSources/Server.swift",
+//     "GeneratedSources/Types.swift",
+// ]
+// #else
+// roomHandlingTarget?.plugins += [
+//     .plugin(name: "OpenAPIGenerator", package: "swift-openapi-generator"),
+// ]
+// #endif
 
 // MARK: - Swift Settings
 
