@@ -413,16 +413,24 @@ paths:
               schema:
                 $ref: '#/components/schemas/QuestionStateError'
         "404":
-          # TODO: More structured error handling
-          description:
-            Either the room or question was not found
-          content:
-            application/json:
-              schema:
-                oneOf:
-                  - $ref: '#/components/schemas/RoomError'
-                  - $ref: '#/components/schemas/QuestionError'
+          $ref: '#/components/responses/RoomOrQuestionNotFound'
 
+  /room/question-vote-count/{code}/{questionID}:
+    get:
+      summary: Get the vote count associated with a question
+      tags:
+        - Room Management
+      parameters:
+        - $ref: '#/components/parameters/RoomCode'
+        - $ref: '#/components/parameters/QuestionID'
+        - $ref: '#/components/parameters/AdminToken'
+      responses:
+        "200":
+          description:
+            The question could be found.
+        "404":
+          $ref: '#/components/responses/RoomOrQuestionNotFound'
+  
 components:
 
   # MARK: - Schemas
@@ -638,6 +646,8 @@ components:
         The type of error can be queried by checking the `type` property on the returned object.
           * `roomNotFound` - 
             A room could not be found with the provided code
+          * `roomAdminTokenInvalid` -
+            The admin token provided is either missing or invalid
           * `questionNotFound` -
             A question could not be found with the provided id
           * `questionNotFinalized` -
@@ -649,10 +659,7 @@ components:
         - description
       properties:
         type:
-          type: string
-          description:
-            The type of the error. See `ErrorType` for the list of
-            possible values.
+          $ref: '#/components/schemas/ErrorType'
         description:
           type: string
           description:
@@ -669,6 +676,20 @@ components:
               type: string
               description:
                 The room code uniquely identifying the room
+    
+    RoomAdminError:
+      allOf:
+        - $ref: '#/components/schemas/RoomError'
+        - type: object
+          required:
+            - adminToken
+          properties:
+            adminToken:
+              type:
+                - string
+                - 'null'
+              description:
+                The admin token associated with the request
     
     QuestionError:
       allOf:
@@ -749,6 +770,17 @@ components:
         type: string
 
   responses:
+
+    RoomOrQuestionNotFound:
+      description:
+        Either the room or question was not found
+      content:
+        application/json:
+          schema:
+            oneOf:
+              - $ref: '#/components/schemas/RoomError'
+              - $ref: '#/components/schemas/QuestionError'
+
     InvalidAdminToken:
       description:
         The admin token is either missing or incorrect
@@ -759,7 +791,6 @@ components:
     InvalidRoomCode:
       description:
         The room does not exist
-
 
 # MARK: - Tags
 tags:
