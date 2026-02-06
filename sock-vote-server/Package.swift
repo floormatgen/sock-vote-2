@@ -6,7 +6,7 @@ import PackageDescription
 let package = Package(
     name: "SockVoteServer",
     platforms: [
-        .macOS(.v14),
+        .macOS(.v15),
     ],
     products: [
         // Products define the executables and libraries a package produces, making them visible to other packages.
@@ -18,9 +18,9 @@ let package = Package(
     dependencies: [
 
         // Utility
-        .package(url: "https://github.com/apple/swift-argument-parser", from: "1.0.0"),
         .package(url: "https://github.com/apple/swift-log", from: "1.6.0"),
         .package(url: "https://github.com/apple/swift-http-types.git", from: "1.0.0"),
+        .package(url: "https://github.com/apple/swift-configuration", from: "1.0.0"),
 
         // Server-related
         .package(url: "https://github.com/apple/swift-openapi-runtime", from: "1.0.0"),
@@ -40,10 +40,10 @@ let package = Package(
             name: "SockVoteServer",
             dependencies: [
                 .target(name: "RoomHandling"),
-                .product(name: "ArgumentParser", package: "swift-argument-parser"),
                 .product(name: "OpenAPIRuntime", package: "swift-openapi-runtime"),
                 .product(name: "OpenAPIHummingbird", package: "swift-openapi-hummingbird"),
                 .product(name: "Hummingbird", package: "hummingbird"),
+                .product(name: "Configuration", package: "swift-configuration"),
             ],
         ),
         .target(
@@ -54,10 +54,6 @@ let package = Package(
                 .product(name: "OpenAPIRuntime", package: "swift-openapi-runtime"),
                 .product(name: "Hummingbird", package: "hummingbird"),
                 .product(name: "HummingbirdWebSocket", package: "hummingbird-websocket"),
-            ],
-            resources: [
-                .process("openapi.yaml"),
-                .process("openapi-generator-config.yaml"),
             ]
         ),
         .target(
@@ -101,6 +97,7 @@ let package = Package(
 
 //! FIXME: Workaround for YAMS bug on windows. Using the package plugin is preferrable.
 //? The package plugin works on other platforms, it just doesn't work on windows.
+//? Windows also currently fails to build due to swift-nio.
 // This tries to work around the fact that the OpenAPI generator doesn't work properly on windows
 #if !os(windows)
 let roomHandlingTarget = package.targets.first { $0.name == "RoomHandling" }!

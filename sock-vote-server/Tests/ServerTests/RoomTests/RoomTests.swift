@@ -5,6 +5,7 @@ import Foundation
 import NIOFoundationCompat
 import HummingbirdTesting
 import HTTPTypes
+import Configuration
 
 @Suite
 struct RoomTests {
@@ -14,8 +15,10 @@ struct RoomTests {
     // static let encoder = JSONEncoder()
 
     init() async throws {
-        let options = MockOptions()
-        self.app = try await buildApplication(options: options)
+        let configProvider = InMemoryProvider(values: [
+            :
+        ])
+        self.app = try await buildApplication(reader: ConfigReader(provider: configProvider))
     }
     
     @Test("Can create room")

@@ -1,0 +1,17 @@
+#! /bin/sh
+
+cd $(dirname $0)
+
+docker run \
+    --rm \
+    --volume $(pwd):/src \
+    --volume $(pwd)/../specification:/specification \
+    --workdir /src \
+    swift:6.2 \
+    bash -c " \
+        cd ..; \
+        cp -r src container; \
+        cd container; \
+        swift package clean; \
+        swift test; \
+    "

@@ -1,17 +1,14 @@
-import ArgumentParser
 import Hummingbird
+import Configuration
 
 @main
-struct EntryPoint: AsyncParsableCommand, OptionsProvider {
+struct EntryPoint {
 
-    @Option(help: "The hostname of the server.")
-    var hostname: String = "127.0.0.1"
-
-    @Option(help: "The port of the server.")
-    var port: Int = 8080
-
-    func run() async throws {
-        let application = try await buildApplication(options: self)
+    static func main() async throws {
+        let config = ConfigReader(providers: [
+            EnvironmentVariablesProvider(),
+        ])
+        let application = try await buildApplication(reader: config)
         try await application.run()
     }
 
