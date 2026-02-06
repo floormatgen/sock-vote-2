@@ -1,8 +1,8 @@
 # Based on the Hummingbird Dockerfile template, but stripped down somewhat
 FROM swift:6.2 AS build
 
-RUN apt-get -q update \
-    && apt-get -q dist-upgrade
+RUN apt-get -q -y update \
+    && apt-get -q -y dist-upgrade
 
 # Set up a build area
 WORKDIR /build
