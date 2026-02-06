@@ -1,13 +1,13 @@
 import Foundation
 import VoteHandling
 
-public protocol RoomProtocol: AnyObject {
-    var name: String { get }
-    var code: String { get }
-    var fields: [String] { get }
+public protocol RoomProtocol: Actor {
+    nonisolated var name: String { get }
+    nonisolated var code: String { get }
+    nonisolated var fields: [String] { get }
 
     /// Active join requests
-    var joinRequests: [String : JoinRequest] { get async }
+    var joinRequests: [String : JoinRequest] { get }
 
     /// Request to join the room
     /// 
@@ -20,63 +20,63 @@ public protocol RoomProtocol: AnyObject {
     /// Verify a provided admin token
     /// 
     /// - Returns: `true` if the token is valid, otherwise `false`
-    func verifyAdminToken(_ adminToken: String) -> Bool
+    nonisolated func verifyAdminToken(_ adminToken: String) -> Bool
 
     /// Handle a join request
     /// 
     /// - Parameter accept: Whether to accept the request
     /// - Parameter participantToken: The participant token to handle
     /// 
-    func handleJoinRequest(_ accept: Bool, forToken participantToken: String) async -> JoinRequestResult
+    func handleJoinRequest(_ accept: Bool, forToken participantToken: String) -> JoinRequestResult
 
     /// Whether the room has a current question
     /// 
     /// To remove a question, call ``removeQuestion()``
-    var hasCurrentQuestion: Bool { get async }
+    var hasCurrentQuestion: Bool { get }
 
     /// Checks if the current room has a question matching the id provided
-    func hasQuestion(with id: UUID) async -> Bool
+    func hasQuestion(with id: UUID) -> Bool
 
     /// Change the state of the current question
-    func setCurrentQuestionState(to state: Question.State) async throws
+    func setCurrentQuestionState(to state: Question.State) throws
 
     /// The state of the current question
-    var currentQuestionState: Question.State? { get async }
+    var currentQuestionState: Question.State? { get }
 
     /// A description of the current question
     /// 
     /// - Returns: `nil` when ``hasCurrentQuestion`` is `false`
-    var currentQuestionDescription: Question.Description? { get async }
+    var currentQuestionDescription: Question.Description? { get }
 
     /// The result of the current question
     /// 
     /// - Returns: `nil` when ``hasCurrentQuestion`` is `false`
-    var currentQuestionResult: Question.Result? { get async throws }
+    var currentQuestionResult: Question.Result? { get throws }
 
     /// The number of votes cast for the current question
-    var currentQuestionVoteCount: Int? { get async }
+    var currentQuestionVoteCount: Int? { get }
 
     /// Updates the question
-    func updateQuestion(prompt: String, options: some Collection<String> & Sendable, style: Question.VotingStyle) async throws
+    func updateQuestion(prompt: String, options: some Collection<String> & Sendable, style: Question.VotingStyle) throws
 
     /// Removes the current question
     /// 
     /// - Returns: `true` if a question was deleted, or `false` is there wasn't a question.
     @discardableResult
-    func removeQuestion() async throws -> Bool
+    func removeQuestion() throws -> Bool
 
     /// Whether the room has a participant with the specified token
-    func hasParticipant(withParticipantToken participantToken: String) async -> Bool
+    func hasParticipant(withParticipantToken participantToken: String) -> Bool
 
     func registerPluralityVote(
         _ vote: Question.PluralityVote, 
         forParticipant participantToken: String
-    ) async throws
+    ) throws
 
     func registerPreferentialVote(
         _ vote: Question.PreferentialVote, 
         forParticipant participantToken: String
-    ) async throws
+    ) throws
 }
 
 public extension RoomProtocol {
@@ -95,7 +95,7 @@ public extension RoomProtocol {
     /// - Parameter extraFields: On return the extra fields, if any
     /// 
     /// - Returns: `true` if the provided fields are valid, `false`` otherwise.
-    func validateFields(
+    nonisolated func validateFields(
         _ fields: [String : String], 
         missingFields: inout [String], 
         extraFields: inout [String]
@@ -107,7 +107,7 @@ public extension RoomProtocol {
         )
     }
   
-    func validateFieldKeys(
+    nonisolated func validateFieldKeys(
         _ fieldKeys: some Collection<String>,
         missingFields: inout [String],
         extraFields: inout [String]
@@ -130,13 +130,13 @@ public extension RoomProtocol {
     /// Checks if the provided fields arae valid
     /// 
     /// ``validateFields(_:missingFields:extraFields:)``
-    func validateFields(
+    nonisolated func validateFields(
         _ fields: [String : String],
     ) -> Bool {
         return validateFieldKeys(fields.keys)
     }
 
-    func validateFieldKeys(
+    nonisolated func validateFieldKeys(
         _ fieldKeys: some Collection<String>,
     ) -> Bool {
         guard fieldKeys.count == self.fields.count else { return false } // fastpath
@@ -153,12 +153,12 @@ public extension RoomProtocol {
     func registerVote(
         _ vote: Components.Schemas.AnyVote,
         forParticipant participantToken: String
-    ) async throws {
+    ) throws {
         switch vote {
             case .PluralityVote(let v):
-                try await registerPluralityVote(.init(v), forParticipant: participantToken)
+                try registerPluralityVote(.init(v), forParticipant: participantToken)
             case .PreferentialVote(let v):
-                try await registerPreferentialVote(.init(v), forParticipant: participantToken)
+                try registerPreferentialVote(.init(v), forParticipant: participantToken)
         }
     }
 

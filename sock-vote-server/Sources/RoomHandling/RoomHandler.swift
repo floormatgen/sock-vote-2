@@ -300,10 +300,15 @@ public extension RoomHandler {
         ))))
     }
 
-    func getRoomQuestionVoteCountCodeQuestionID(
-        _ input: Operations.GetRoomQuestionVoteCountCodeQuestionID.Input
-    ) async throws -> Operations.GetRoomQuestionVoteCountCodeQuestionID.Output {
-        fatalError()
+    func getRoomQuestionVotesInfoCodeQuestionID(
+        _ input: Operations.GetRoomQuestionVotesInfoCodeQuestionID.Input
+    ) async throws -> Operations.GetRoomQuestionVotesInfoCodeQuestionID.Output {
+        await withVerifiedQuestionAndAdmin(input: input) { room, _, _ in
+            return .ok(.init(body: .json(.init(
+                timestamp: Date.now.ISO8601Format(), 
+                voteCount: await room.currentQuestionVoteCount ?? 0
+            ))))
+        }
     }
 
     // MARK: - Voting

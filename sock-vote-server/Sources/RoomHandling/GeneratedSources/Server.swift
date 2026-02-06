@@ -153,14 +153,14 @@ extension APIProtocol {
         )
         try transport.register(
             {
-                try await server.getRoomQuestionVoteCountCodeQuestionID(
+                try await server.getRoomQuestionVotesInfoCodeQuestionID(
                     request: $0,
                     body: $1,
                     metadata: $2
                 )
             },
             method: .get,
-            path: server.apiPathComponentsWithServerPrefix("/room/question-vote-count/{code}/{questionID}")
+            path: server.apiPathComponentsWithServerPrefix("/room/question-votes-info/{code}/{questionID}")
         )
     }
 }
@@ -1149,11 +1149,13 @@ fileprivate extension UniversalServer where APIHandler: APIProtocol {
             }
         )
     }
-    /// Get the vote count associated with a question
+    /// Get the vote-information
     ///
-    /// - Remark: HTTP `GET /room/question-vote-count/{code}/{questionID}`.
-    /// - Remark: Generated from `#/paths//room/question-vote-count/{code}/{questionID}/get`.
-    func getRoomQuestionVoteCountCodeQuestionID(
+    /// This information is limited intentionally to prevent spoiling the vote.
+    ///
+    /// - Remark: HTTP `GET /room/question-votes-info/{code}/{questionID}`.
+    /// - Remark: Generated from `#/paths//room/question-votes-info/{code}/{questionID}/get`.
+    func getRoomQuestionVotesInfoCodeQuestionID(
         request: HTTPTypes.HTTPRequest,
         body: OpenAPIRuntime.HTTPBody?,
         metadata: OpenAPIRuntime.ServerRequestMetadata
@@ -1162,12 +1164,12 @@ fileprivate extension UniversalServer where APIHandler: APIProtocol {
             request: request,
             requestBody: body,
             metadata: metadata,
-            forOperation: Operations.GetRoomQuestionVoteCountCodeQuestionID.id,
+            forOperation: Operations.GetRoomQuestionVotesInfoCodeQuestionID.id,
             using: {
-                APIHandler.getRoomQuestionVoteCountCodeQuestionID($0)
+                APIHandler.getRoomQuestionVotesInfoCodeQuestionID($0)
             },
             deserializer: { request, requestBody, metadata in
-                let path: Operations.GetRoomQuestionVoteCountCodeQuestionID.Input.Path = .init(
+                let path: Operations.GetRoomQuestionVotesInfoCodeQuestionID.Input.Path = .init(
                     code: try converter.getPathParameterAsURI(
                         in: metadata.pathParameters,
                         name: "code",
@@ -1179,7 +1181,7 @@ fileprivate extension UniversalServer where APIHandler: APIProtocol {
                         as: Components.Parameters.QuestionID.self
                     )
                 )
-                let headers: Operations.GetRoomQuestionVoteCountCodeQuestionID.Input.Headers = .init(
+                let headers: Operations.GetRoomQuestionVotesInfoCodeQuestionID.Input.Headers = .init(
                     roomAdminToken: try converter.getRequiredHeaderFieldAsURI(
                         in: request.headerFields,
                         name: "Room-Admin-Token",
@@ -1187,7 +1189,7 @@ fileprivate extension UniversalServer where APIHandler: APIProtocol {
                     ),
                     accept: try converter.extractAcceptHeaderIfPresent(in: request.headerFields)
                 )
-                return Operations.GetRoomQuestionVoteCountCodeQuestionID.Input(
+                return Operations.GetRoomQuestionVotesInfoCodeQuestionID.Input(
                     path: path,
                     headers: headers
                 )
@@ -1198,7 +1200,38 @@ fileprivate extension UniversalServer where APIHandler: APIProtocol {
                     suppressUnusedWarning(value)
                     var response = HTTPTypes.HTTPResponse(soar_statusCode: 200)
                     suppressMutabilityWarning(&response)
-                    return (response, nil)
+                    let body: OpenAPIRuntime.HTTPBody
+                    switch value.body {
+                    case let .json(value):
+                        try converter.validateAcceptIfPresent(
+                            "application/json",
+                            in: request.headerFields
+                        )
+                        body = try converter.setResponseBodyAsJSON(
+                            value,
+                            headerFields: &response.headerFields,
+                            contentType: "application/json; charset=utf-8"
+                        )
+                    }
+                    return (response, body)
+                case let .forbidden(value):
+                    suppressUnusedWarning(value)
+                    var response = HTTPTypes.HTTPResponse(soar_statusCode: 403)
+                    suppressMutabilityWarning(&response)
+                    let body: OpenAPIRuntime.HTTPBody
+                    switch value.body {
+                    case let .json(value):
+                        try converter.validateAcceptIfPresent(
+                            "application/json",
+                            in: request.headerFields
+                        )
+                        body = try converter.setResponseBodyAsJSON(
+                            value,
+                            headerFields: &response.headerFields,
+                            contentType: "application/json; charset=utf-8"
+                        )
+                    }
+                    return (response, body)
                 case let .notFound(value):
                     suppressUnusedWarning(value)
                     var response = HTTPTypes.HTTPResponse(soar_statusCode: 404)

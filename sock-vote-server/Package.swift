@@ -20,7 +20,13 @@ let package = Package(
         // Utility
         .package(url: "https://github.com/apple/swift-log", from: "1.6.0"),
         .package(url: "https://github.com/apple/swift-http-types.git", from: "1.0.0"),
-        .package(url: "https://github.com/apple/swift-configuration", from: "1.0.0"),
+
+        // Configuration
+        .package(
+            url: "https://github.com/apple/swift-configuration", 
+            from: "1.0.0", 
+            traits: [.defaults, "CommandLineArguments"]
+        ),
 
         // Server-related
         .package(url: "https://github.com/apple/swift-openapi-runtime", from: "1.0.0"),

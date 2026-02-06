@@ -78,11 +78,13 @@ public protocol APIProtocol: Sendable {
     /// - Remark: HTTP `GET /room/question-result/{code}/{questionID}`.
     /// - Remark: Generated from `#/paths//room/question-result/{code}/{questionID}/get`.
     func getRoomQuestionResultCodeQuestionID(_ input: Operations.GetRoomQuestionResultCodeQuestionID.Input) async throws -> Operations.GetRoomQuestionResultCodeQuestionID.Output
-    /// Get the vote count associated with a question
+    /// Get the vote-information
     ///
-    /// - Remark: HTTP `GET /room/question-vote-count/{code}/{questionID}`.
-    /// - Remark: Generated from `#/paths//room/question-vote-count/{code}/{questionID}/get`.
-    func getRoomQuestionVoteCountCodeQuestionID(_ input: Operations.GetRoomQuestionVoteCountCodeQuestionID.Input) async throws -> Operations.GetRoomQuestionVoteCountCodeQuestionID.Output
+    /// This information is limited intentionally to prevent spoiling the vote.
+    ///
+    /// - Remark: HTTP `GET /room/question-votes-info/{code}/{questionID}`.
+    /// - Remark: Generated from `#/paths//room/question-votes-info/{code}/{questionID}/get`.
+    func getRoomQuestionVotesInfoCodeQuestionID(_ input: Operations.GetRoomQuestionVotesInfoCodeQuestionID.Input) async throws -> Operations.GetRoomQuestionVotesInfoCodeQuestionID.Output
 }
 
 /// Convenience overloads for operation inputs.
@@ -252,15 +254,17 @@ extension APIProtocol {
             headers: headers
         ))
     }
-    /// Get the vote count associated with a question
+    /// Get the vote-information
     ///
-    /// - Remark: HTTP `GET /room/question-vote-count/{code}/{questionID}`.
-    /// - Remark: Generated from `#/paths//room/question-vote-count/{code}/{questionID}/get`.
-    public func getRoomQuestionVoteCountCodeQuestionID(
-        path: Operations.GetRoomQuestionVoteCountCodeQuestionID.Input.Path,
-        headers: Operations.GetRoomQuestionVoteCountCodeQuestionID.Input.Headers
-    ) async throws -> Operations.GetRoomQuestionVoteCountCodeQuestionID.Output {
-        try await getRoomQuestionVoteCountCodeQuestionID(Operations.GetRoomQuestionVoteCountCodeQuestionID.Input(
+    /// This information is limited intentionally to prevent spoiling the vote.
+    ///
+    /// - Remark: HTTP `GET /room/question-votes-info/{code}/{questionID}`.
+    /// - Remark: Generated from `#/paths//room/question-votes-info/{code}/{questionID}/get`.
+    public func getRoomQuestionVotesInfoCodeQuestionID(
+        path: Operations.GetRoomQuestionVotesInfoCodeQuestionID.Input.Path,
+        headers: Operations.GetRoomQuestionVotesInfoCodeQuestionID.Input.Headers
+    ) async throws -> Operations.GetRoomQuestionVotesInfoCodeQuestionID.Output {
+        try await getRoomQuestionVotesInfoCodeQuestionID(Operations.GetRoomQuestionVotesInfoCodeQuestionID.Input(
             path: path,
             headers: headers
         ))
@@ -445,6 +449,31 @@ public enum Components {
                 case _type = "type"
             }
         }
+        /// Information about the current voting state of the current question. The information is curated to prevent leaking individual votes, as well as to prematurely leak the result.
+        ///
+        /// - Remark: Generated from `#/components/schemas/QuestionVotesInfo`.
+        public struct QuestionVotesInfo: Codable, Hashable, Sendable {
+            /// - Remark: Generated from `#/components/schemas/QuestionVotesInfo/timestamp`.
+            public var timestamp: Components.Schemas.Timestamp
+            /// - Remark: Generated from `#/components/schemas/QuestionVotesInfo/voteCount`.
+            public var voteCount: Swift.Int
+            /// Creates a new `QuestionVotesInfo`.
+            ///
+            /// - Parameters:
+            ///   - timestamp:
+            ///   - voteCount:
+            public init(
+                timestamp: Components.Schemas.Timestamp,
+                voteCount: Swift.Int
+            ) {
+                self.timestamp = timestamp
+                self.voteCount = voteCount
+            }
+            public enum CodingKeys: String, CodingKey {
+                case timestamp
+                case voteCount
+            }
+        }
         /// - Remark: Generated from `#/components/schemas/Fields`.
         public struct Fields: Codable, Hashable, Sendable {
             /// A container of undocumented properties.
@@ -463,6 +492,10 @@ public enum Components {
                 try encoder.encodeAdditionalProperties(additionalProperties)
             }
         }
+        /// A timestamp in the ISO8601 format.
+        ///
+        /// - Remark: Generated from `#/components/schemas/Timestamp`.
+        public typealias Timestamp = Swift.String
         /// - Remark: Generated from `#/components/schemas/Question`.
         public struct Question: Codable, Hashable, Sendable {
             /// - Remark: Generated from `#/components/schemas/Question/value1`.
@@ -889,6 +922,7 @@ public enum Components {
         /// - Remark: Generated from `#/components/schemas/ErrorType`.
         @frozen public enum ErrorType: String, Codable, Hashable, Sendable, CaseIterable {
             case roomNotFound = "roomNotFound"
+            case roomAdminTokenInvalid = "roomAdminTokenInvalid"
             case questionNotFound = "questionNotFound"
             case questionNotFinalized = "questionNotFinalized"
         }
@@ -948,6 +982,50 @@ public enum Components {
             public init(
                 value1: Components.Schemas.BaseError,
                 value2: Components.Schemas.RoomError.Value2Payload
+            ) {
+                self.value1 = value1
+                self.value2 = value2
+            }
+            public init(from decoder: any Decoder) throws {
+                self.value1 = try .init(from: decoder)
+                self.value2 = try .init(from: decoder)
+            }
+            public func encode(to encoder: any Encoder) throws {
+                try self.value1.encode(to: encoder)
+                try self.value2.encode(to: encoder)
+            }
+        }
+        /// - Remark: Generated from `#/components/schemas/RoomAdminError`.
+        public struct RoomAdminError: Codable, Hashable, Sendable {
+            /// - Remark: Generated from `#/components/schemas/RoomAdminError/value1`.
+            public var value1: Components.Schemas.RoomError
+            /// - Remark: Generated from `#/components/schemas/RoomAdminError/value2`.
+            public struct Value2Payload: Codable, Hashable, Sendable {
+                /// The admin token associated with the request
+                ///
+                /// - Remark: Generated from `#/components/schemas/RoomAdminError/value2/adminToken`.
+                public var adminToken: Swift.String?
+                /// Creates a new `Value2Payload`.
+                ///
+                /// - Parameters:
+                ///   - adminToken: The admin token associated with the request
+                public init(adminToken: Swift.String? = nil) {
+                    self.adminToken = adminToken
+                }
+                public enum CodingKeys: String, CodingKey {
+                    case adminToken
+                }
+            }
+            /// - Remark: Generated from `#/components/schemas/RoomAdminError/value2`.
+            public var value2: Components.Schemas.RoomAdminError.Value2Payload
+            /// Creates a new `RoomAdminError`.
+            ///
+            /// - Parameters:
+            ///   - value1:
+            ///   - value2:
+            public init(
+                value1: Components.Schemas.RoomError,
+                value2: Components.Schemas.RoomAdminError.Value2Payload
             ) {
                 self.value1 = value1
                 self.value2 = value2
@@ -1099,6 +1177,34 @@ public enum Components {
     public enum RequestBodies {}
     /// Types generated from the `#/components/responses` section of the OpenAPI document.
     public enum Responses {
+        public struct RoomAdminTokenInvalid: Sendable, Hashable {
+            /// - Remark: Generated from `#/components/responses/RoomAdminTokenInvalid/content`.
+            @frozen public enum Body: Sendable, Hashable {
+                /// - Remark: Generated from `#/components/responses/RoomAdminTokenInvalid/content/application\/json`.
+                case json(Components.Schemas.RoomAdminError)
+                /// The associated value of the enum case if `self` is `.json`.
+                ///
+                /// - Throws: An error if `self` is not `.json`.
+                /// - SeeAlso: `.json`.
+                public var json: Components.Schemas.RoomAdminError {
+                    get throws {
+                        switch self {
+                        case let .json(body):
+                            return body
+                        }
+                    }
+                }
+            }
+            /// Received HTTP response body
+            public var body: Components.Responses.RoomAdminTokenInvalid.Body
+            /// Creates a new `RoomAdminTokenInvalid`.
+            ///
+            /// - Parameters:
+            ///   - body: Received HTTP response body
+            public init(body: Components.Responses.RoomAdminTokenInvalid.Body) {
+                self.body = body
+            }
+        }
         public struct RoomOrQuestionNotFound: Sendable, Hashable {
             /// - Remark: Generated from `#/components/responses/RoomOrQuestionNotFound/content`.
             @frozen public enum Body: Sendable, Hashable {
@@ -3789,22 +3895,24 @@ public enum Operations {
             }
         }
     }
-    /// Get the vote count associated with a question
+    /// Get the vote-information
     ///
-    /// - Remark: HTTP `GET /room/question-vote-count/{code}/{questionID}`.
-    /// - Remark: Generated from `#/paths//room/question-vote-count/{code}/{questionID}/get`.
-    public enum GetRoomQuestionVoteCountCodeQuestionID {
-        public static let id: Swift.String = "get/room/question-vote-count/{code}/{questionID}"
+    /// This information is limited intentionally to prevent spoiling the vote.
+    ///
+    /// - Remark: HTTP `GET /room/question-votes-info/{code}/{questionID}`.
+    /// - Remark: Generated from `#/paths//room/question-votes-info/{code}/{questionID}/get`.
+    public enum GetRoomQuestionVotesInfoCodeQuestionID {
+        public static let id: Swift.String = "get/room/question-votes-info/{code}/{questionID}"
         public struct Input: Sendable, Hashable {
-            /// - Remark: Generated from `#/paths/room/question-vote-count/{code}/{questionID}/GET/path`.
+            /// - Remark: Generated from `#/paths/room/question-votes-info/{code}/{questionID}/GET/path`.
             public struct Path: Sendable, Hashable {
                 /// A code uniquely identifying an alive room.
                 ///
-                /// - Remark: Generated from `#/paths/room/question-vote-count/{code}/{questionID}/GET/path/code`.
+                /// - Remark: Generated from `#/paths/room/question-votes-info/{code}/{questionID}/GET/path/code`.
                 public var code: Components.Parameters.RoomCode
                 /// The id uniquely identifying the question. This is used to make sure that the client is voting on the question they expect.
                 ///
-                /// - Remark: Generated from `#/paths/room/question-vote-count/{code}/{questionID}/GET/path/questionID`.
+                /// - Remark: Generated from `#/paths/room/question-votes-info/{code}/{questionID}/GET/path/questionID`.
                 public var questionID: Components.Parameters.QuestionID
                 /// Creates a new `Path`.
                 ///
@@ -3819,14 +3927,14 @@ public enum Operations {
                     self.questionID = questionID
                 }
             }
-            public var path: Operations.GetRoomQuestionVoteCountCodeQuestionID.Input.Path
-            /// - Remark: Generated from `#/paths/room/question-vote-count/{code}/{questionID}/GET/header`.
+            public var path: Operations.GetRoomQuestionVotesInfoCodeQuestionID.Input.Path
+            /// - Remark: Generated from `#/paths/room/question-votes-info/{code}/{questionID}/GET/header`.
             public struct Headers: Sendable, Hashable {
                 /// To ensure that only an admin is able to make privileged actions to a room. The token is provided to the room creator as a response to the create request.
                 ///
-                /// - Remark: Generated from `#/paths/room/question-vote-count/{code}/{questionID}/GET/header/Room-Admin-Token`.
+                /// - Remark: Generated from `#/paths/room/question-votes-info/{code}/{questionID}/GET/header/Room-Admin-Token`.
                 public var roomAdminToken: Components.Parameters.AdminToken
-                public var accept: [OpenAPIRuntime.AcceptHeaderContentType<Operations.GetRoomQuestionVoteCountCodeQuestionID.AcceptableContentType>]
+                public var accept: [OpenAPIRuntime.AcceptHeaderContentType<Operations.GetRoomQuestionVotesInfoCodeQuestionID.AcceptableContentType>]
                 /// Creates a new `Headers`.
                 ///
                 /// - Parameters:
@@ -3834,21 +3942,21 @@ public enum Operations {
                 ///   - accept:
                 public init(
                     roomAdminToken: Components.Parameters.AdminToken,
-                    accept: [OpenAPIRuntime.AcceptHeaderContentType<Operations.GetRoomQuestionVoteCountCodeQuestionID.AcceptableContentType>] = .defaultValues()
+                    accept: [OpenAPIRuntime.AcceptHeaderContentType<Operations.GetRoomQuestionVotesInfoCodeQuestionID.AcceptableContentType>] = .defaultValues()
                 ) {
                     self.roomAdminToken = roomAdminToken
                     self.accept = accept
                 }
             }
-            public var headers: Operations.GetRoomQuestionVoteCountCodeQuestionID.Input.Headers
+            public var headers: Operations.GetRoomQuestionVotesInfoCodeQuestionID.Input.Headers
             /// Creates a new `Input`.
             ///
             /// - Parameters:
             ///   - path:
             ///   - headers:
             public init(
-                path: Operations.GetRoomQuestionVoteCountCodeQuestionID.Input.Path,
-                headers: Operations.GetRoomQuestionVoteCountCodeQuestionID.Input.Headers
+                path: Operations.GetRoomQuestionVotesInfoCodeQuestionID.Input.Path,
+                headers: Operations.GetRoomQuestionVotesInfoCodeQuestionID.Input.Headers
             ) {
                 self.path = path
                 self.headers = headers
@@ -3856,28 +3964,44 @@ public enum Operations {
         }
         @frozen public enum Output: Sendable, Hashable {
             public struct Ok: Sendable, Hashable {
+                /// - Remark: Generated from `#/paths/room/question-votes-info/{code}/{questionID}/GET/responses/200/content`.
+                @frozen public enum Body: Sendable, Hashable {
+                    /// - Remark: Generated from `#/paths/room/question-votes-info/{code}/{questionID}/GET/responses/200/content/application\/json`.
+                    case json(Components.Schemas.QuestionVotesInfo)
+                    /// The associated value of the enum case if `self` is `.json`.
+                    ///
+                    /// - Throws: An error if `self` is not `.json`.
+                    /// - SeeAlso: `.json`.
+                    public var json: Components.Schemas.QuestionVotesInfo {
+                        get throws {
+                            switch self {
+                            case let .json(body):
+                                return body
+                            }
+                        }
+                    }
+                }
+                /// Received HTTP response body
+                public var body: Operations.GetRoomQuestionVotesInfoCodeQuestionID.Output.Ok.Body
                 /// Creates a new `Ok`.
-                public init() {}
+                ///
+                /// - Parameters:
+                ///   - body: Received HTTP response body
+                public init(body: Operations.GetRoomQuestionVotesInfoCodeQuestionID.Output.Ok.Body) {
+                    self.body = body
+                }
             }
-            /// The question could be found.
+            /// The question could be found, and the admin token is valid
             ///
-            /// - Remark: Generated from `#/paths//room/question-vote-count/{code}/{questionID}/get/responses/200`.
+            /// - Remark: Generated from `#/paths//room/question-votes-info/{code}/{questionID}/get/responses/200`.
             ///
             /// HTTP response code: `200 ok`.
-            case ok(Operations.GetRoomQuestionVoteCountCodeQuestionID.Output.Ok)
-            /// The question could be found.
-            ///
-            /// - Remark: Generated from `#/paths//room/question-vote-count/{code}/{questionID}/get/responses/200`.
-            ///
-            /// HTTP response code: `200 ok`.
-            public static var ok: Self {
-                .ok(.init())
-            }
+            case ok(Operations.GetRoomQuestionVotesInfoCodeQuestionID.Output.Ok)
             /// The associated value of the enum case if `self` is `.ok`.
             ///
             /// - Throws: An error if `self` is not `.ok`.
             /// - SeeAlso: `.ok`.
-            public var ok: Operations.GetRoomQuestionVoteCountCodeQuestionID.Output.Ok {
+            public var ok: Operations.GetRoomQuestionVotesInfoCodeQuestionID.Output.Ok {
                 get throws {
                     switch self {
                     case let .ok(response):
@@ -3890,9 +4014,32 @@ public enum Operations {
                     }
                 }
             }
+            /// Either the admin token was not provided, or it is invalid
+            ///
+            /// - Remark: Generated from `#/paths//room/question-votes-info/{code}/{questionID}/get/responses/403`.
+            ///
+            /// HTTP response code: `403 forbidden`.
+            case forbidden(Components.Responses.RoomAdminTokenInvalid)
+            /// The associated value of the enum case if `self` is `.forbidden`.
+            ///
+            /// - Throws: An error if `self` is not `.forbidden`.
+            /// - SeeAlso: `.forbidden`.
+            public var forbidden: Components.Responses.RoomAdminTokenInvalid {
+                get throws {
+                    switch self {
+                    case let .forbidden(response):
+                        return response
+                    default:
+                        try throwUnexpectedResponseStatus(
+                            expectedStatus: "forbidden",
+                            response: self
+                        )
+                    }
+                }
+            }
             /// Either the room or question was not found
             ///
-            /// - Remark: Generated from `#/paths//room/question-vote-count/{code}/{questionID}/get/responses/404`.
+            /// - Remark: Generated from `#/paths//room/question-votes-info/{code}/{questionID}/get/responses/404`.
             ///
             /// HTTP response code: `404 notFound`.
             case notFound(Components.Responses.RoomOrQuestionNotFound)

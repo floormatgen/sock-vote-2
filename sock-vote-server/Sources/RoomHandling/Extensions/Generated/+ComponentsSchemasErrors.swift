@@ -26,7 +26,6 @@ public extension Components.Schemas.RoomError {
 
 }
 
-
 public extension Components.Schemas.QuestionError {
 
     fileprivate init(
@@ -95,6 +94,40 @@ public extension Components.Schemas.QuestionStateError {
             questionID: questionID, 
             currentState: currentState, 
             allowedStates: [.finalized]
+        )
+    }
+
+}
+
+public extension Components.Schemas.RoomAdminError {
+
+    fileprivate init(
+        _type type: Components.Schemas.ErrorType,
+        description: String,
+        roomCode: String,
+        adminToken: String
+    ) {
+        self.init(
+            value1: .init(
+                _type: type, 
+                description: description, 
+                roomCode: roomCode
+            ), 
+            value2: .init(
+                adminToken: adminToken
+            )
+        )
+    }
+
+    static func roomAdminTokenInvalid(
+        roomCode: String, 
+        adminToken: String
+    ) -> Self {
+        self.init(
+            _type: .roomAdminTokenInvalid, 
+            description: "The admin token \(adminToken) is invalid for room \(roomCode)", 
+            roomCode: roomCode, 
+            adminToken: adminToken
         )
     }
 

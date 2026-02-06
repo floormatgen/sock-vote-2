@@ -258,6 +258,42 @@ extension RoomHandlerTests {
             #expect(!roomError.description.isEmpty)
         }
 
+        @Test("Can get question votes info", arguments: [0, 1, 10, 100])
+        func test_canGetQuestionVotesInfo(_ expectedVoteCount: Int) async throws {
+            let timeLeniance = 1.0
+            let startDate = Date.now - timeLeniance
+            let questionID = try await Self.createQuestion(
+                on: roomHandler, 
+                roomCode: code, 
+                adminToken: adminToken
+            )
+            for i in 0..<expectedVoteCount {
+                let name = "Participant \(i)"
+                let participantToken = try await forceJoinRoom(
+                    on: roomHandler, 
+                    roomCode: code, 
+                    adminToken: adminToken, 
+                    name: name
+                )
+                try await Self.voteOnQuestion(
+                    on: roomHandler, 
+                    roomCode: code, 
+                    questionID: questionID, 
+                    participantToken: participantToken, 
+                    vote: .plurality(Self.defaultQuestionOptions[(1..<3).randomElement()!])
+                )
+            }
+            let (timestampString, voteCount) = try await Self.getVotesInfo(
+                on: roomHandler, 
+                roomCode: code, 
+                questionID: questionID, 
+                adminToken: adminToken
+            )
+            let timestamp = try Utilities.parseTimestamp(timestampString)
+            #expect((startDate...(Date.now + timeLeniance)).contains(timestamp))
+            #expect(expectedVoteCount == voteCount)
+        }
+
         // MARK: - Utilities
 
         static var defaultQuestionName: String {
@@ -475,6 +511,91 @@ extension RoomHandlerTests {
             let body = try response.ok.body.json
             #expect(body.id == questionID)
             return .init(body.result)
+        }
+
+        enum Vote {
+            case plurality(String)
+            case preferential([String])
+        }
+
+        static func voteOnQuestionWithResponse(
+            on roomHandler: RoomHandler<some RoomManagerProtocol>,
+            roomCode: String,
+            questionID: String,
+            participantToken: String,
+            vote: Vote
+        ) async throws -> Operations.PostRoomVoteCodeQuestionID.Output {
+            let anyVote: Components.Schemas.AnyVote
+            switch vote {
+                case .plurality(let s):
+                    anyVote = .PluralityVote(.init(selection: s))
+                case .preferential(let so):
+                    anyVote = .PreferentialVote(.init(selectionOrder: so))
+            }
+            return try await roomHandler.postRoomVoteCodeQuestionID(
+                .init(
+                    path: .init(
+                        code: roomCode, 
+                        questionID: questionID
+                    ), 
+                    headers: .init(
+                        participantToken: participantToken
+                    ), 
+                    body: .json(anyVote)
+                )
+            )
+        }
+
+        static func voteOnQuestion(
+            on roomHandler: RoomHandler<some RoomManagerProtocol>,
+            roomCode: String,
+            questionID: String,
+            participantToken: String,
+            vote: Vote
+        ) async throws {
+            let response = try await Self.voteOnQuestionWithResponse(
+                on: roomHandler, 
+                roomCode: roomCode, 
+                questionID: questionID, 
+                participantToken: participantToken, 
+                vote: vote
+            )
+            _ = try response.ok
+        }
+
+        static func getVotesInfoWithResponse(
+            on roomHandler: RoomHandler<some RoomManagerProtocol>,
+            roomCode: String,
+            questionID: String,
+            adminToken: String
+        ) async throws -> Operations.GetRoomQuestionVotesInfoCodeQuestionID.Output {
+            try await roomHandler.getRoomQuestionVotesInfoCodeQuestionID(
+                .init(
+                    path: .init(
+                        code: roomCode, 
+                        questionID: questionID
+                    ), 
+                    headers: .init(
+                        roomAdminToken: adminToken
+                    )
+                )
+            )
+        }
+
+        static func getVotesInfo(
+            on roomHandler: RoomHandler<some RoomManagerProtocol>,
+            roomCode: String,
+            questionID: String,
+            adminToken: String            
+        ) async throws -> (timestamp: String, voteCount: Int) {
+            let response = try await Self.getVotesInfoWithResponse(
+                on: roomHandler, 
+                roomCode: roomCode, 
+                questionID: questionID, 
+                adminToken: adminToken
+            )
+            let body = try response.ok.body.json
+            return (body.timestamp, body.voteCount)
         }
 
     }
