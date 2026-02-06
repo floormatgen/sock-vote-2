@@ -2,7 +2,8 @@
 
 cd "$(dirname $0)"
 
+echo "yes" |
 swift \
     package plugin \
     generate-code-from-openapi \
-    --target "RoomHandling"
+    --target "RoomHandling" \

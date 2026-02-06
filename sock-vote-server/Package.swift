@@ -99,19 +99,19 @@ let package = Package(
 
 // MARK: - Code Generation
 
-//! FIXME: Workaround for YAMS bug on windows. Using the package plugin is preferrable 
+//! FIXME: Workaround for YAMS bug on windows. Using the package plugin is preferrable.
+//? The package plugin works on other platforms, it just doesn't work on windows.
 // This tries to work around the fact that the OpenAPI generator doesn't work properly on windows
-// let roomHandlingTarget = package.targets.first { $0.name == "RoomHandling" }
-// #if !os(windows)
-// roomHandlingTarget?.exclude += [
-//     "GeneratedSources/Server.swift",
-//     "GeneratedSources/Types.swift",
-// ]
-// #else
-// roomHandlingTarget?.plugins += [
-//     .plugin(name: "OpenAPIGenerator", package: "swift-openapi-generator"),
-// ]
-// #endif
+#if !os(windows)
+let roomHandlingTarget = package.targets.first { $0.name == "RoomHandling" }!
+roomHandlingTarget.plugins = (roomHandlingTarget.plugins ?? []) + [
+    .plugin(name: "OpenAPIGenerator", package: "swift-openapi-generator"),
+]
+roomHandlingTarget.exclude += [
+    "GeneratedSources/Server.swift",
+    "GeneratedSources/Types.swift",
+]
+#endif
 
 // MARK: - Swift Settings
 
