@@ -7,12 +7,13 @@ internal extension RoomHandler {
     //! switch to using an isolated parameter when compiler supports it.
 
     /// Does common request checks for admin operations on questions
-    func withVerifiedQuestionAndAdmin<E: Error, Output: Validation.RoomAdminQuestionOutput & Sendable>(
+    func withVerifiedQuestionAndAdmin<E: Error, Output: Validation.RoomAdminQuestionOutput>(
         roomCode: String,
         questionID: String,
         adminToken: String,
         outputType: Output.Type = Output.self,
-        operation: sending (_ room: /* isolated */ RoomManager.Room, _ adminToken: String, _ questionUUID: UUID) async throws(E) -> sending Output
+        operation: sending (_ room: /* isolated */ RoomManager.Room, _ adminToken: String, _ questionUUID: UUID) 
+            async throws(E) -> sending Output
     ) async throws(E) -> sending Output {
         guard let room = await roomManager.room(withCode: roomCode) else {
             return .notFound(.init(body: .json(.RoomError(.roomNotFound(
@@ -41,9 +42,10 @@ internal extension RoomHandler {
 
     func withVerifiedQuestionAndAdmin<
         E: Error,
-        Input: Validation.RoomAdminQuestionInput, Output: Validation.RoomAdminQuestionOutput & Sendable
+        Input: Validation.RoomAdminQuestionInput, Output: Validation.RoomAdminQuestionOutput
     >(
         input: Input,
+        outputType: Output.Type = Output.self,
         operation: sending (_ room: /* isolated */ RoomManager.Room, _ adminToken: String, _ questionUUID: UUID)
             async throws(E) -> sending Output
     ) async throws(E) -> sending Output {
@@ -59,6 +61,51 @@ internal extension RoomHandler {
         )
     }
 
+    func withVerifiedQuestion<E: Error, Output: Validation.RoomQuestionOutput>(
+        roomCode: String,
+        questionID: String,
+        outputType: Output.Type = Output.self,
+        operation: sending (_ room: /* isolated */ RoomManager.Room, _ questionUUID: UUID) 
+            async throws(E) -> sending Output
+    ) async throws(E) -> sending Output {
+        guard let room = await roomManager.room(withCode: roomCode) else {
+            return .notFound(.init(body: .json(.RoomError(.roomNotFound(
+                roomCode: roomCode
+            )))))
+        }
+        return try await { (_ room: isolated RoomManager.Room) async throws(E) -> sending Output in 
+            guard
+                let questionUUID = UUID(uuidString: questionID),
+                room.hasQuestion(with: questionUUID)
+            else {
+                return .notFound(.init(body: .json(.QuestionError(.questionNotFound(
+                    roomCode: roomCode, 
+                    questionID: questionID
+                )))))
+            }
+            return try await operation(room, questionUUID)
+        }(room)
+    }
+
+    func withVerifiedQuestion<
+        E: Error,
+        Input: Validation.RoomQuestionInput, Output: Validation.RoomQuestionOutput
+    >(
+        input: Input,
+        outputType: Output.Type = Output.self,
+        operation: sending (_ room: /* isolated */ RoomManager.Room, _ questionUUID: UUID)
+            async throws(E) -> sending Output
+    ) async throws (E) -> sending Output {
+        let path = input.path
+        let code = path.code
+        let questionID = path.questionID
+        return try await withVerifiedQuestion(
+            roomCode: code, 
+            questionID: questionID, 
+            operation: operation
+        )
+    }
+
 }
 
 internal enum Validation {
@@ -68,7 +115,11 @@ internal enum Validation {
         var path: Path { get }
     }
 
-    protocol RoomAdminQuestionInput: RoomInput where Path: RoomQuestionPath {
+    protocol RoomQuestionInput: RoomInput where Path: RoomQuestionPath {
+        
+    }
+
+    protocol RoomAdminQuestionInput: RoomQuestionInput {
         associatedtype Headers: RoomAdminHeaders
         var headers: Headers { get }
     }
@@ -85,7 +136,7 @@ internal enum Validation {
         var roomAdminToken: String { get }
     }
 
-    protocol RoomQuestionOutput {
+    protocol RoomQuestionOutput: Sendable {
         static func notFound(_: Components.Responses.RoomOrQuestionNotFound) -> Self
     }
 
@@ -101,3 +152,7 @@ extension Operations.GetRoomQuestionVotesInfoCodeQuestionID.Input: Validation.Ro
 extension Operations.GetRoomQuestionVotesInfoCodeQuestionID.Input.Path: Validation.RoomQuestionPath {}
 extension Operations.GetRoomQuestionVotesInfoCodeQuestionID.Input.Headers: Validation.RoomAdminHeaders {}
 extension Operations.GetRoomQuestionVotesInfoCodeQuestionID.Output: Validation.RoomAdminQuestionOutput {}
+
+extension Operations.GetRoomQuestionResultCodeQuestionID.Input: Validation.RoomQuestionInput {}
+extension Operations.GetRoomQuestionResultCodeQuestionID.Input.Path: Validation.RoomQuestionPath {}
+extension Operations.GetRoomQuestionResultCodeQuestionID.Output: Validation.RoomQuestionOutput {}

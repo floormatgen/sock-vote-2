@@ -31,7 +31,7 @@ let package = Package(
         // Server-related
         .package(url: "https://github.com/apple/swift-openapi-runtime", from: "1.0.0"),
         .package(url: "https://github.com/hummingbird-project/swift-openapi-hummingbird", from: "2.0.0"),
-        .package(url: "https://github.com/hummingbird-project/hummingbird", from: "2.0.0"),
+        .package(url: "https://github.com/hummingbird-project/hummingbird", from: "2.18.0"),
         .package(url: "https://github.com/hummingbird-project/hummingbird-websocket", from: "2.0.0"),
 
         // Plugins
