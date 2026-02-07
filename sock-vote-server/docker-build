@@ -2,5 +2,5 @@
 
 docker build \
     --build-context spec=../specification \
-    --tag sock-vote-server:v1 \
+    --tag sock-vote-server:dev \
     .

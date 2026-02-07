@@ -7,7 +7,7 @@ extension Question: @unchecked Sendable { }
 public /* abstract */ class Question: Identifiable {
 
     /// The style of voting for the question
-    public enum VotingStyle: Sendable {
+    public enum VotingStyle: Sendable, Codable {
         case plurality
         case preferential
     }
@@ -15,7 +15,7 @@ public /* abstract */ class Question: Identifiable {
     /// The current state of the question
     /// 
     /// The question state affects what actions are permitted to take on a question
-    public enum State: Sendable {
+    public enum State: Sendable, Codable {
         /// The question is accepting votes
         case open
         /// The question is not accepting votes
@@ -30,7 +30,7 @@ public /* abstract */ class Question: Identifiable {
     /// 
     /// This can be used to send information about a question through
     /// isolation domains, as ``Question`` is explicitly non-`Sendable`.
-    public struct Description: Sendable {
+    public struct Description: Sendable, Codable {
         public let id: UUID
         public let prompt: String
         public let options: [String]

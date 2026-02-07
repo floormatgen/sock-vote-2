@@ -237,7 +237,7 @@ struct RoomHandlerTests {
             name: name, 
             fields: fields
         )
-        try await Task.sleep(for: .milliseconds(10))
+        try await Task.sleep(for: .milliseconds(1))
         let requests = try await Self.listJoinRequests(
             on: roomHandler, 
             roomCode: roomCode, 

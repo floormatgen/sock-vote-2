@@ -59,7 +59,7 @@ let package = Package(
                 .product(name: "Logging", package: "swift-log"),
                 .product(name: "OpenAPIRuntime", package: "swift-openapi-runtime"),
                 .product(name: "Hummingbird", package: "hummingbird"),
-                .product(name: "HummingbirdWebSocket", package: "hummingbird-websocket"),
+                .product(name: "HummingbirdWebSocket", package: "hummingbird-websocket")
             ]
         ),
         .target(
