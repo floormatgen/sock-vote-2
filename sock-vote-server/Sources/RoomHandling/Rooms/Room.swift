@@ -2,6 +2,14 @@ import Foundation
 import VoteHandling
 
 public protocol RoomProtocol: Actor {
+    associatedtype ParticipantConnection: Connections.ParticipantConnection
+
+    init(
+        name: String, code: String, 
+        fields: [String], adminToken: String,
+        participantTimeout: Duration, joinRequestTimeout: Duration
+    )
+
     nonisolated var name: String { get }
     nonisolated var code: String { get }
     nonisolated var fields: [String] { get }
@@ -77,6 +85,14 @@ public protocol RoomProtocol: Actor {
         _ vote: Question.PreferentialVote, 
         forParticipant participantToken: String
     ) throws
+
+    // MARK: Handling Connections
+
+    func addParticipantConnection(
+        _ participantConnection: ParticipantConnection, 
+        forParticipantToken participantToken: String
+    ) throws
+
 }
 
 public extension RoomProtocol {
@@ -164,9 +180,11 @@ public extension RoomProtocol {
 
 }
 
-public typealias DefaultRoom = Room
+public typealias DefaultRoom = Room<Connections.WebSocketParticipantConnection>
 
-public final actor Room: RoomProtocol {
+public final actor Room<
+    ParticipantConnection: Connections.ParticipantConnection
+>: RoomProtocol {
     nonisolated public let name: String
     nonisolated public let code: String
     nonisolated public let fields: [String]
@@ -174,22 +192,47 @@ public final actor Room: RoomProtocol {
     nonisolated private let adminToken: String
 
     public typealias TimeoutFunction = @Sendable (Duration) async throws -> Void
-    public static let defaultTimeoutFunction: TimeoutFunction = { try await Task.sleep(for: $0) }
+    public static var defaultTimeoutFunction: TimeoutFunction { { try await Task.sleep(for: $0) } }
 
+    // Join Requests
     public var joinRequests: [String : JoinRequest]
     private var joinRequestTimeouts: [String : Task<Void, any Swift.Error>]
     nonisolated public let joinRequestTimeout: Duration
     nonisolated private let joinRequestTimeoutFunction: TimeoutFunction
 
+    // Inactive Participants
     private var inactiveParticipants: [String : Task<Void, any Swift.Error>]
     nonisolated public let participantTimeout: Duration
     nonisolated private let participantTimeoutFunction: TimeoutFunction
 
-    typealias Error = RoomError
+    // Active Participants
+    private var activeParticipants: [String : ParticipantConnection]
+
+    public typealias Error = RoomError
 
     // TODO: Handle Participant and Admin connections
 
     private var currentQuestion: Question?
+
+    public init(
+        name: String, 
+        code: String, 
+        fields: [String], 
+        adminToken: String,
+        participantTimeout: Duration = .seconds(45),
+        joinRequestTimeout: Duration = .seconds(120)
+    ) {
+        self.init(
+            name: name, 
+            code: code, 
+            fields: fields, 
+            adminToken: adminToken,
+            participantTimeout: participantTimeout,
+            participantTimeoutFunction: Self.defaultTimeoutFunction, 
+            joinRequestTimeout: joinRequestTimeout,
+            joinRequestTimeoutFunction: Self.defaultTimeoutFunction
+        )
+    }
 
     /// Creates a new room
     /// 
@@ -197,15 +240,15 @@ public final actor Room: RoomProtocol {
     /// > The `Task` that surrounds the ``participantTimeoutFunction`` and the ``joinRequestTimeoutFunction`` will be cancelled
     /// > if necessary, such as when a join request gets accepted or rejected.
     /// 
-    public init(
+    internal init(
         name: String, 
         code: String, 
         fields: [String], 
         adminToken: String,
-        participantTimeout: Duration = .seconds(45),
-        participantTimeoutFunction: @escaping TimeoutFunction = defaultTimeoutFunction,
-        joinRequestTimeout: Duration = .seconds(120),
-        joinRequestTimeoutFunction: @escaping TimeoutFunction = defaultTimeoutFunction
+        participantTimeout: Duration,
+        participantTimeoutFunction: @escaping TimeoutFunction,
+        joinRequestTimeout: Duration,
+        joinRequestTimeoutFunction: @escaping TimeoutFunction
     ) {
         self.name = name
         self.code = code
@@ -214,6 +257,7 @@ public final actor Room: RoomProtocol {
         self.joinRequests = [:]
         self.joinRequestTimeouts = [:]
         self.inactiveParticipants = [:]
+        self.activeParticipants = [:]
         self.participantTimeout = participantTimeout
         self.participantTimeoutFunction = participantTimeoutFunction
         self.joinRequestTimeout = joinRequestTimeout
@@ -273,12 +317,14 @@ public extension Room {
 
     func updateQuestion(prompt: String, options: some Collection<String> & Sendable, style: Question.VotingStyle) throws {
         let newQuestion = try Question.create(prompt: prompt, options: options, votingStyle: style)
+        Task { try await sendQuestionUpdate() }
         currentQuestion = newQuestion
     }
 
     func removeQuestion() throws -> Bool {
         if currentQuestion == nil { return false }
         currentQuestion = nil
+        Task { try await sendQuestionUpdate() }
         return true
     }
 
@@ -307,8 +353,10 @@ public extension Room {
     }
 
     func hasParticipant(withParticipantToken participantToken: String) -> Bool {
-        // TODO: Handle Active participants
-        return inactiveParticipants.keys.contains(participantToken)
+        return (
+            activeParticipants.keys.contains(participantToken) ||
+            inactiveParticipants.keys.contains(participantToken)
+        )
     }
 
     func registerPluralityVote(
@@ -329,6 +377,52 @@ public extension Room {
             throw RoomError.missingActiveQuestion
         }
         try question.registerPreferentialVote(vote, participantToken: participantToken)
+    }
+
+    // MARK: - Handling Connections
+
+    func addParticipantConnection(
+        _ participantConnection: ParticipantConnection, 
+        forParticipantToken participantToken: String
+    ) throws {
+        assert(
+            !(
+                activeParticipants.keys.contains(participantToken) &&
+                inactiveParticipants.keys.contains(participantToken)
+            ),
+            "\(#function): Participant \(participantToken) found to be active and inactive. This is not allowed."
+        )
+        guard !activeParticipants.keys.contains(participantToken) else {
+            throw Error.alreadyConnected(participantToken: participantToken)
+        }
+        guard let timeout = inactiveParticipants.removeValue(forKey: participantToken) else {
+            throw Error.invaidParticipantToken(participantToken)
+        }
+        assert(
+            !timeout.isCancelled, 
+            "\(#function): The timeout for participant \(participantToken) was cancelled but not removed"
+        )
+        timeout.cancel()
+        activeParticipants[participantToken] = participantConnection
+    }
+
+}
+
+/// MARK: - Sending Updates
+private extension Room {
+
+    func sendQuestionUpdate() async throws  {
+        // TODO: Delegate to another task
+        if let question = self.currentQuestionDescription {
+            for c in activeParticipants.values {
+                try await c.sendQuestionUpdate(with: question)
+            }
+        } else {
+            for c in activeParticipants.values {
+                try await c.sendQuestionRemove()
+            }
+        }
+
     }
 
 }
@@ -359,10 +453,6 @@ private extension Room {
         }
 
         inactiveParticipants[participantToken] = timeout
-    }
-
-    func makeActive(participantToken: String) {
-        assert(!joinRequests.keys.contains(participantToken))
     }
 
 }

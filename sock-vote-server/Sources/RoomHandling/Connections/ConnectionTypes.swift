@@ -54,6 +54,19 @@ extension Connections {
     public struct QuestionUpdated {
         public var basePayload: BasePayload
         public var question: Question
+
+        public init(timestamp: Date = .now, question: Question) {
+            self.basePayload = .init(type: .questionUpdated, timestamp: timestamp)
+            self.question = question
+        }
+    }
+
+    public struct QuestionRemoved {
+        public var basePayload: BasePayload
+
+        public init(timestamp: Date = .now) {
+            self.basePayload = .init(type: .questionDeleted, timestamp: timestamp)
+        }
     }
 
 }
@@ -68,6 +81,18 @@ extension Connections.QuestionUpdated: Codable {
     public init(from decoder: any Decoder) throws {
         self.basePayload = try .init(from: decoder)
         self.question = try .init(from: decoder)
+    }
+
+}
+
+extension Connections.QuestionRemoved: Codable {
+
+    public func encode(to encoder: any Encoder) throws {
+        try basePayload.encode(to: encoder)
+    }
+
+    public init(from decoder: any Decoder) throws {
+        self.basePayload = try .init(from: decoder)
     }
 
 }

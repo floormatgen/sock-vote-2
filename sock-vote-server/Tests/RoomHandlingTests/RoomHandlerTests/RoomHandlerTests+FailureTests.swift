@@ -9,7 +9,7 @@ extension RoomHandlerTests {
         @Test("Codegen failure handled gracefully")
         func test_failedToGenerateCode() async throws {
             let generator = ConstantRoomCodeGenerator(value: "123456")
-            let handler = RoomHandler(roomManager: RoomManager(roomCodeGenerator: generator))
+            let handler = RoomHandler(roomManager: RoomManager(roomType: DefaultRoom.self, roomCodeGenerator: generator))
             _ = try await handler.createRoom(withName: "Test Room")
             let response = try await handler.postRoomCreate(.init(body: .json(.init(name: "Fail Room"))))
             _ = try response.internalServerError

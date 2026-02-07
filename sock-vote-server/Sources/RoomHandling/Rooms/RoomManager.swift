@@ -21,9 +21,10 @@ public protocol RoomManagerProtocol: AnyObject, Sendable {
 
 }
 
-public typealias DefaultRoomManager = RoomManager<DefaultRoomCodeGenerator>
+public typealias DefaultRoomManager = RoomManager<DefaultRoom, DefaultRoomCodeGenerator>
 
 public final actor RoomManager<
+    Room: RoomProtocol,
     RoomCodeGenerator: RoomCodeGeneratorProtocol
 >: RoomManagerProtocol {
     private var rooms: [String : Room]
@@ -32,6 +33,7 @@ public final actor RoomManager<
     private var codeGenMaxTries: Int
 
     public init(
+        roomType: Room.Type = Room.self,
         roomCodeGenerator: RoomCodeGenerator = DefaultRoomCodeGenerator(),
         codeGenMaxTries: Int = 100
     ) {
@@ -61,7 +63,15 @@ public extension RoomManager {
         }
         // TODO: Find a more secure way to generate admin tokens
         let adminToken = UUID().uuidString
-        let room = Room(name: name, code: code, fields: fields, adminToken: adminToken)
+        // TODO: Allow configuring the timeouts
+        let room = Room(
+            name: name, 
+            code: code, 
+            fields: fields, 
+            adminToken: adminToken,
+            participantTimeout: .seconds(45),
+            joinRequestTimeout: .seconds(120)
+        )
         assert(!rooms.keys.contains(code))
         rooms[code] = room
         return (code: code, adminToken: adminToken)

@@ -20,9 +20,9 @@ struct RoomTests {
         code: String? = nil,
         adminToken: String? = nil,
         participantTimeout: Duration = .seconds(45),
-        participantTimeoutFunction: @escaping Room.TimeoutFunction = Room.defaultTimeoutFunction,
+        participantTimeoutFunction: @escaping Room.TimeoutFunction = DefaultRoom.defaultTimeoutFunction,
         joinRequestTimeout: Duration = .seconds(120),
-        joinRequestTimeoutFunction: @escaping Room.TimeoutFunction = Room.defaultTimeoutFunction
+        joinRequestTimeoutFunction: @escaping Room.TimeoutFunction = DefaultRoom.defaultTimeoutFunction
     ) throws -> DefaultRoom {
         let code = code ?? UUID().uuidString
         let adminToken = adminToken ?? UUID().uuidString

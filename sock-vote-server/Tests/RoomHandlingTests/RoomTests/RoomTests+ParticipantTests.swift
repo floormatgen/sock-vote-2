@@ -65,7 +65,7 @@ extension RoomTests {
         }
 
         static func joinRequest(
-            on room: Room,
+            on room: some RoomProtocol,
             name: String = defaultParticipantName,
             fields: [String : String] = defaultFields
         ) async throws -> JoinResult {
