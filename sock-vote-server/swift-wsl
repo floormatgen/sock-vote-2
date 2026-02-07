@@ -1,0 +1,10 @@
+#! /bin/sh
+
+cd "$(dirname "$0")";
+
+if [ -z "${USE_PRE_GENERATED_SOURCES}" ]; then
+    export USE_PRE_GENERATED_SOURCES="1";
+    echo "Set USE_PRE_GENERATED_SOURCES";
+fi
+
+swift "$@";

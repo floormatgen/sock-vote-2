@@ -7,7 +7,7 @@ let package = Package(
     name: "SockVoteServer",
     platforms: [
         .macOS(.v15),
-    ],
+    ], 
     products: [
         // Products define the executables and libraries a package produces, making them visible to other packages.
         .executable(
@@ -33,6 +33,7 @@ let package = Package(
         .package(url: "https://github.com/hummingbird-project/swift-openapi-hummingbird", from: "2.0.0"),
         .package(url: "https://github.com/hummingbird-project/hummingbird", from: "2.18.0"),
         .package(url: "https://github.com/hummingbird-project/hummingbird-websocket", from: "2.0.0"),
+        .package(url: "https://github.com/apple/swift-nio.git", from: "2.94.0"),
 
         // Plugins
         .package(url: "https://github.com/swiftlang/swift-docc-plugin", from: "1.1.0"),
@@ -59,7 +60,8 @@ let package = Package(
                 .product(name: "Logging", package: "swift-log"),
                 .product(name: "OpenAPIRuntime", package: "swift-openapi-runtime"),
                 .product(name: "Hummingbird", package: "hummingbird"),
-                .product(name: "HummingbirdWebSocket", package: "hummingbird-websocket")
+                .product(name: "HummingbirdWebSocket", package: "hummingbird-websocket"),
+                .product(name: "NIOFoundationCompat", package: "swift-nio"),
             ]
         ),
         .target(
@@ -101,19 +103,35 @@ let package = Package(
 
 // MARK: - Code Generation
 
-//! FIXME: Workaround for YAMS bug on windows. Using the package plugin is preferrable.
-//? The package plugin works on other platforms, it just doesn't work on windows.
+//! FIXME: Workaround for YAMS bug on Windows and WSL. Using the package plugin is preferrable.
+//? The package plugin works on other platforms, it just doesn't work on windows and WSL.
 //? Windows also currently fails to build due to swift-nio.
 // This tries to work around the fact that the OpenAPI generator doesn't work properly on windows
-#if !os(windows)
+
 let roomHandlingTarget = package.targets.first { $0.name == "RoomHandling" }!
-roomHandlingTarget.plugins = (roomHandlingTarget.plugins ?? []) + [
-    .plugin(name: "OpenAPIGenerator", package: "swift-openapi-generator"),
+
+let environment = Context.environment
+let usePreGeneratedSources = ((environment["USE_PRE_GENERATED_SOURCES"] ?? "0") == "1")
+
+let generatorFiles: [String] = [
+    "openapi.yaml",
+    "openapi-generator-config.yaml",
 ]
-roomHandlingTarget.exclude += [
-    "GeneratedSources/Server.swift",
-    "GeneratedSources/Types.swift",
-]
+
+#if !os(windows)
+if !usePreGeneratedSources {
+    roomHandlingTarget.plugins = (roomHandlingTarget.plugins ?? []) + [
+        .plugin(name: "OpenAPIGenerator", package: "swift-openapi-generator"),
+    ]
+    roomHandlingTarget.exclude += [
+        "GeneratedSources/Server.swift",
+        "GeneratedSources/Types.swift",
+    ]
+} else {
+    roomHandlingTarget.exclude += generatorFiles
+}
+#else
+roomHandlingTarget.exclude += generatorFiles
 #endif
 
 // MARK: - Swift Settings
