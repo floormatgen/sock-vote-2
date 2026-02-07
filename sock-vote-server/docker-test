@@ -2,6 +2,9 @@
 
 cd $(dirname $0)
 
+msys_no_pathconv_old=${MSYS_NO_PATHCONV}
+export MSYS_NO_PATHCONV=1
+
 docker run \
     --rm \
     --volume $(pwd):/src \
@@ -15,3 +18,5 @@ docker run \
         swift package clean; \
         swift test; \
     "
+
+export MSYS_NO_PATHCONV=${msys_no_pathconv_old}
