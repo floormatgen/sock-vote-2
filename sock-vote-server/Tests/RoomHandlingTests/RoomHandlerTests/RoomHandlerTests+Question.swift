@@ -7,16 +7,24 @@ import Foundation
 extension RoomHandlerTests {
 
     @Suite
-    struct QuestionTests {
+    final class QuestionTests {
         let roomHandler: DefaultRoomHandler
         let code: String
         let adminToken: String
+        let managerTask: Task<Void, any Error>
 
         init() async throws {
-            self.roomHandler = DefaultRoomHandler()
+            let roomManager = DefaultRoomManager()
+            self.roomHandler = DefaultRoomHandler(roomManager: roomManager)
+            self.managerTask = Task { try await roomManager.run() }
+            try await Task.sleep(for: .milliseconds(1))
             let (code, adminToken) = try await createRoom(on: roomHandler)
             self.code = code
             self.adminToken = adminToken
+        }
+        
+        deinit {
+            managerTask.cancel()
         }
 
         @Test("Admin can create question")
@@ -308,8 +316,8 @@ extension RoomHandlerTests {
             on roomHandler: RoomHandler<some RoomManagerProtocol>,
             roomCode: String,
             adminToken: String,
-            prompt: String = Self.defaultQuestionName,
-            options: [String] = Self.defaultQuestionOptions,
+            prompt: String = defaultQuestionName,
+            options: [String] = defaultQuestionOptions,
             votingStyle: Question.VotingStyle = .plurality
         ) async throws -> Operations.PostRoomQuestionCode.Output {
             try await roomHandler.postRoomQuestionCode(.init(
@@ -328,8 +336,8 @@ extension RoomHandlerTests {
             on roomHandler: RoomHandler<some RoomManagerProtocol>,
             roomCode: String,
             adminToken: String,
-            prompt: String = Self.defaultQuestionName,
-            options: [String] = Self.defaultQuestionOptions,
+            prompt: String = defaultQuestionName,
+            options: [String] = defaultQuestionOptions,
             votingStyle: Question.VotingStyle = .plurality
         ) async throws -> String {
             let response = try await createQuestionWithResponse(

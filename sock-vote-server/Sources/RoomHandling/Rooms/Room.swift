@@ -1,5 +1,6 @@
 import Foundation
 import VoteHandling
+import Logging
 
 public protocol RoomProtocol: Actor {
     associatedtype ParticipantConnection: Connections.ParticipantConnection
@@ -87,6 +88,13 @@ public protocol RoomProtocol: Actor {
     ) throws
 
     // MARK: Handling Connections
+
+    /// Run the connection manager associated with the room
+    /// 
+    /// This method will suspend until the room is closed,
+    /// or when task cancellation or graceful shutdown is triggered.
+    /// 
+    nonisolated func runConnectionManager() async throws
 
     func addParticipantConnection(
         _ participantConnection: ParticipantConnection, 
@@ -208,6 +216,9 @@ public final actor Room<
     // Active Participants
     private var activeParticipants: [String : ParticipantConnection]
 
+    // Handling Connections
+    nonisolated private let connectionManager: ConnectionManager
+
     public typealias Error = RoomError
 
     // TODO: Handle Participant and Admin connections
@@ -262,6 +273,7 @@ public final actor Room<
         self.participantTimeoutFunction = participantTimeoutFunction
         self.joinRequestTimeout = joinRequestTimeout
         self.joinRequestTimeoutFunction = joinRequestTimeoutFunction
+        self.connectionManager = ConnectionManager(logger: Logger(label: "ConnectionManager(room: \(code))"))
     }
 
 }
@@ -380,6 +392,10 @@ public extension Room {
     }
 
     // MARK: - Handling Connections
+
+    nonisolated func runConnectionManager() async throws {
+        try await connectionManager.run()
+    }
 
     func addParticipantConnection(
         _ participantConnection: ParticipantConnection, 

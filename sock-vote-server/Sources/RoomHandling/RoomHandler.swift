@@ -9,7 +9,7 @@ public struct RoomHandler<RoomManager: RoomManagerProtocol>: APIProtocol {
 
     let roomManager: RoomManager
 
-    public init(roomManager: RoomManager = DefaultRoomManager()) {
+    public init(roomManager: RoomManager) {
         self.roomManager = roomManager
     }
 

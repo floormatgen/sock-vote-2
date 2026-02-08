@@ -28,3 +28,12 @@ public enum RoomError: Swift.Error, Equatable {
         }
     }
 }
+
+public enum RoomManagerError: Swift.Error, Equatable {
+    /// The room manager is not accepting new room requests
+    /// 
+    /// This is likely either because the `run()` method on ``RoomManagerProtocol``
+    /// has not been called, or the process is going through graceful shutdown or
+    /// task cancellation.
+    case managerNotAcceptingNewRooms
+}

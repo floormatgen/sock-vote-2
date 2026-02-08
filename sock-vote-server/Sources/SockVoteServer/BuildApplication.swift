@@ -11,11 +11,13 @@ func buildApplication(
 ) async throws -> DefaultApplication {
     let router = Router()
 
-    let roomHTTPAPI = RoomHandler()
+    let roomManager = DefaultRoomManager()
+    let roomHTTPAPI = RoomHandler(roomManager: roomManager)
     try roomHTTPAPI.registerHandlers(on: router)
 
     let config = ApplicationConfiguration(reader: configReader)
-    let application = Application(router: router, configuration: config)
+    var application = Application(router: router, configuration: config)
+    application.addServices(roomManager)
     
     return application
 }

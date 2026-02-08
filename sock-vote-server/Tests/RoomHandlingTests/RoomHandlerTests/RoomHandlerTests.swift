@@ -5,11 +5,19 @@ import Foundation
 import HTTPTypes
 
 @Suite
-struct RoomHandlerTests {
+final class RoomHandlerTests: Sendable {
     let roomHandler: DefaultRoomHandler
+    let managerTask: Task<Void, any Error>
 
     init() async throws {
-        self.roomHandler = DefaultRoomHandler()
+        let roomManager = DefaultRoomManager()
+        self.roomHandler = DefaultRoomHandler(roomManager: roomManager)
+        self.managerTask = Task { try await roomManager.run() }
+        try await Task.sleep(for: .milliseconds(1))
+    }
+
+    deinit {
+        managerTask.cancel()
     }
 
     static var roomNames: [String] {[
@@ -38,7 +46,7 @@ struct RoomHandlerTests {
     func test_canAttemptToJoinExistingRoom(_ name: String) async throws {
         let (_, code, _, adminToken) = try await roomHandler.createRoom(withName: "Room")
         let joinRequestTask = Task.detached {
-            try await roomHandler.postRoomJoinCode(
+            try await self.roomHandler.postRoomJoinCode(
                 .init(path: .init(code: code), body: .json(.init(
                     name: name, 
                     fields: .init(additionalProperties: [:])

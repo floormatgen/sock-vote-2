@@ -11,7 +11,10 @@ extension RoomHandlerTests {
         let questionID: String
 
         init() async throws {
-            self.roomHandler = DefaultRoomHandler()
+            let roomManager = DefaultRoomManager()
+            self.roomHandler = DefaultRoomHandler(roomManager: roomManager)
+            async let _ = roomManager.run()
+            try await Task.sleep(for: .milliseconds(1))
             let (roomCode, adminToken) = try await createRoom(on: self.roomHandler)
             self.roomCode = roomCode
             self.adminToken = adminToken

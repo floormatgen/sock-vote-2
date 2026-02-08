@@ -19,6 +19,7 @@ struct RoomTests {
             :
         ])
         self.app = try await buildApplication(reader: ConfigReader(provider: configProvider))
+        try await Task.sleep(for: .milliseconds(1))
     }
     
     @Test("Can create room")

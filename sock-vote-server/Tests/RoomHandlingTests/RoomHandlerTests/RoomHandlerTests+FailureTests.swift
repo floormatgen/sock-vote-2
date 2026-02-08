@@ -9,7 +9,10 @@ extension RoomHandlerTests {
         @Test("Codegen failure handled gracefully")
         func test_failedToGenerateCode() async throws {
             let generator = ConstantRoomCodeGenerator(value: "123456")
-            let handler = RoomHandler(roomManager: RoomManager(roomType: DefaultRoom.self, roomCodeGenerator: generator))
+            let roomManager = RoomManager(roomType: DefaultRoom.self, roomCodeGenerator: generator)
+            let handler = RoomHandler(roomManager: roomManager)
+            async let _ = roomManager.run()
+            try await Task.sleep(for: .milliseconds(1))
             _ = try await handler.createRoom(withName: "Test Room")
             let response = try await handler.postRoomCreate(.init(body: .json(.init(name: "Fail Room"))))
             _ = try response.internalServerError
@@ -17,7 +20,10 @@ extension RoomHandlerTests {
         
         @Test("Nonexistent room returns not found")
         func test_infoForNonexistentRoomReturnsNotFound() async throws {
-            let handler = DefaultRoomHandler()
+            let roomManager = DefaultRoomManager()
+            let handler = DefaultRoomHandler(roomManager: roomManager)
+            async let _ = roomManager.run()
+            try await Task.sleep(for: .milliseconds(1))
             let response = try await handler.getRoomInfoCode(.init(path: .init(code: "123456")))
             guard case .notFound = response else {
                 Issue.record("Did not return .notFound, instead: \(response)")

@@ -1,4 +1,4 @@
-public protocol RoomCodeGeneratorProtocol {
+public protocol RoomCodeGeneratorProtocol: Sendable {
     /// Generates a new room code
     mutating func next() -> String
 }
