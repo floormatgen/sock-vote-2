@@ -1,11 +1,21 @@
 #! /bin/sh
 
+cd "$(dirname "$0")"
+
 DOCS_FOLDER="$1"
+
 OPENAPI_FILE="./openapi.yaml"
 OPENAPI_OUTPUT_PATH="${DOCS_FOLDER}/specification/openapi"
 
+ASYNCAPI_FILE="./asyncapi.yml"
+ASYNCAPI_OUTPUT_PATH="${DOCS_FOLDER}/specification/asyncapi"
+
 echo "Outputting OpenAPI file to ${OPENAPI_OUTPUT_PATH}"
 
-cd "$(dirname "$0")"
 mkdir -p "${OPENAPI_OUTPUT_PATH}"
 cp "${OPENAPI_FILE}" "${OPENAPI_OUTPUT_PATH}/${OPENAPI_FILE}"
+
+echo "Outputting AsyncAPI file to ${ASYNCAPI_OUTPUT_PATH}"
+
+mkdir -p "${ASASYNCAPI_OUTPUT_PATH}"
+cp "${ASYNCAPI_FILE}" "${ASYNCAPI_OUTPUT_PATH}/${ASYNCAPI_FILE}"

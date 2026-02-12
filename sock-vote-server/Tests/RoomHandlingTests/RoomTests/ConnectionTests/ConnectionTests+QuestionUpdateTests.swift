@@ -74,9 +74,9 @@ extension RoomTests.ConnectionTests {
             let options = ["Yes", "No"]
             let style = Question.VotingStyle.preferential
             try await room.updateQuestion(
-                    prompt: prompt, 
-                    options: options, 
-                    style: style
+                prompt: prompt, 
+                options: options, 
+                style: style
             )
             try await confirmation(expectedCount: connectionCount) { confirmation in
                 await withThrowingTaskGroup{ group in 
@@ -93,7 +93,7 @@ extension RoomTests.ConnectionTests {
                         }
                     }
                 }
-                try await room.removeQuestion()
+                #expect(try await room.removeQuestion())
                 try await Task.sleep(for: .milliseconds(10))
             }
         }

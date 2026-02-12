@@ -9,6 +9,15 @@ TARGETS=("SockVoteServer" "RoomHandling" "VoteHandling")
 cd "$(dirname "$0")"
 echo "Clearing contents of ${DOCS_DIRECTORY} ..."
 rm -rd ${DOCS_DIRECTORY}/*
+
+if [ -z "${USE_PRE_GENERATED_SOURCES}" ]; then
+    pre_generated_sources_set=false
+    export USE_PRE_GENERATED_SOURCES="1"
+    swift package resolve
+else
+    pre_generated_sources_set=true
+fi
+
 for target in ${TARGETS[@]}; do
     output_path="${DOCS_DIRECTORY}/${target}"
     mkdir -v "${output_path}"
@@ -23,6 +32,10 @@ for target in ${TARGETS[@]}; do
         --source-service-base-url "https://github.com/floormatgen/sock-vote-2/blob/main/sock-vote-server" \
         --checkout-path "$(pwd)"
 done
+
+if [ $pre_generated_sources_set = false ]; then
+    unset USE_PRE_GENERATED_SOURCES
+fi
 
 # Rename generated archives to remove extension
 # echo "Renaming Archives..."
