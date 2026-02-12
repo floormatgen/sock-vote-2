@@ -6,6 +6,10 @@ extension RoomTests {
     @Suite
     struct ConnectionTests {
 
+        static var standardConnectionCounts: [Int] {
+            [1, 10, 100, 1000]
+        }
+
         struct MockParticipantConnection: Connections.ParticipantConnection {
             var sendQuestionUpdatedHandler: (@Sendable (_ description: Connections.QuestionDescription) async throws -> Void)?
             var sendQuestionDeletedHandler: (@Sendable () async throws -> Void)?

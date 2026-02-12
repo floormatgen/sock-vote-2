@@ -75,13 +75,11 @@ public final actor RoomManager<
                 }
             }    
         } onCancelOrGracefulShutdown: {
-            print("\(#function): Cancelled")
             self.connectionSequenceContinuation.finish()
             // TODO: Try not using an unstructured task here
             Task { await self._setIsAcceptingNewRooms(false) }
         }
         isAcceptingNewRooms = false
-        print("isAcceptingNewRooms: \(isAcceptingNewRooms)")
     }
 
     private func _setIsAcceptingNewRooms(_ newValue: Bool) {
