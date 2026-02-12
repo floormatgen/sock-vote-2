@@ -17,13 +17,21 @@ servers:
 
 channels:
   participantConnection:
-    address: '/connect/participant'
+    address: 'room/connect/{code}/participant'
     title: Participant Notification
+    parameters:
+      code:
+        $ref: '#/components/parameters/RoomCode'
     messages:
       questionUpdated:
         $ref: '#/components/messages/questionUpdated'
       questionRemoved:
         $ref: '#/components/messages/questionRemoved'
+    bindings:
+      ws:
+        headers:
+          'Participant-Token':
+            $ref: '#/components/schemas/ParticipantToken'
 
 operations:
   updateQuestion:
@@ -95,6 +103,19 @@ components:
       type: string
       description:
         An [**ISO8601**](https://www.iso.org/iso-8601-date-and-time-format.html) compliant timestamp
+
+  # MARK: - Header Types
+    ParticipantToken:
+      name: Participant-Token
+      type: string
+      description:
+        The token corresponding to each participant
+
+  # MARK: - Parameters
+  parameters:
+    RoomCode:
+      description:
+        The room code of the room.
 
   messages:
     questionUpdated:

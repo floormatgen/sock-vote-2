@@ -99,7 +99,7 @@ public protocol RoomProtocol: Actor {
     func addParticipantConnection(
         _ participantConnection: ParticipantConnection, 
         forParticipantToken participantToken: String
-    ) throws
+    ) async throws
 
 }
 
@@ -186,6 +186,15 @@ public extension RoomProtocol {
         }
     }
 
+    @discardableResult
+    func handleJoinRequests(_ accept: Bool, forTokens participantTokens: some Collection<String>) -> [String : JoinRequestResult] {
+        Dictionary(
+            uniqueKeysWithValues: participantTokens.map { token in
+                (token, handleJoinRequest(accept, forToken: token))
+            }
+        )
+    }
+
 }
 
 public typealias DefaultRoom = Room<Connections.WebSocketParticipantConnection>
@@ -214,7 +223,7 @@ public final actor Room<
     nonisolated private let participantTimeoutFunction: TimeoutFunction
 
     // Active Participants
-    private var activeParticipants: [String : ParticipantConnection]
+    private var activeParticipants: Set<String>
 
     // Handling Connections
     nonisolated private let connectionManager: ConnectionManager
@@ -268,7 +277,7 @@ public final actor Room<
         self.joinRequests = [:]
         self.joinRequestTimeouts = [:]
         self.inactiveParticipants = [:]
-        self.activeParticipants = [:]
+        self.activeParticipants = Set()
         self.participantTimeout = participantTimeout
         self.participantTimeoutFunction = participantTimeoutFunction
         self.joinRequestTimeout = joinRequestTimeout
@@ -366,7 +375,7 @@ public extension Room {
 
     func hasParticipant(withParticipantToken participantToken: String) -> Bool {
         return (
-            activeParticipants.keys.contains(participantToken) ||
+            activeParticipants.contains(participantToken) ||
             inactiveParticipants.keys.contains(participantToken)
         )
     }
@@ -400,15 +409,15 @@ public extension Room {
     func addParticipantConnection(
         _ participantConnection: ParticipantConnection, 
         forParticipantToken participantToken: String
-    ) throws {
+    ) async throws {
         assert(
             !(
-                activeParticipants.keys.contains(participantToken) &&
+                activeParticipants.contains(participantToken) &&
                 inactiveParticipants.keys.contains(participantToken)
             ),
             "\(#function): Participant \(participantToken) found to be active and inactive. This is not allowed."
         )
-        guard !activeParticipants.keys.contains(participantToken) else {
+        guard !activeParticipants.contains(participantToken) else {
             throw Error.alreadyConnected(participantToken: participantToken)
         }
         guard let timeout = inactiveParticipants.removeValue(forKey: participantToken) else {
@@ -419,7 +428,8 @@ public extension Room {
             "\(#function): The timeout for participant \(participantToken) was cancelled but not removed"
         )
         timeout.cancel()
-        activeParticipants[participantToken] = participantConnection
+        activeParticipants.insert(participantToken)
+        try await connectionManager.registerConnection(participantConnection, forParticipantToken: participantToken)
     }
 
 }

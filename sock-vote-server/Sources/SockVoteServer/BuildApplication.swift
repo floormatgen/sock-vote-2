@@ -1,4 +1,5 @@
 import Hummingbird
+import HummingbirdWebSocket
 import OpenAPIHummingbird
 import RoomHandling
 import Configuration
@@ -16,7 +17,19 @@ func buildApplication(
     try roomHTTPAPI.registerHandlers(on: router)
 
     let config = ApplicationConfiguration(reader: configReader)
-    var application = Application(router: router, configuration: config)
+
+    let webSocketRouter = Router(context: BasicWebSocketRequestContext.self)
+    let connectionRoutes = Connections.Routes(roomManager: roomManager)
+    connectionRoutes.addRoutes(to: webSocketRouter)
+
+    var application = Application(
+        router: router, 
+        server: .http1WebSocketUpgrade(
+            webSocketRouter: webSocketRouter
+        ),
+        configuration: config
+    )
+
     application.addServices(roomManager)
     
     return application

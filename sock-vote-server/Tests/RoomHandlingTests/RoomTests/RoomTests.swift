@@ -43,4 +43,29 @@ struct RoomTests {
         return room
     }
 
+    @discardableResult
+    static func addParticipants(
+        to room: some RoomProtocol,
+        count: Int = 1
+    ) async throws -> [String] {
+        try await withThrowingTaskGroup { group in
+            let fields = room.fields
+            for i in 0..<count {
+                group.addTask {
+                    let name = "Participant \(i)"
+                    let fields = Dictionary(
+                        uniqueKeysWithValues: fields.map { key in
+                            (key, UUID().uuidString)
+                        }
+                    )
+                    _ = try await room.requestJoinRoom(name: name, fields: fields)
+                }
+            }
+            try await Task.sleep(for: .milliseconds(1))
+            let requests = await room.joinRequests
+            let results = await room.handleJoinRequests(true, forTokens: requests.keys)
+            return Array(results.keys)
+        }
+    }
+
 }

@@ -65,9 +65,9 @@ extension Room {
                                             self.logger.trace("Sending question update to participant with token \(participantToken)")
                                             switch message {
                                                 case .questionUpdated(let question):
-                                                    try await connection.sendQuestionUpdate(with: question)
+                                                    try await connection.sendQuestionUpdated(with: question)
                                                 case .questionDeleted:
-                                                    try await connection.sendQuestionRemove()
+                                                    try await connection.sendQuestionDeleted()
                                             }
                                         } catch {
                                             self.logger.debug("Failed to send question update to participant with token \(participantToken)")
