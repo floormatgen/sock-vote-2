@@ -1,0 +1,136 @@
+asyncapi: 3.0.0
+info:
+  title: sock-vote-server
+  description:
+    Specifies connection information for the real time voting system.
+    This uses both WebSocket as well as HTTP, where WebSocket is used for notifications,
+    while HTTP is used for question and vote submissions. Due to the scale of this project,
+    room information is stored in-memory.
+  version: '0.1.0'
+
+servers:
+  development:
+    host: localhost:8080
+    protocol: WebSocket
+    description:
+      Local development server
+
+channels:
+  participantConnection:
+    address: 'room/connect/{code}/participant'
+    title: Participant Notification
+    parameters:
+      code:
+        $ref: '#/components/parameters/RoomCode'
+    messages:
+      questionUpdated:
+        $ref: '#/components/messages/questionUpdated'
+      questionRemoved:
+        $ref: '#/components/messages/questionRemoved'
+    bindings:
+      ws:
+        headers:
+          'Participant-Token':
+            $ref: '#/components/schemas/ParticipantToken'
+
+operations:
+  updateQuestion:
+    action: receive
+    summary: The question was updated
+    channel:
+      $ref: '#/channels/participantConnection'
+
+components:
+  schemas:
+
+    # MARK: - Data Types
+    BasePayload:
+      type: object
+      required:
+        - type
+        - timestamp
+      properties: 
+        type:
+          $ref: '#/components/schemas/PayloadType'
+        timestamp:
+          $ref: '#/components/schemas/Timestamp'
+      discriminator: type
+
+    Question:
+      type: object
+      required:
+        - id
+        - prompt
+        - votingStyle
+        - options
+        - state
+      properties:
+        id:
+          type: string
+        prompt:
+          type: string
+        votingStyle:
+          $ref: '#/components/schemas/VotingStyle'
+        options:
+          type: array
+          items:
+            type: string
+        state:
+          $ref: '#/components/schemas/QuestionState'
+
+
+    # MARK: - Primitive Data Types
+    PayloadType:
+      type: string
+      enum:
+        - questionUpdated
+        - questionRemoved
+
+    VotingStyle:
+      type: string
+      enum:
+        - plurality
+        - preferential
+
+    QuestionState:
+      type: string
+      enum:
+        - open
+        - closed
+        - finalized
+    
+    Timestamp:
+      type: string
+      description:
+        An [**ISO8601**](https://www.iso.org/iso-8601-date-and-time-format.html) compliant timestamp
+
+  # MARK: - Header Types
+    ParticipantToken:
+      name: Participant-Token
+      type: string
+      description:
+        The token corresponding to each participant
+
+  # MARK: - Parameters
+  parameters:
+    RoomCode:
+      description:
+        The room code of the room.
+
+  messages:
+    questionUpdated:
+      title: Question Updated
+      description:
+        Note that "questionUpdated" will be used as the discriminator value.
+      summary: The question was updated
+      payload:
+        allOf:
+          - $ref: '#/components/schemas/BasePayload'
+          - $ref: '#/components/schemas/Question'
+    questionRemoved:
+      title: Question Removed
+      summary: The current question was removed
+      description:
+        The active question was removed
+      payload:
+        $ref: '#/components/schemas/BasePayload'
