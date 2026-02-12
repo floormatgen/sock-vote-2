@@ -329,14 +329,14 @@ public extension Room {
 
     func updateQuestion(prompt: String, options: some Collection<String> & Sendable, style: Question.VotingStyle) throws {
         let newQuestion = try Question.create(prompt: prompt, options: options, votingStyle: style)
-        Task { try await sendQuestionUpdate() }
+        try sendQuestionUpdate(newQuestion)
         currentQuestion = newQuestion
     }
 
     func removeQuestion() throws -> Bool {
         if currentQuestion == nil { return false }
         currentQuestion = nil
-        Task { try await sendQuestionUpdate() }
+        try sendQuestionUpdate(currentQuestion)
         return true
     }
 
@@ -427,18 +427,8 @@ public extension Room {
 /// MARK: - Sending Updates
 private extension Room {
 
-    func sendQuestionUpdate() async throws  {
-        // TODO: Delegate to another task
-        if let question = self.currentQuestionDescription {
-            for c in activeParticipants.values {
-                try await c.sendQuestionUpdate(with: question)
-            }
-        } else {
-            for c in activeParticipants.values {
-                try await c.sendQuestionRemove()
-            }
-        }
-
+    func sendQuestionUpdate(_ question: Question?) throws {
+        connectionManager.updateQuestion(question?.questionDescription)
     }
 
 }

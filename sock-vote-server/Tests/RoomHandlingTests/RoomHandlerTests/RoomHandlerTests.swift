@@ -35,7 +35,7 @@ final class RoomHandlerTests: Sendable {
         let createName = try createOutput.ok.body.json.name
         let createCode = try createOutput.ok.body.json.code
         #expect(createName == name)
-        let infoOutput = try await roomHandler.getRoomInfoCode(.init(path: .init(code: createCode)))
+        let infoOutput = try await roomHandler.getRoomCodeInfo(.init(path: .init(code: createCode)))
         let infoName = try infoOutput.ok.body.json.name
         let infoCode = try infoOutput.ok.body.json.code
         #expect(createName == infoName)
@@ -46,7 +46,7 @@ final class RoomHandlerTests: Sendable {
     func test_canAttemptToJoinExistingRoom(_ name: String) async throws {
         let (_, code, _, adminToken) = try await roomHandler.createRoom(withName: "Room")
         let joinRequestTask = Task.detached {
-            try await self.roomHandler.postRoomJoinCode(
+            try await self.roomHandler.postRoomCodeJoin(
                 .init(path: .init(code: code), body: .json(.init(
                     name: name, 
                     fields: .init(additionalProperties: [:])
@@ -128,8 +128,8 @@ final class RoomHandlerTests: Sendable {
         adminToken: String,
         accept: [String]? = [],
         reject: [String]? = []
-    ) async throws -> Operations.PostRoomJoinRequestsCode.Output {
-        try await roomHandler.postRoomJoinRequestsCode(
+    ) async throws -> Operations.PostRoomCodeJoinRequests.Output {
+        try await roomHandler.postRoomCodeJoinRequests(
             .init(
                 path: .init(
                     code: roomCode
@@ -168,8 +168,8 @@ final class RoomHandlerTests: Sendable {
         on roomHandler: RoomHandler<some RoomManagerProtocol>,
         roomCode: String,
         adminToken: String
-    ) async throws -> Operations.GetRoomJoinRequestsCode.Output {
-        try await roomHandler.getRoomJoinRequestsCode(
+    ) async throws -> Operations.GetRoomCodeJoinRequests.Output {
+        try await roomHandler.getRoomCodeJoinRequests(
             .init(
                 path: .init(
                     code: roomCode
@@ -181,7 +181,7 @@ final class RoomHandlerTests: Sendable {
         )
     }
 
-    typealias PendingJoinRequest = Operations.GetRoomJoinRequestsCode.Output.Ok.Body.JsonPayload.RequestsPayloadPayload
+    typealias PendingJoinRequest = Operations.GetRoomCodeJoinRequests.Output.Ok.Body.JsonPayload.RequestsPayloadPayload
 
     static func listJoinRequests(
         on roomHandler: RoomHandler<some RoomManagerProtocol>,
@@ -202,8 +202,8 @@ final class RoomHandlerTests: Sendable {
         roomCode: String,
         name: String = "Participant",
         fields: [String : String]? = nil
-    ) async throws -> Operations.PostRoomJoinCode.Output {
-        try await roomHandler.postRoomJoinCode(
+    ) async throws -> Operations.PostRoomCodeJoin.Output {
+        try await roomHandler.postRoomCodeJoin(
             .init(
                 path: .init(
                     code: roomCode

@@ -20,7 +20,7 @@ extension RoomHandler {
     func roomInfo(
         withCode code: String
     ) async throws -> (name: String, code: String) {
-        let output = try await getRoomInfoCode(.init(path: .init(code: code)))
+        let output = try await getRoomCodeInfo(.init(path: .init(code: code)))
         let body = try output.ok.body.json
         return (body.name, body.code)
     }
@@ -29,7 +29,7 @@ extension RoomHandler {
         withCode code: String,
         adminToken: String
     ) async throws -> [JoinRequest] {
-        let output = try await getRoomJoinRequestsCode(.init(path: .init(code: code), headers: .init(roomAdminToken: adminToken)))
+        let output = try await getRoomCodeJoinRequests(.init(path: .init(code: code), headers: .init(roomAdminToken: adminToken)))
         let body = try output.ok.body.json.requests
         return body.map { JoinRequest(name: $0.name, participantToken: $0.participantToken, timestamp: $0.timestamp, fields: $0.fields?.additionalProperties ?? [:]) }
     }
@@ -38,7 +38,7 @@ extension RoomHandler {
         withCode code: String,
         name: String, fields: [String : String]? = nil
     ) async throws -> String {
-        let output = try await postRoomJoinCode(.init(path: .init(code: code), body: .json(.init(name: name, fields: .init(additionalProperties: fields ?? [:])))))
+        let output = try await postRoomCodeJoin(.init(path: .init(code: code), body: .json(.init(name: name, fields: .init(additionalProperties: fields ?? [:])))))
         let body = try output.ok.body.json
         return body.participantToken
     }
@@ -49,7 +49,7 @@ extension RoomHandler {
         accept: [String]? = nil,
         reject: [String]? = nil
     ) async throws -> (accepted: [String]?, rejected: [String]?, failed: [String]?, status: HTTPResponse.Status) {
-        let output = try await postRoomJoinRequestsCode(.init(
+        let output = try await postRoomCodeJoinRequests(.init(
             path: .init(code: code), 
             headers: .init(roomAdminToken: adminToken), 
             body: .json(.init(accept: accept, reject: reject))

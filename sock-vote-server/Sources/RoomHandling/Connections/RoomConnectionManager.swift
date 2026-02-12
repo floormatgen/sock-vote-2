@@ -39,9 +39,16 @@ extension Room {
             participantConnections[participantToken] = connection
         }
 
-        /// Cleans up the 
         internal nonisolated func cleanup() {
             self.participantMessageContinutaion.finish()
+        }
+
+        internal nonisolated func updateQuestion(_ question: Question.Description?) {
+            if let question = question {
+                participantMessageContinutaion.yield(.questionUpdated(question: question))
+            } else {
+                participantMessageContinutaion.yield(.questionDeleted)
+            }
         }
 
         internal func run() async throws {

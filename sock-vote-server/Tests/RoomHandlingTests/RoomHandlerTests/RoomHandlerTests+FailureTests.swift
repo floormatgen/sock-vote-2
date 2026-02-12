@@ -24,7 +24,7 @@ extension RoomHandlerTests {
             let handler = DefaultRoomHandler(roomManager: roomManager)
             async let _ = roomManager.run()
             try await Task.sleep(for: .milliseconds(1))
-            let response = try await handler.getRoomInfoCode(.init(path: .init(code: "123456")))
+            let response = try await handler.getRoomCodeInfo(.init(path: .init(code: "123456")))
             guard case .notFound = response else {
                 Issue.record("Did not return .notFound, instead: \(response)")
                 return

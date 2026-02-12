@@ -22,7 +22,7 @@ extension TestClientProtocol {
         withCode code: String
     ) async throws -> TestResponse {
         return try await self.execute(
-            uri: "/room/info/\(code)",
+            uri: "/room/\(code)/info",
             method: .get
         )
     }

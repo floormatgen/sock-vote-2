@@ -37,9 +37,9 @@ public extension RoomHandler {
 
     // MARK: - Room Info
 
-    func getRoomInfoCode(
-        _ input: Operations.GetRoomInfoCode.Input
-    ) async throws -> Operations.GetRoomInfoCode.Output {
+    func getRoomCodeInfo(
+        _ input: Operations.GetRoomCodeInfo.Input
+    ) async throws -> Operations.GetRoomCodeInfo.Output {
         let code = input.path.code
         guard let room = await roomManager.room(withCode: code) else {
             return .notFound
@@ -49,9 +49,9 @@ public extension RoomHandler {
 
     // MARK: - Join Requests
 
-    func postRoomJoinCode(
-        _ input: Operations.PostRoomJoinCode.Input
-    ) async throws -> Operations.PostRoomJoinCode.Output {
+    func postRoomCodeJoin(
+        _ input: Operations.PostRoomCodeJoin.Input
+    ) async throws -> Operations.PostRoomCodeJoin.Output {
         let code = input.path.code
         guard let room = await roomManager.room(withCode: code) else {
             return .notFound
@@ -73,9 +73,9 @@ public extension RoomHandler {
         }
     }
 
-    func getRoomJoinRequestsCode(
-        _ input: Operations.GetRoomJoinRequestsCode.Input
-    ) async throws -> Operations.GetRoomJoinRequestsCode.Output {
+    func getRoomCodeJoinRequests(
+        _ input: Operations.GetRoomCodeJoinRequests.Input
+    ) async throws -> Operations.GetRoomCodeJoinRequests.Output {
         let code = input.path.code
         let adminToken = input.headers.roomAdminToken
         guard let room = await roomManager.room(withCode: code) else {
@@ -100,9 +100,9 @@ public extension RoomHandler {
         ))))
     }
 
-    func postRoomJoinRequestsCode(
-        _ input: Operations.PostRoomJoinRequestsCode.Input
-    ) async throws -> Operations.PostRoomJoinRequestsCode.Output {
+    func postRoomCodeJoinRequests(
+        _ input: Operations.PostRoomCodeJoinRequests.Input
+    ) async throws -> Operations.PostRoomCodeJoinRequests.Output {
         let code = input.path.code
         let adminToken = input.headers.roomAdminToken
         guard let room = await roomManager.room(withCode: code) else {
@@ -151,9 +151,9 @@ public extension RoomHandler {
 
     // MARK: - Question Handling 
 
-    func getRoomQuestionCode(
-        _ input: Operations.GetRoomQuestionCode.Input
-    ) async throws -> Operations.GetRoomQuestionCode.Output {
+    func getRoomCodeQuestion(
+        _ input: Operations.GetRoomCodeQuestion.Input
+    ) async throws -> Operations.GetRoomCodeQuestion.Output {
         // TODO: Could provide more information to a client, such as a number of votes in the future
         // if an admin token is provided.
         let code = input.path.code
@@ -166,9 +166,9 @@ public extension RoomHandler {
         return .ok(.init(body: .json(questionDescription.openAPIQuestion)))
     }
 
-    func postRoomQuestionCode(
-        _ input: Operations.PostRoomQuestionCode.Input
-    ) async throws -> Operations.PostRoomQuestionCode.Output {
+    func postRoomCodeQuestion(
+        _ input: Operations.PostRoomCodeQuestion.Input
+    ) async throws -> Operations.PostRoomCodeQuestion.Output {
         let code = input.path.code
         let adminToken = input.headers.roomAdminToken
         guard let room = await roomManager.room(withCode: code) else {
@@ -193,9 +193,9 @@ public extension RoomHandler {
         }
     }
 
-    func deleteRoomQuestionCodeQuestionID(
-        _ input: Operations.DeleteRoomQuestionCodeQuestionID.Input
-    ) async throws -> Operations.DeleteRoomQuestionCodeQuestionID.Output {
+    func deleteRoomCodeQuestionID(
+        _ input: Operations.DeleteRoomCodeQuestionID.Input
+    ) async throws -> Operations.DeleteRoomCodeQuestionID.Output {
         let code = input.path.code
         let questionID = input.path.questionID
         let adminToken = input.headers.roomAdminToken
@@ -215,9 +215,9 @@ public extension RoomHandler {
         return .ok(.init(body: .json(questionDescription.openAPIQuestion)))
     }
 
-    func putRoomQuestionCodeQuestionID(
-        _ input: Operations.PutRoomQuestionCodeQuestionID.Input
-    ) async throws -> Operations.PutRoomQuestionCodeQuestionID.Output {
+    func putRoomCodeQuestionID(
+        _ input: Operations.PutRoomCodeQuestionID.Input
+    ) async throws -> Operations.PutRoomCodeQuestionID.Output {
         let code = input.path.code
         let questionID = input.path.questionID
         let adminToken = input.headers.roomAdminToken
@@ -255,9 +255,9 @@ public extension RoomHandler {
         return .ok
     }
 
-    func getRoomQuestionResultCodeQuestionID(
-        _ input: Operations.GetRoomQuestionResultCodeQuestionID.Input
-    ) async throws -> Operations.GetRoomQuestionResultCodeQuestionID.Output {
+    func getRoomCodeQuestionIDResult(
+        _ input: Operations.GetRoomCodeQuestionIDResult.Input
+    ) async throws -> Operations.GetRoomCodeQuestionIDResult.Output {
         try await withVerifiedQuestion(input: input) { room, questionUUID in
             guard let currentQuestionState = await room.currentQuestionState else {
                 assertionFailure("\(#function): Question exists but currentQuestionState return nil")
@@ -287,9 +287,9 @@ public extension RoomHandler {
         }
     }
 
-    func getRoomQuestionVotesInfoCodeQuestionID(
-        _ input: Operations.GetRoomQuestionVotesInfoCodeQuestionID.Input
-    ) async throws -> Operations.GetRoomQuestionVotesInfoCodeQuestionID.Output {
+    func getRoomCodeQuestionIDVotesInfo(
+        _ input: Operations.GetRoomCodeQuestionIDVotesInfo.Input
+    ) async throws -> Operations.GetRoomCodeQuestionIDVotesInfo.Output {
         await withVerifiedQuestionAndAdmin(input: input) { room, _, _ in
             return .ok(.init(body: .json(.init(
                 timestamp: Date.now.ISO8601Format(), 
@@ -300,9 +300,9 @@ public extension RoomHandler {
 
     // MARK: - Voting
 
-    func postRoomVoteCodeQuestionID(
-        _ input: Operations.PostRoomVoteCodeQuestionID.Input
-    ) async throws -> Operations.PostRoomVoteCodeQuestionID.Output {
+    func postRoomCodeQuestionIDVote(
+        _ input: Operations.PostRoomCodeQuestionIDVote.Input
+    ) async throws -> Operations.PostRoomCodeQuestionIDVote.Output {
         let code = input.path.code
         let questionID = input.path.questionID
         let participantToken = input.headers.participantToken

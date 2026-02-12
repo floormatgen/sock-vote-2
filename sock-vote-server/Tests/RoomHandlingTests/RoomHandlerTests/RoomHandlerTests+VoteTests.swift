@@ -55,8 +55,8 @@ extension RoomHandlerTests {
             questionID: String,
             participantToken: String,
             vote: Components.Schemas.AnyVote
-        ) async throws -> Operations.PostRoomVoteCodeQuestionID.Output {
-            try await roomHandler.postRoomVoteCodeQuestionID(
+        ) async throws -> Operations.PostRoomCodeQuestionIDVote.Output {
+            try await roomHandler.postRoomCodeQuestionIDVote(
                 .init(
                     path: .init(
                         code: roomCode,

@@ -6,6 +6,8 @@ internal extension RoomHandler {
     //! FIXME: Region-based isolation checker can't handle using an isolated parameter here,
     //! switch to using an isolated parameter when compiler supports it.
 
+    // TODO: Make operation closures isolated to room
+
     /// Does common request checks for admin operations on questions
     func withVerifiedQuestionAndAdmin<E: Error, Output: Validation.RoomAdminQuestionOutput>(
         roomCode: String,
@@ -148,11 +150,11 @@ internal enum Validation {
 
 // MARK: - Conformances
 
-extension Operations.GetRoomQuestionVotesInfoCodeQuestionID.Input: Validation.RoomAdminQuestionInput {}
-extension Operations.GetRoomQuestionVotesInfoCodeQuestionID.Input.Path: Validation.RoomQuestionPath {}
-extension Operations.GetRoomQuestionVotesInfoCodeQuestionID.Input.Headers: Validation.RoomAdminHeaders {}
-extension Operations.GetRoomQuestionVotesInfoCodeQuestionID.Output: Validation.RoomAdminQuestionOutput {}
+extension Operations.GetRoomCodeQuestionIDVotesInfo.Input: Validation.RoomAdminQuestionInput {}
+extension Operations.GetRoomCodeQuestionIDVotesInfo.Input.Path: Validation.RoomQuestionPath {}
+extension Operations.GetRoomCodeQuestionIDVotesInfo.Input.Headers: Validation.RoomAdminHeaders {}
+extension Operations.GetRoomCodeQuestionIDVotesInfo.Output: Validation.RoomAdminQuestionOutput {}
 
-extension Operations.GetRoomQuestionResultCodeQuestionID.Input: Validation.RoomQuestionInput {}
-extension Operations.GetRoomQuestionResultCodeQuestionID.Input.Path: Validation.RoomQuestionPath {}
-extension Operations.GetRoomQuestionResultCodeQuestionID.Output: Validation.RoomQuestionOutput {}
+extension Operations.GetRoomCodeQuestionIDResult.Input: Validation.RoomQuestionInput {}
+extension Operations.GetRoomCodeQuestionIDResult.Input.Path: Validation.RoomQuestionPath {}
+extension Operations.GetRoomCodeQuestionIDResult.Output: Validation.RoomQuestionOutput {}

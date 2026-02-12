@@ -319,10 +319,14 @@ extension RoomHandlerTests {
             prompt: String = defaultQuestionName,
             options: [String] = defaultQuestionOptions,
             votingStyle: Question.VotingStyle = .plurality
-        ) async throws -> Operations.PostRoomQuestionCode.Output {
-            try await roomHandler.postRoomQuestionCode(.init(
-                path: .init(code: roomCode),
-                headers: .init(roomAdminToken: adminToken),
+        ) async throws -> Operations.PostRoomCodeQuestion.Output {
+            try await roomHandler.postRoomCodeQuestion(.init(
+                path: .init(
+                    code: roomCode
+                ),
+                headers: .init(
+                    roomAdminToken: adminToken
+                ),
                 body: .json(.init(
                     prompt: prompt, 
                     votingStyle: votingStyle.openAPIVotingStyle, 
@@ -361,9 +365,11 @@ extension RoomHandlerTests {
             roomCode: String,
             id: String? = nil
         ) async throws -> Bool {
-            let response = try await roomHandler.getRoomQuestionCode(
+            let response = try await roomHandler.getRoomCodeQuestion(
                 .init(
-                    path: .init(code: roomCode)
+                    path: .init(
+                        code: roomCode
+                    )
                 )
             )
             switch response {
@@ -382,8 +388,8 @@ extension RoomHandlerTests {
             roomCode: String,
             questionID: String,
             adminToken: String
-        ) async throws -> Operations.DeleteRoomQuestionCodeQuestionID.Output {
-            try await roomHandler.deleteRoomQuestionCodeQuestionID(
+        ) async throws -> Operations.DeleteRoomCodeQuestionID.Output {
+            try await roomHandler.deleteRoomCodeQuestionID(
                 .init(
                     path: .init(
                         code: roomCode,
@@ -421,8 +427,8 @@ extension RoomHandlerTests {
             questionID: String,
             adminToken: String,
             state: Question.State
-        ) async throws -> Operations.PutRoomQuestionCodeQuestionID.Output {
-            try await roomHandler.putRoomQuestionCodeQuestionID(
+        ) async throws -> Operations.PutRoomCodeQuestionID.Output {
+            try await roomHandler.putRoomCodeQuestionID(
                 .init(
                     path: .init(
                         code: roomCode,
@@ -467,8 +473,8 @@ extension RoomHandlerTests {
             on roomHandler: RoomHandler<some RoomManagerProtocol>,
             roomCode: String,
             questionID: String
-        ) async throws -> Operations.GetRoomQuestionCode.Output {
-            try await roomHandler.getRoomQuestionCode(
+        ) async throws -> Operations.GetRoomCodeQuestion.Output {
+            try await roomHandler.getRoomCodeQuestion(
                 .init(
                     path: .init(
                         code: roomCode
@@ -495,8 +501,8 @@ extension RoomHandlerTests {
             on roomHandler: RoomHandler<some RoomManagerProtocol>,
             roomCode: String,
             questionID: String
-        ) async throws -> Operations.GetRoomQuestionResultCodeQuestionID.Output {
-            try await roomHandler.getRoomQuestionResultCodeQuestionID(
+        ) async throws -> Operations.GetRoomCodeQuestionIDResult.Output {
+            try await roomHandler.getRoomCodeQuestionIDResult(
                 .init(
                     path: .init(
                         code: roomCode,
@@ -532,7 +538,7 @@ extension RoomHandlerTests {
             questionID: String,
             participantToken: String,
             vote: Vote
-        ) async throws -> Operations.PostRoomVoteCodeQuestionID.Output {
+        ) async throws -> Operations.PostRoomCodeQuestionIDVote.Output {
             let anyVote: Components.Schemas.AnyVote
             switch vote {
                 case .plurality(let s):
@@ -540,7 +546,7 @@ extension RoomHandlerTests {
                 case .preferential(let so):
                     anyVote = .PreferentialVote(.init(selectionOrder: so))
             }
-            return try await roomHandler.postRoomVoteCodeQuestionID(
+            return try await roomHandler.postRoomCodeQuestionIDVote(
                 .init(
                     path: .init(
                         code: roomCode, 
@@ -576,8 +582,8 @@ extension RoomHandlerTests {
             roomCode: String,
             questionID: String,
             adminToken: String
-        ) async throws -> Operations.GetRoomQuestionVotesInfoCodeQuestionID.Output {
-            try await roomHandler.getRoomQuestionVotesInfoCodeQuestionID(
+        ) async throws -> Operations.GetRoomCodeQuestionIDVotesInfo.Output {
+            try await roomHandler.getRoomCodeQuestionIDVotesInfo(
                 .init(
                     path: .init(
                         code: roomCode, 
