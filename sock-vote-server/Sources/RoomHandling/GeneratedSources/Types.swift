@@ -22,69 +22,69 @@ public protocol APIProtocol: Sendable {
     ///
     /// Provides information about a room, like whether the room code corresponds to a valid room
     ///
-    /// - Remark: HTTP `GET /room/info/{code}`.
-    /// - Remark: Generated from `#/paths//room/info/{code}/get`.
-    func getRoomInfoCode(_ input: Operations.GetRoomInfoCode.Input) async throws -> Operations.GetRoomInfoCode.Output
+    /// - Remark: HTTP `GET /room/{code}/info`.
+    /// - Remark: Generated from `#/paths//room/{code}/info/get`.
+    func getRoomCodeInfo(_ input: Operations.GetRoomCodeInfo.Input) async throws -> Operations.GetRoomCodeInfo.Output
     /// Join a room
     ///
     /// This route only asks the room owner whether to allow you to join the room, it doesn't actually open a connection to the room. To do that, use the `/room/connect/{code}` route.
     ///
-    /// - Remark: HTTP `POST /room/join/{code}`.
-    /// - Remark: Generated from `#/paths//room/join/{code}/post`.
-    func postRoomJoinCode(_ input: Operations.PostRoomJoinCode.Input) async throws -> Operations.PostRoomJoinCode.Output
+    /// - Remark: HTTP `POST /room/{code}/join`.
+    /// - Remark: Generated from `#/paths//room/{code}/join/post`.
+    func postRoomCodeJoin(_ input: Operations.PostRoomCodeJoin.Input) async throws -> Operations.PostRoomCodeJoin.Output
     /// Pending requests to join a room
     ///
     /// Allows an admin to view pending join requests for a room
     ///
-    /// - Remark: HTTP `GET /room/join-requests/{code}`.
-    /// - Remark: Generated from `#/paths//room/join-requests/{code}/get`.
-    func getRoomJoinRequestsCode(_ input: Operations.GetRoomJoinRequestsCode.Input) async throws -> Operations.GetRoomJoinRequestsCode.Output
+    /// - Remark: HTTP `GET /room/{code}/join-requests`.
+    /// - Remark: Generated from `#/paths//room/{code}/join-requests/get`.
+    func getRoomCodeJoinRequests(_ input: Operations.GetRoomCodeJoinRequests.Input) async throws -> Operations.GetRoomCodeJoinRequests.Output
     /// Handle join requests
     ///
     /// Allows a room admin to accept or reject join requests.
     ///
-    /// - Remark: HTTP `POST /room/join-requests/{code}`.
-    /// - Remark: Generated from `#/paths//room/join-requests/{code}/post`.
-    func postRoomJoinRequestsCode(_ input: Operations.PostRoomJoinRequestsCode.Input) async throws -> Operations.PostRoomJoinRequestsCode.Output
+    /// - Remark: HTTP `POST /room/{code}/join-requests`.
+    /// - Remark: Generated from `#/paths//room/{code}/join-requests/post`.
+    func postRoomCodeJoinRequests(_ input: Operations.PostRoomCodeJoinRequests.Input) async throws -> Operations.PostRoomCodeJoinRequests.Output
     /// Get the active question
     ///
-    /// - Remark: HTTP `GET /room/question/{code}`.
-    /// - Remark: Generated from `#/paths//room/question/{code}/get`.
-    func getRoomQuestionCode(_ input: Operations.GetRoomQuestionCode.Input) async throws -> Operations.GetRoomQuestionCode.Output
+    /// - Remark: HTTP `GET /room/{code}/question`.
+    /// - Remark: Generated from `#/paths//room/{code}/question/get`.
+    func getRoomCodeQuestion(_ input: Operations.GetRoomCodeQuestion.Input) async throws -> Operations.GetRoomCodeQuestion.Output
     /// Submit a new question
     ///
-    /// - Remark: HTTP `POST /room/question/{code}`.
-    /// - Remark: Generated from `#/paths//room/question/{code}/post`.
-    func postRoomQuestionCode(_ input: Operations.PostRoomQuestionCode.Input) async throws -> Operations.PostRoomQuestionCode.Output
+    /// - Remark: HTTP `POST /room/{code}/question`.
+    /// - Remark: Generated from `#/paths//room/{code}/question/post`.
+    func postRoomCodeQuestion(_ input: Operations.PostRoomCodeQuestion.Input) async throws -> Operations.PostRoomCodeQuestion.Output
     /// Edits the current question
     ///
     /// Modify attributes of the current question
     ///
-    /// - Remark: HTTP `PUT /room/question/{code}/{questionID}`.
-    /// - Remark: Generated from `#/paths//room/question/{code}/{questionID}/put`.
-    func putRoomQuestionCodeQuestionID(_ input: Operations.PutRoomQuestionCodeQuestionID.Input) async throws -> Operations.PutRoomQuestionCodeQuestionID.Output
+    /// - Remark: HTTP `PUT /room/{code}/{questionID}`.
+    /// - Remark: Generated from `#/paths//room/{code}/{questionID}/put`.
+    func putRoomCodeQuestionID(_ input: Operations.PutRoomCodeQuestionID.Input) async throws -> Operations.PutRoomCodeQuestionID.Output
     /// Removes the current question
     ///
-    /// - Remark: HTTP `DELETE /room/question/{code}/{questionID}`.
-    /// - Remark: Generated from `#/paths//room/question/{code}/{questionID}/delete`.
-    func deleteRoomQuestionCodeQuestionID(_ input: Operations.DeleteRoomQuestionCodeQuestionID.Input) async throws -> Operations.DeleteRoomQuestionCodeQuestionID.Output
+    /// - Remark: HTTP `DELETE /room/{code}/{questionID}`.
+    /// - Remark: Generated from `#/paths//room/{code}/{questionID}/delete`.
+    func deleteRoomCodeQuestionID(_ input: Operations.DeleteRoomCodeQuestionID.Input) async throws -> Operations.DeleteRoomCodeQuestionID.Output
     /// Vote on a question
     ///
-    /// - Remark: HTTP `POST /room/vote/{code}/{questionID}`.
-    /// - Remark: Generated from `#/paths//room/vote/{code}/{questionID}/post`.
-    func postRoomVoteCodeQuestionID(_ input: Operations.PostRoomVoteCodeQuestionID.Input) async throws -> Operations.PostRoomVoteCodeQuestionID.Output
+    /// - Remark: HTTP `POST /room/{code}/{questionID}/vote`.
+    /// - Remark: Generated from `#/paths//room/{code}/{questionID}/vote/post`.
+    func postRoomCodeQuestionIDVote(_ input: Operations.PostRoomCodeQuestionIDVote.Input) async throws -> Operations.PostRoomCodeQuestionIDVote.Output
     /// Check the result of the question
     ///
-    /// - Remark: HTTP `GET /room/question-result/{code}/{questionID}`.
-    /// - Remark: Generated from `#/paths//room/question-result/{code}/{questionID}/get`.
-    func getRoomQuestionResultCodeQuestionID(_ input: Operations.GetRoomQuestionResultCodeQuestionID.Input) async throws -> Operations.GetRoomQuestionResultCodeQuestionID.Output
+    /// - Remark: HTTP `GET /room/{code}/{questionID}/result`.
+    /// - Remark: Generated from `#/paths//room/{code}/{questionID}/result/get`.
+    func getRoomCodeQuestionIDResult(_ input: Operations.GetRoomCodeQuestionIDResult.Input) async throws -> Operations.GetRoomCodeQuestionIDResult.Output
     /// Get the vote-information
     ///
     /// This information is limited intentionally to prevent spoiling the vote.
     ///
-    /// - Remark: HTTP `GET /room/question-votes-info/{code}/{questionID}`.
-    /// - Remark: Generated from `#/paths//room/question-votes-info/{code}/{questionID}/get`.
-    func getRoomQuestionVotesInfoCodeQuestionID(_ input: Operations.GetRoomQuestionVotesInfoCodeQuestionID.Input) async throws -> Operations.GetRoomQuestionVotesInfoCodeQuestionID.Output
+    /// - Remark: HTTP `GET /room/{code}/{questionID}/votes-info`.
+    /// - Remark: Generated from `#/paths//room/{code}/{questionID}/votes-info/get`.
+    func getRoomCodeQuestionIDVotesInfo(_ input: Operations.GetRoomCodeQuestionIDVotesInfo.Input) async throws -> Operations.GetRoomCodeQuestionIDVotesInfo.Output
 }
 
 /// Convenience overloads for operation inputs.
@@ -108,13 +108,13 @@ extension APIProtocol {
     ///
     /// Provides information about a room, like whether the room code corresponds to a valid room
     ///
-    /// - Remark: HTTP `GET /room/info/{code}`.
-    /// - Remark: Generated from `#/paths//room/info/{code}/get`.
-    public func getRoomInfoCode(
-        path: Operations.GetRoomInfoCode.Input.Path,
-        headers: Operations.GetRoomInfoCode.Input.Headers = .init()
-    ) async throws -> Operations.GetRoomInfoCode.Output {
-        try await getRoomInfoCode(Operations.GetRoomInfoCode.Input(
+    /// - Remark: HTTP `GET /room/{code}/info`.
+    /// - Remark: Generated from `#/paths//room/{code}/info/get`.
+    public func getRoomCodeInfo(
+        path: Operations.GetRoomCodeInfo.Input.Path,
+        headers: Operations.GetRoomCodeInfo.Input.Headers = .init()
+    ) async throws -> Operations.GetRoomCodeInfo.Output {
+        try await getRoomCodeInfo(Operations.GetRoomCodeInfo.Input(
             path: path,
             headers: headers
         ))
@@ -123,14 +123,14 @@ extension APIProtocol {
     ///
     /// This route only asks the room owner whether to allow you to join the room, it doesn't actually open a connection to the room. To do that, use the `/room/connect/{code}` route.
     ///
-    /// - Remark: HTTP `POST /room/join/{code}`.
-    /// - Remark: Generated from `#/paths//room/join/{code}/post`.
-    public func postRoomJoinCode(
-        path: Operations.PostRoomJoinCode.Input.Path,
-        headers: Operations.PostRoomJoinCode.Input.Headers = .init(),
-        body: Operations.PostRoomJoinCode.Input.Body
-    ) async throws -> Operations.PostRoomJoinCode.Output {
-        try await postRoomJoinCode(Operations.PostRoomJoinCode.Input(
+    /// - Remark: HTTP `POST /room/{code}/join`.
+    /// - Remark: Generated from `#/paths//room/{code}/join/post`.
+    public func postRoomCodeJoin(
+        path: Operations.PostRoomCodeJoin.Input.Path,
+        headers: Operations.PostRoomCodeJoin.Input.Headers = .init(),
+        body: Operations.PostRoomCodeJoin.Input.Body
+    ) async throws -> Operations.PostRoomCodeJoin.Output {
+        try await postRoomCodeJoin(Operations.PostRoomCodeJoin.Input(
             path: path,
             headers: headers,
             body: body
@@ -140,13 +140,13 @@ extension APIProtocol {
     ///
     /// Allows an admin to view pending join requests for a room
     ///
-    /// - Remark: HTTP `GET /room/join-requests/{code}`.
-    /// - Remark: Generated from `#/paths//room/join-requests/{code}/get`.
-    public func getRoomJoinRequestsCode(
-        path: Operations.GetRoomJoinRequestsCode.Input.Path,
-        headers: Operations.GetRoomJoinRequestsCode.Input.Headers
-    ) async throws -> Operations.GetRoomJoinRequestsCode.Output {
-        try await getRoomJoinRequestsCode(Operations.GetRoomJoinRequestsCode.Input(
+    /// - Remark: HTTP `GET /room/{code}/join-requests`.
+    /// - Remark: Generated from `#/paths//room/{code}/join-requests/get`.
+    public func getRoomCodeJoinRequests(
+        path: Operations.GetRoomCodeJoinRequests.Input.Path,
+        headers: Operations.GetRoomCodeJoinRequests.Input.Headers
+    ) async throws -> Operations.GetRoomCodeJoinRequests.Output {
+        try await getRoomCodeJoinRequests(Operations.GetRoomCodeJoinRequests.Input(
             path: path,
             headers: headers
         ))
@@ -155,14 +155,14 @@ extension APIProtocol {
     ///
     /// Allows a room admin to accept or reject join requests.
     ///
-    /// - Remark: HTTP `POST /room/join-requests/{code}`.
-    /// - Remark: Generated from `#/paths//room/join-requests/{code}/post`.
-    public func postRoomJoinRequestsCode(
-        path: Operations.PostRoomJoinRequestsCode.Input.Path,
-        headers: Operations.PostRoomJoinRequestsCode.Input.Headers,
-        body: Operations.PostRoomJoinRequestsCode.Input.Body
-    ) async throws -> Operations.PostRoomJoinRequestsCode.Output {
-        try await postRoomJoinRequestsCode(Operations.PostRoomJoinRequestsCode.Input(
+    /// - Remark: HTTP `POST /room/{code}/join-requests`.
+    /// - Remark: Generated from `#/paths//room/{code}/join-requests/post`.
+    public func postRoomCodeJoinRequests(
+        path: Operations.PostRoomCodeJoinRequests.Input.Path,
+        headers: Operations.PostRoomCodeJoinRequests.Input.Headers,
+        body: Operations.PostRoomCodeJoinRequests.Input.Body
+    ) async throws -> Operations.PostRoomCodeJoinRequests.Output {
+        try await postRoomCodeJoinRequests(Operations.PostRoomCodeJoinRequests.Input(
             path: path,
             headers: headers,
             body: body
@@ -170,27 +170,27 @@ extension APIProtocol {
     }
     /// Get the active question
     ///
-    /// - Remark: HTTP `GET /room/question/{code}`.
-    /// - Remark: Generated from `#/paths//room/question/{code}/get`.
-    public func getRoomQuestionCode(
-        path: Operations.GetRoomQuestionCode.Input.Path,
-        headers: Operations.GetRoomQuestionCode.Input.Headers = .init()
-    ) async throws -> Operations.GetRoomQuestionCode.Output {
-        try await getRoomQuestionCode(Operations.GetRoomQuestionCode.Input(
+    /// - Remark: HTTP `GET /room/{code}/question`.
+    /// - Remark: Generated from `#/paths//room/{code}/question/get`.
+    public func getRoomCodeQuestion(
+        path: Operations.GetRoomCodeQuestion.Input.Path,
+        headers: Operations.GetRoomCodeQuestion.Input.Headers = .init()
+    ) async throws -> Operations.GetRoomCodeQuestion.Output {
+        try await getRoomCodeQuestion(Operations.GetRoomCodeQuestion.Input(
             path: path,
             headers: headers
         ))
     }
     /// Submit a new question
     ///
-    /// - Remark: HTTP `POST /room/question/{code}`.
-    /// - Remark: Generated from `#/paths//room/question/{code}/post`.
-    public func postRoomQuestionCode(
-        path: Operations.PostRoomQuestionCode.Input.Path,
-        headers: Operations.PostRoomQuestionCode.Input.Headers,
-        body: Operations.PostRoomQuestionCode.Input.Body
-    ) async throws -> Operations.PostRoomQuestionCode.Output {
-        try await postRoomQuestionCode(Operations.PostRoomQuestionCode.Input(
+    /// - Remark: HTTP `POST /room/{code}/question`.
+    /// - Remark: Generated from `#/paths//room/{code}/question/post`.
+    public func postRoomCodeQuestion(
+        path: Operations.PostRoomCodeQuestion.Input.Path,
+        headers: Operations.PostRoomCodeQuestion.Input.Headers,
+        body: Operations.PostRoomCodeQuestion.Input.Body
+    ) async throws -> Operations.PostRoomCodeQuestion.Output {
+        try await postRoomCodeQuestion(Operations.PostRoomCodeQuestion.Input(
             path: path,
             headers: headers,
             body: body
@@ -200,14 +200,14 @@ extension APIProtocol {
     ///
     /// Modify attributes of the current question
     ///
-    /// - Remark: HTTP `PUT /room/question/{code}/{questionID}`.
-    /// - Remark: Generated from `#/paths//room/question/{code}/{questionID}/put`.
-    public func putRoomQuestionCodeQuestionID(
-        path: Operations.PutRoomQuestionCodeQuestionID.Input.Path,
-        headers: Operations.PutRoomQuestionCodeQuestionID.Input.Headers,
-        body: Operations.PutRoomQuestionCodeQuestionID.Input.Body
-    ) async throws -> Operations.PutRoomQuestionCodeQuestionID.Output {
-        try await putRoomQuestionCodeQuestionID(Operations.PutRoomQuestionCodeQuestionID.Input(
+    /// - Remark: HTTP `PUT /room/{code}/{questionID}`.
+    /// - Remark: Generated from `#/paths//room/{code}/{questionID}/put`.
+    public func putRoomCodeQuestionID(
+        path: Operations.PutRoomCodeQuestionID.Input.Path,
+        headers: Operations.PutRoomCodeQuestionID.Input.Headers,
+        body: Operations.PutRoomCodeQuestionID.Input.Body
+    ) async throws -> Operations.PutRoomCodeQuestionID.Output {
+        try await putRoomCodeQuestionID(Operations.PutRoomCodeQuestionID.Input(
             path: path,
             headers: headers,
             body: body
@@ -215,27 +215,27 @@ extension APIProtocol {
     }
     /// Removes the current question
     ///
-    /// - Remark: HTTP `DELETE /room/question/{code}/{questionID}`.
-    /// - Remark: Generated from `#/paths//room/question/{code}/{questionID}/delete`.
-    public func deleteRoomQuestionCodeQuestionID(
-        path: Operations.DeleteRoomQuestionCodeQuestionID.Input.Path,
-        headers: Operations.DeleteRoomQuestionCodeQuestionID.Input.Headers
-    ) async throws -> Operations.DeleteRoomQuestionCodeQuestionID.Output {
-        try await deleteRoomQuestionCodeQuestionID(Operations.DeleteRoomQuestionCodeQuestionID.Input(
+    /// - Remark: HTTP `DELETE /room/{code}/{questionID}`.
+    /// - Remark: Generated from `#/paths//room/{code}/{questionID}/delete`.
+    public func deleteRoomCodeQuestionID(
+        path: Operations.DeleteRoomCodeQuestionID.Input.Path,
+        headers: Operations.DeleteRoomCodeQuestionID.Input.Headers
+    ) async throws -> Operations.DeleteRoomCodeQuestionID.Output {
+        try await deleteRoomCodeQuestionID(Operations.DeleteRoomCodeQuestionID.Input(
             path: path,
             headers: headers
         ))
     }
     /// Vote on a question
     ///
-    /// - Remark: HTTP `POST /room/vote/{code}/{questionID}`.
-    /// - Remark: Generated from `#/paths//room/vote/{code}/{questionID}/post`.
-    public func postRoomVoteCodeQuestionID(
-        path: Operations.PostRoomVoteCodeQuestionID.Input.Path,
-        headers: Operations.PostRoomVoteCodeQuestionID.Input.Headers,
-        body: Operations.PostRoomVoteCodeQuestionID.Input.Body
-    ) async throws -> Operations.PostRoomVoteCodeQuestionID.Output {
-        try await postRoomVoteCodeQuestionID(Operations.PostRoomVoteCodeQuestionID.Input(
+    /// - Remark: HTTP `POST /room/{code}/{questionID}/vote`.
+    /// - Remark: Generated from `#/paths//room/{code}/{questionID}/vote/post`.
+    public func postRoomCodeQuestionIDVote(
+        path: Operations.PostRoomCodeQuestionIDVote.Input.Path,
+        headers: Operations.PostRoomCodeQuestionIDVote.Input.Headers,
+        body: Operations.PostRoomCodeQuestionIDVote.Input.Body
+    ) async throws -> Operations.PostRoomCodeQuestionIDVote.Output {
+        try await postRoomCodeQuestionIDVote(Operations.PostRoomCodeQuestionIDVote.Input(
             path: path,
             headers: headers,
             body: body
@@ -243,13 +243,13 @@ extension APIProtocol {
     }
     /// Check the result of the question
     ///
-    /// - Remark: HTTP `GET /room/question-result/{code}/{questionID}`.
-    /// - Remark: Generated from `#/paths//room/question-result/{code}/{questionID}/get`.
-    public func getRoomQuestionResultCodeQuestionID(
-        path: Operations.GetRoomQuestionResultCodeQuestionID.Input.Path,
-        headers: Operations.GetRoomQuestionResultCodeQuestionID.Input.Headers = .init()
-    ) async throws -> Operations.GetRoomQuestionResultCodeQuestionID.Output {
-        try await getRoomQuestionResultCodeQuestionID(Operations.GetRoomQuestionResultCodeQuestionID.Input(
+    /// - Remark: HTTP `GET /room/{code}/{questionID}/result`.
+    /// - Remark: Generated from `#/paths//room/{code}/{questionID}/result/get`.
+    public func getRoomCodeQuestionIDResult(
+        path: Operations.GetRoomCodeQuestionIDResult.Input.Path,
+        headers: Operations.GetRoomCodeQuestionIDResult.Input.Headers = .init()
+    ) async throws -> Operations.GetRoomCodeQuestionIDResult.Output {
+        try await getRoomCodeQuestionIDResult(Operations.GetRoomCodeQuestionIDResult.Input(
             path: path,
             headers: headers
         ))
@@ -258,13 +258,13 @@ extension APIProtocol {
     ///
     /// This information is limited intentionally to prevent spoiling the vote.
     ///
-    /// - Remark: HTTP `GET /room/question-votes-info/{code}/{questionID}`.
-    /// - Remark: Generated from `#/paths//room/question-votes-info/{code}/{questionID}/get`.
-    public func getRoomQuestionVotesInfoCodeQuestionID(
-        path: Operations.GetRoomQuestionVotesInfoCodeQuestionID.Input.Path,
-        headers: Operations.GetRoomQuestionVotesInfoCodeQuestionID.Input.Headers
-    ) async throws -> Operations.GetRoomQuestionVotesInfoCodeQuestionID.Output {
-        try await getRoomQuestionVotesInfoCodeQuestionID(Operations.GetRoomQuestionVotesInfoCodeQuestionID.Input(
+    /// - Remark: HTTP `GET /room/{code}/{questionID}/votes-info`.
+    /// - Remark: Generated from `#/paths//room/{code}/{questionID}/votes-info/get`.
+    public func getRoomCodeQuestionIDVotesInfo(
+        path: Operations.GetRoomCodeQuestionIDVotesInfo.Input.Path,
+        headers: Operations.GetRoomCodeQuestionIDVotesInfo.Input.Headers
+    ) async throws -> Operations.GetRoomCodeQuestionIDVotesInfo.Output {
+        try await getRoomCodeQuestionIDVotesInfo(Operations.GetRoomCodeQuestionIDVotesInfo.Input(
             path: path,
             headers: headers
         ))
@@ -1527,16 +1527,16 @@ public enum Operations {
     ///
     /// Provides information about a room, like whether the room code corresponds to a valid room
     ///
-    /// - Remark: HTTP `GET /room/info/{code}`.
-    /// - Remark: Generated from `#/paths//room/info/{code}/get`.
-    public enum GetRoomInfoCode {
-        public static let id: Swift.String = "get/room/info/{code}"
+    /// - Remark: HTTP `GET /room/{code}/info`.
+    /// - Remark: Generated from `#/paths//room/{code}/info/get`.
+    public enum GetRoomCodeInfo {
+        public static let id: Swift.String = "get/room/{code}/info"
         public struct Input: Sendable, Hashable {
-            /// - Remark: Generated from `#/paths/room/info/{code}/GET/path`.
+            /// - Remark: Generated from `#/paths/room/{code}/info/GET/path`.
             public struct Path: Sendable, Hashable {
                 /// A code uniquely identifying an alive room.
                 ///
-                /// - Remark: Generated from `#/paths/room/info/{code}/GET/path/code`.
+                /// - Remark: Generated from `#/paths/room/{code}/info/GET/path/code`.
                 public var code: Components.Parameters.RoomCode
                 /// Creates a new `Path`.
                 ///
@@ -1546,27 +1546,27 @@ public enum Operations {
                     self.code = code
                 }
             }
-            public var path: Operations.GetRoomInfoCode.Input.Path
-            /// - Remark: Generated from `#/paths/room/info/{code}/GET/header`.
+            public var path: Operations.GetRoomCodeInfo.Input.Path
+            /// - Remark: Generated from `#/paths/room/{code}/info/GET/header`.
             public struct Headers: Sendable, Hashable {
-                public var accept: [OpenAPIRuntime.AcceptHeaderContentType<Operations.GetRoomInfoCode.AcceptableContentType>]
+                public var accept: [OpenAPIRuntime.AcceptHeaderContentType<Operations.GetRoomCodeInfo.AcceptableContentType>]
                 /// Creates a new `Headers`.
                 ///
                 /// - Parameters:
                 ///   - accept:
-                public init(accept: [OpenAPIRuntime.AcceptHeaderContentType<Operations.GetRoomInfoCode.AcceptableContentType>] = .defaultValues()) {
+                public init(accept: [OpenAPIRuntime.AcceptHeaderContentType<Operations.GetRoomCodeInfo.AcceptableContentType>] = .defaultValues()) {
                     self.accept = accept
                 }
             }
-            public var headers: Operations.GetRoomInfoCode.Input.Headers
+            public var headers: Operations.GetRoomCodeInfo.Input.Headers
             /// Creates a new `Input`.
             ///
             /// - Parameters:
             ///   - path:
             ///   - headers:
             public init(
-                path: Operations.GetRoomInfoCode.Input.Path,
-                headers: Operations.GetRoomInfoCode.Input.Headers = .init()
+                path: Operations.GetRoomCodeInfo.Input.Path,
+                headers: Operations.GetRoomCodeInfo.Input.Headers = .init()
             ) {
                 self.path = path
                 self.headers = headers
@@ -1574,15 +1574,15 @@ public enum Operations {
         }
         @frozen public enum Output: Sendable, Hashable {
             public struct Ok: Sendable, Hashable {
-                /// - Remark: Generated from `#/paths/room/info/{code}/GET/responses/200/content`.
+                /// - Remark: Generated from `#/paths/room/{code}/info/GET/responses/200/content`.
                 @frozen public enum Body: Sendable, Hashable {
-                    /// - Remark: Generated from `#/paths/room/info/{code}/GET/responses/200/content/json`.
+                    /// - Remark: Generated from `#/paths/room/{code}/info/GET/responses/200/content/json`.
                     public struct JsonPayload: Codable, Hashable, Sendable {
-                        /// - Remark: Generated from `#/paths/room/info/{code}/GET/responses/200/content/json/name`.
+                        /// - Remark: Generated from `#/paths/room/{code}/info/GET/responses/200/content/json/name`.
                         public var name: Swift.String
-                        /// - Remark: Generated from `#/paths/room/info/{code}/GET/responses/200/content/json/code`.
+                        /// - Remark: Generated from `#/paths/room/{code}/info/GET/responses/200/content/json/code`.
                         public var code: Swift.String
-                        /// - Remark: Generated from `#/paths/room/info/{code}/GET/responses/200/content/json/fields`.
+                        /// - Remark: Generated from `#/paths/room/{code}/info/GET/responses/200/content/json/fields`.
                         public var fields: [Swift.String]?
                         /// Creates a new `JsonPayload`.
                         ///
@@ -1605,13 +1605,13 @@ public enum Operations {
                             case fields
                         }
                     }
-                    /// - Remark: Generated from `#/paths/room/info/{code}/GET/responses/200/content/application\/json`.
-                    case json(Operations.GetRoomInfoCode.Output.Ok.Body.JsonPayload)
+                    /// - Remark: Generated from `#/paths/room/{code}/info/GET/responses/200/content/application\/json`.
+                    case json(Operations.GetRoomCodeInfo.Output.Ok.Body.JsonPayload)
                     /// The associated value of the enum case if `self` is `.json`.
                     ///
                     /// - Throws: An error if `self` is not `.json`.
                     /// - SeeAlso: `.json`.
-                    public var json: Operations.GetRoomInfoCode.Output.Ok.Body.JsonPayload {
+                    public var json: Operations.GetRoomCodeInfo.Output.Ok.Body.JsonPayload {
                         get throws {
                             switch self {
                             case let .json(body):
@@ -1621,26 +1621,26 @@ public enum Operations {
                     }
                 }
                 /// Received HTTP response body
-                public var body: Operations.GetRoomInfoCode.Output.Ok.Body
+                public var body: Operations.GetRoomCodeInfo.Output.Ok.Body
                 /// Creates a new `Ok`.
                 ///
                 /// - Parameters:
                 ///   - body: Received HTTP response body
-                public init(body: Operations.GetRoomInfoCode.Output.Ok.Body) {
+                public init(body: Operations.GetRoomCodeInfo.Output.Ok.Body) {
                     self.body = body
                 }
             }
             /// The room exists and was found.
             ///
-            /// - Remark: Generated from `#/paths//room/info/{code}/get/responses/200`.
+            /// - Remark: Generated from `#/paths//room/{code}/info/get/responses/200`.
             ///
             /// HTTP response code: `200 ok`.
-            case ok(Operations.GetRoomInfoCode.Output.Ok)
+            case ok(Operations.GetRoomCodeInfo.Output.Ok)
             /// The associated value of the enum case if `self` is `.ok`.
             ///
             /// - Throws: An error if `self` is not `.ok`.
             /// - SeeAlso: `.ok`.
-            public var ok: Operations.GetRoomInfoCode.Output.Ok {
+            public var ok: Operations.GetRoomCodeInfo.Output.Ok {
                 get throws {
                     switch self {
                     case let .ok(response):
@@ -1655,13 +1655,13 @@ public enum Operations {
             }
             /// The room does not exist
             ///
-            /// - Remark: Generated from `#/paths//room/info/{code}/get/responses/404`.
+            /// - Remark: Generated from `#/paths//room/{code}/info/get/responses/404`.
             ///
             /// HTTP response code: `404 notFound`.
             case notFound(Components.Responses.InvalidRoomCode)
             /// The room does not exist
             ///
-            /// - Remark: Generated from `#/paths//room/info/{code}/get/responses/404`.
+            /// - Remark: Generated from `#/paths//room/{code}/info/get/responses/404`.
             ///
             /// HTTP response code: `404 notFound`.
             public static var notFound: Self {
@@ -1719,16 +1719,16 @@ public enum Operations {
     ///
     /// This route only asks the room owner whether to allow you to join the room, it doesn't actually open a connection to the room. To do that, use the `/room/connect/{code}` route.
     ///
-    /// - Remark: HTTP `POST /room/join/{code}`.
-    /// - Remark: Generated from `#/paths//room/join/{code}/post`.
-    public enum PostRoomJoinCode {
-        public static let id: Swift.String = "post/room/join/{code}"
+    /// - Remark: HTTP `POST /room/{code}/join`.
+    /// - Remark: Generated from `#/paths//room/{code}/join/post`.
+    public enum PostRoomCodeJoin {
+        public static let id: Swift.String = "post/room/{code}/join"
         public struct Input: Sendable, Hashable {
-            /// - Remark: Generated from `#/paths/room/join/{code}/POST/path`.
+            /// - Remark: Generated from `#/paths/room/{code}/join/POST/path`.
             public struct Path: Sendable, Hashable {
                 /// A code uniquely identifying an alive room.
                 ///
-                /// - Remark: Generated from `#/paths/room/join/{code}/POST/path/code`.
+                /// - Remark: Generated from `#/paths/room/{code}/join/POST/path/code`.
                 public var code: Components.Parameters.RoomCode
                 /// Creates a new `Path`.
                 ///
@@ -1738,26 +1738,26 @@ public enum Operations {
                     self.code = code
                 }
             }
-            public var path: Operations.PostRoomJoinCode.Input.Path
-            /// - Remark: Generated from `#/paths/room/join/{code}/POST/header`.
+            public var path: Operations.PostRoomCodeJoin.Input.Path
+            /// - Remark: Generated from `#/paths/room/{code}/join/POST/header`.
             public struct Headers: Sendable, Hashable {
-                public var accept: [OpenAPIRuntime.AcceptHeaderContentType<Operations.PostRoomJoinCode.AcceptableContentType>]
+                public var accept: [OpenAPIRuntime.AcceptHeaderContentType<Operations.PostRoomCodeJoin.AcceptableContentType>]
                 /// Creates a new `Headers`.
                 ///
                 /// - Parameters:
                 ///   - accept:
-                public init(accept: [OpenAPIRuntime.AcceptHeaderContentType<Operations.PostRoomJoinCode.AcceptableContentType>] = .defaultValues()) {
+                public init(accept: [OpenAPIRuntime.AcceptHeaderContentType<Operations.PostRoomCodeJoin.AcceptableContentType>] = .defaultValues()) {
                     self.accept = accept
                 }
             }
-            public var headers: Operations.PostRoomJoinCode.Input.Headers
-            /// - Remark: Generated from `#/paths/room/join/{code}/POST/requestBody`.
+            public var headers: Operations.PostRoomCodeJoin.Input.Headers
+            /// - Remark: Generated from `#/paths/room/{code}/join/POST/requestBody`.
             @frozen public enum Body: Sendable, Hashable {
-                /// - Remark: Generated from `#/paths/room/join/{code}/POST/requestBody/json`.
+                /// - Remark: Generated from `#/paths/room/{code}/join/POST/requestBody/json`.
                 public struct JsonPayload: Codable, Hashable, Sendable {
-                    /// - Remark: Generated from `#/paths/room/join/{code}/POST/requestBody/json/name`.
+                    /// - Remark: Generated from `#/paths/room/{code}/join/POST/requestBody/json/name`.
                     public var name: Swift.String
-                    /// - Remark: Generated from `#/paths/room/join/{code}/POST/requestBody/json/fields`.
+                    /// - Remark: Generated from `#/paths/room/{code}/join/POST/requestBody/json/fields`.
                     public var fields: Components.Schemas.Fields?
                     /// Creates a new `JsonPayload`.
                     ///
@@ -1776,10 +1776,10 @@ public enum Operations {
                         case fields
                     }
                 }
-                /// - Remark: Generated from `#/paths/room/join/{code}/POST/requestBody/content/application\/json`.
-                case json(Operations.PostRoomJoinCode.Input.Body.JsonPayload)
+                /// - Remark: Generated from `#/paths/room/{code}/join/POST/requestBody/content/application\/json`.
+                case json(Operations.PostRoomCodeJoin.Input.Body.JsonPayload)
             }
-            public var body: Operations.PostRoomJoinCode.Input.Body
+            public var body: Operations.PostRoomCodeJoin.Input.Body
             /// Creates a new `Input`.
             ///
             /// - Parameters:
@@ -1787,9 +1787,9 @@ public enum Operations {
             ///   - headers:
             ///   - body:
             public init(
-                path: Operations.PostRoomJoinCode.Input.Path,
-                headers: Operations.PostRoomJoinCode.Input.Headers = .init(),
-                body: Operations.PostRoomJoinCode.Input.Body
+                path: Operations.PostRoomCodeJoin.Input.Path,
+                headers: Operations.PostRoomCodeJoin.Input.Headers = .init(),
+                body: Operations.PostRoomCodeJoin.Input.Body
             ) {
                 self.path = path
                 self.headers = headers
@@ -1798,11 +1798,11 @@ public enum Operations {
         }
         @frozen public enum Output: Sendable, Hashable {
             public struct Ok: Sendable, Hashable {
-                /// - Remark: Generated from `#/paths/room/join/{code}/POST/responses/200/content`.
+                /// - Remark: Generated from `#/paths/room/{code}/join/POST/responses/200/content`.
                 @frozen public enum Body: Sendable, Hashable {
-                    /// - Remark: Generated from `#/paths/room/join/{code}/POST/responses/200/content/json`.
+                    /// - Remark: Generated from `#/paths/room/{code}/join/POST/responses/200/content/json`.
                     public struct JsonPayload: Codable, Hashable, Sendable {
-                        /// - Remark: Generated from `#/paths/room/join/{code}/POST/responses/200/content/json/participantToken`.
+                        /// - Remark: Generated from `#/paths/room/{code}/join/POST/responses/200/content/json/participantToken`.
                         public var participantToken: Swift.String
                         /// Creates a new `JsonPayload`.
                         ///
@@ -1815,13 +1815,13 @@ public enum Operations {
                             case participantToken
                         }
                     }
-                    /// - Remark: Generated from `#/paths/room/join/{code}/POST/responses/200/content/application\/json`.
-                    case json(Operations.PostRoomJoinCode.Output.Ok.Body.JsonPayload)
+                    /// - Remark: Generated from `#/paths/room/{code}/join/POST/responses/200/content/application\/json`.
+                    case json(Operations.PostRoomCodeJoin.Output.Ok.Body.JsonPayload)
                     /// The associated value of the enum case if `self` is `.json`.
                     ///
                     /// - Throws: An error if `self` is not `.json`.
                     /// - SeeAlso: `.json`.
-                    public var json: Operations.PostRoomJoinCode.Output.Ok.Body.JsonPayload {
+                    public var json: Operations.PostRoomCodeJoin.Output.Ok.Body.JsonPayload {
                         get throws {
                             switch self {
                             case let .json(body):
@@ -1831,26 +1831,26 @@ public enum Operations {
                     }
                 }
                 /// Received HTTP response body
-                public var body: Operations.PostRoomJoinCode.Output.Ok.Body
+                public var body: Operations.PostRoomCodeJoin.Output.Ok.Body
                 /// Creates a new `Ok`.
                 ///
                 /// - Parameters:
                 ///   - body: Received HTTP response body
-                public init(body: Operations.PostRoomJoinCode.Output.Ok.Body) {
+                public init(body: Operations.PostRoomCodeJoin.Output.Ok.Body) {
                     self.body = body
                 }
             }
             /// The room does exist, and the client is permitted to enter.
             ///
-            /// - Remark: Generated from `#/paths//room/join/{code}/post/responses/200`.
+            /// - Remark: Generated from `#/paths//room/{code}/join/post/responses/200`.
             ///
             /// HTTP response code: `200 ok`.
-            case ok(Operations.PostRoomJoinCode.Output.Ok)
+            case ok(Operations.PostRoomCodeJoin.Output.Ok)
             /// The associated value of the enum case if `self` is `.ok`.
             ///
             /// - Throws: An error if `self` is not `.ok`.
             /// - SeeAlso: `.ok`.
-            public var ok: Operations.PostRoomJoinCode.Output.Ok {
+            public var ok: Operations.PostRoomCodeJoin.Output.Ok {
                 get throws {
                     switch self {
                     case let .ok(response):
@@ -1869,13 +1869,13 @@ public enum Operations {
             }
             /// The room does exist, but the client has been rejected.
             ///
-            /// - Remark: Generated from `#/paths//room/join/{code}/post/responses/403`.
+            /// - Remark: Generated from `#/paths//room/{code}/join/post/responses/403`.
             ///
             /// HTTP response code: `403 forbidden`.
-            case forbidden(Operations.PostRoomJoinCode.Output.Forbidden)
+            case forbidden(Operations.PostRoomCodeJoin.Output.Forbidden)
             /// The room does exist, but the client has been rejected.
             ///
-            /// - Remark: Generated from `#/paths//room/join/{code}/post/responses/403`.
+            /// - Remark: Generated from `#/paths//room/{code}/join/post/responses/403`.
             ///
             /// HTTP response code: `403 forbidden`.
             public static var forbidden: Self {
@@ -1885,7 +1885,7 @@ public enum Operations {
             ///
             /// - Throws: An error if `self` is not `.forbidden`.
             /// - SeeAlso: `.forbidden`.
-            public var forbidden: Operations.PostRoomJoinCode.Output.Forbidden {
+            public var forbidden: Operations.PostRoomCodeJoin.Output.Forbidden {
                 get throws {
                     switch self {
                     case let .forbidden(response):
@@ -1900,13 +1900,13 @@ public enum Operations {
             }
             /// The room does not exist
             ///
-            /// - Remark: Generated from `#/paths//room/join/{code}/post/responses/404`.
+            /// - Remark: Generated from `#/paths//room/{code}/join/post/responses/404`.
             ///
             /// HTTP response code: `404 notFound`.
             case notFound(Components.Responses.InvalidRoomCode)
             /// The room does not exist
             ///
-            /// - Remark: Generated from `#/paths//room/join/{code}/post/responses/404`.
+            /// - Remark: Generated from `#/paths//room/{code}/join/post/responses/404`.
             ///
             /// HTTP response code: `404 notFound`.
             public static var notFound: Self {
@@ -1964,16 +1964,16 @@ public enum Operations {
     ///
     /// Allows an admin to view pending join requests for a room
     ///
-    /// - Remark: HTTP `GET /room/join-requests/{code}`.
-    /// - Remark: Generated from `#/paths//room/join-requests/{code}/get`.
-    public enum GetRoomJoinRequestsCode {
-        public static let id: Swift.String = "get/room/join-requests/{code}"
+    /// - Remark: HTTP `GET /room/{code}/join-requests`.
+    /// - Remark: Generated from `#/paths//room/{code}/join-requests/get`.
+    public enum GetRoomCodeJoinRequests {
+        public static let id: Swift.String = "get/room/{code}/join-requests"
         public struct Input: Sendable, Hashable {
-            /// - Remark: Generated from `#/paths/room/join-requests/{code}/GET/path`.
+            /// - Remark: Generated from `#/paths/room/{code}/join-requests/GET/path`.
             public struct Path: Sendable, Hashable {
                 /// A code uniquely identifying an alive room.
                 ///
-                /// - Remark: Generated from `#/paths/room/join-requests/{code}/GET/path/code`.
+                /// - Remark: Generated from `#/paths/room/{code}/join-requests/GET/path/code`.
                 public var code: Components.Parameters.RoomCode
                 /// Creates a new `Path`.
                 ///
@@ -1983,14 +1983,14 @@ public enum Operations {
                     self.code = code
                 }
             }
-            public var path: Operations.GetRoomJoinRequestsCode.Input.Path
-            /// - Remark: Generated from `#/paths/room/join-requests/{code}/GET/header`.
+            public var path: Operations.GetRoomCodeJoinRequests.Input.Path
+            /// - Remark: Generated from `#/paths/room/{code}/join-requests/GET/header`.
             public struct Headers: Sendable, Hashable {
                 /// To ensure that only an admin is able to make privileged actions to a room. The token is provided to the room creator as a response to the create request.
                 ///
-                /// - Remark: Generated from `#/paths/room/join-requests/{code}/GET/header/Room-Admin-Token`.
+                /// - Remark: Generated from `#/paths/room/{code}/join-requests/GET/header/Room-Admin-Token`.
                 public var roomAdminToken: Components.Parameters.AdminToken
-                public var accept: [OpenAPIRuntime.AcceptHeaderContentType<Operations.GetRoomJoinRequestsCode.AcceptableContentType>]
+                public var accept: [OpenAPIRuntime.AcceptHeaderContentType<Operations.GetRoomCodeJoinRequests.AcceptableContentType>]
                 /// Creates a new `Headers`.
                 ///
                 /// - Parameters:
@@ -1998,21 +1998,21 @@ public enum Operations {
                 ///   - accept:
                 public init(
                     roomAdminToken: Components.Parameters.AdminToken,
-                    accept: [OpenAPIRuntime.AcceptHeaderContentType<Operations.GetRoomJoinRequestsCode.AcceptableContentType>] = .defaultValues()
+                    accept: [OpenAPIRuntime.AcceptHeaderContentType<Operations.GetRoomCodeJoinRequests.AcceptableContentType>] = .defaultValues()
                 ) {
                     self.roomAdminToken = roomAdminToken
                     self.accept = accept
                 }
             }
-            public var headers: Operations.GetRoomJoinRequestsCode.Input.Headers
+            public var headers: Operations.GetRoomCodeJoinRequests.Input.Headers
             /// Creates a new `Input`.
             ///
             /// - Parameters:
             ///   - path:
             ///   - headers:
             public init(
-                path: Operations.GetRoomJoinRequestsCode.Input.Path,
-                headers: Operations.GetRoomJoinRequestsCode.Input.Headers
+                path: Operations.GetRoomCodeJoinRequests.Input.Path,
+                headers: Operations.GetRoomCodeJoinRequests.Input.Headers
             ) {
                 self.path = path
                 self.headers = headers
@@ -2020,21 +2020,21 @@ public enum Operations {
         }
         @frozen public enum Output: Sendable, Hashable {
             public struct Ok: Sendable, Hashable {
-                /// - Remark: Generated from `#/paths/room/join-requests/{code}/GET/responses/200/content`.
+                /// - Remark: Generated from `#/paths/room/{code}/join-requests/GET/responses/200/content`.
                 @frozen public enum Body: Sendable, Hashable {
-                    /// - Remark: Generated from `#/paths/room/join-requests/{code}/GET/responses/200/content/json`.
+                    /// - Remark: Generated from `#/paths/room/{code}/join-requests/GET/responses/200/content/json`.
                     public struct JsonPayload: Codable, Hashable, Sendable {
-                        /// - Remark: Generated from `#/paths/room/join-requests/{code}/GET/responses/200/content/json/lastUpdated`.
+                        /// - Remark: Generated from `#/paths/room/{code}/join-requests/GET/responses/200/content/json/lastUpdated`.
                         public var lastUpdated: Swift.String
-                        /// - Remark: Generated from `#/paths/room/join-requests/{code}/GET/responses/200/content/json/RequestsPayload`.
+                        /// - Remark: Generated from `#/paths/room/{code}/join-requests/GET/responses/200/content/json/RequestsPayload`.
                         public struct RequestsPayloadPayload: Codable, Hashable, Sendable {
-                            /// - Remark: Generated from `#/paths/room/join-requests/{code}/GET/responses/200/content/json/RequestsPayload/name`.
+                            /// - Remark: Generated from `#/paths/room/{code}/join-requests/GET/responses/200/content/json/RequestsPayload/name`.
                             public var name: Swift.String
-                            /// - Remark: Generated from `#/paths/room/join-requests/{code}/GET/responses/200/content/json/RequestsPayload/participantToken`.
+                            /// - Remark: Generated from `#/paths/room/{code}/join-requests/GET/responses/200/content/json/RequestsPayload/participantToken`.
                             public var participantToken: Swift.String
-                            /// - Remark: Generated from `#/paths/room/join-requests/{code}/GET/responses/200/content/json/RequestsPayload/timestamp`.
+                            /// - Remark: Generated from `#/paths/room/{code}/join-requests/GET/responses/200/content/json/RequestsPayload/timestamp`.
                             public var timestamp: Swift.String
-                            /// - Remark: Generated from `#/paths/room/join-requests/{code}/GET/responses/200/content/json/RequestsPayload/fields`.
+                            /// - Remark: Generated from `#/paths/room/{code}/join-requests/GET/responses/200/content/json/RequestsPayload/fields`.
                             public var fields: Components.Schemas.Fields?
                             /// Creates a new `RequestsPayloadPayload`.
                             ///
@@ -2061,10 +2061,10 @@ public enum Operations {
                                 case fields
                             }
                         }
-                        /// - Remark: Generated from `#/paths/room/join-requests/{code}/GET/responses/200/content/json/requests`.
-                        public typealias RequestsPayload = [Operations.GetRoomJoinRequestsCode.Output.Ok.Body.JsonPayload.RequestsPayloadPayload]
-                        /// - Remark: Generated from `#/paths/room/join-requests/{code}/GET/responses/200/content/json/requests`.
-                        public var requests: Operations.GetRoomJoinRequestsCode.Output.Ok.Body.JsonPayload.RequestsPayload
+                        /// - Remark: Generated from `#/paths/room/{code}/join-requests/GET/responses/200/content/json/requests`.
+                        public typealias RequestsPayload = [Operations.GetRoomCodeJoinRequests.Output.Ok.Body.JsonPayload.RequestsPayloadPayload]
+                        /// - Remark: Generated from `#/paths/room/{code}/join-requests/GET/responses/200/content/json/requests`.
+                        public var requests: Operations.GetRoomCodeJoinRequests.Output.Ok.Body.JsonPayload.RequestsPayload
                         /// Creates a new `JsonPayload`.
                         ///
                         /// - Parameters:
@@ -2072,7 +2072,7 @@ public enum Operations {
                         ///   - requests:
                         public init(
                             lastUpdated: Swift.String,
-                            requests: Operations.GetRoomJoinRequestsCode.Output.Ok.Body.JsonPayload.RequestsPayload
+                            requests: Operations.GetRoomCodeJoinRequests.Output.Ok.Body.JsonPayload.RequestsPayload
                         ) {
                             self.lastUpdated = lastUpdated
                             self.requests = requests
@@ -2082,13 +2082,13 @@ public enum Operations {
                             case requests
                         }
                     }
-                    /// - Remark: Generated from `#/paths/room/join-requests/{code}/GET/responses/200/content/application\/json`.
-                    case json(Operations.GetRoomJoinRequestsCode.Output.Ok.Body.JsonPayload)
+                    /// - Remark: Generated from `#/paths/room/{code}/join-requests/GET/responses/200/content/application\/json`.
+                    case json(Operations.GetRoomCodeJoinRequests.Output.Ok.Body.JsonPayload)
                     /// The associated value of the enum case if `self` is `.json`.
                     ///
                     /// - Throws: An error if `self` is not `.json`.
                     /// - SeeAlso: `.json`.
-                    public var json: Operations.GetRoomJoinRequestsCode.Output.Ok.Body.JsonPayload {
+                    public var json: Operations.GetRoomCodeJoinRequests.Output.Ok.Body.JsonPayload {
                         get throws {
                             switch self {
                             case let .json(body):
@@ -2098,26 +2098,26 @@ public enum Operations {
                     }
                 }
                 /// Received HTTP response body
-                public var body: Operations.GetRoomJoinRequestsCode.Output.Ok.Body
+                public var body: Operations.GetRoomCodeJoinRequests.Output.Ok.Body
                 /// Creates a new `Ok`.
                 ///
                 /// - Parameters:
                 ///   - body: Received HTTP response body
-                public init(body: Operations.GetRoomJoinRequestsCode.Output.Ok.Body) {
+                public init(body: Operations.GetRoomCodeJoinRequests.Output.Ok.Body) {
                     self.body = body
                 }
             }
             /// The room exists and the admin token is valid.
             ///
-            /// - Remark: Generated from `#/paths//room/join-requests/{code}/get/responses/200`.
+            /// - Remark: Generated from `#/paths//room/{code}/join-requests/get/responses/200`.
             ///
             /// HTTP response code: `200 ok`.
-            case ok(Operations.GetRoomJoinRequestsCode.Output.Ok)
+            case ok(Operations.GetRoomCodeJoinRequests.Output.Ok)
             /// The associated value of the enum case if `self` is `.ok`.
             ///
             /// - Throws: An error if `self` is not `.ok`.
             /// - SeeAlso: `.ok`.
-            public var ok: Operations.GetRoomJoinRequestsCode.Output.Ok {
+            public var ok: Operations.GetRoomCodeJoinRequests.Output.Ok {
                 get throws {
                     switch self {
                     case let .ok(response):
@@ -2132,13 +2132,13 @@ public enum Operations {
             }
             /// The admin token is either missing or incorrect
             ///
-            /// - Remark: Generated from `#/paths//room/join-requests/{code}/get/responses/403`.
+            /// - Remark: Generated from `#/paths//room/{code}/join-requests/get/responses/403`.
             ///
             /// HTTP response code: `403 forbidden`.
             case forbidden(Components.Responses.InvalidAdminToken)
             /// The admin token is either missing or incorrect
             ///
-            /// - Remark: Generated from `#/paths//room/join-requests/{code}/get/responses/403`.
+            /// - Remark: Generated from `#/paths//room/{code}/join-requests/get/responses/403`.
             ///
             /// HTTP response code: `403 forbidden`.
             public static var forbidden: Self {
@@ -2163,13 +2163,13 @@ public enum Operations {
             }
             /// The room does not exist
             ///
-            /// - Remark: Generated from `#/paths//room/join-requests/{code}/get/responses/404`.
+            /// - Remark: Generated from `#/paths//room/{code}/join-requests/get/responses/404`.
             ///
             /// HTTP response code: `404 notFound`.
             case notFound(Components.Responses.InvalidRoomCode)
             /// The room does not exist
             ///
-            /// - Remark: Generated from `#/paths//room/join-requests/{code}/get/responses/404`.
+            /// - Remark: Generated from `#/paths//room/{code}/join-requests/get/responses/404`.
             ///
             /// HTTP response code: `404 notFound`.
             public static var notFound: Self {
@@ -2227,16 +2227,16 @@ public enum Operations {
     ///
     /// Allows a room admin to accept or reject join requests.
     ///
-    /// - Remark: HTTP `POST /room/join-requests/{code}`.
-    /// - Remark: Generated from `#/paths//room/join-requests/{code}/post`.
-    public enum PostRoomJoinRequestsCode {
-        public static let id: Swift.String = "post/room/join-requests/{code}"
+    /// - Remark: HTTP `POST /room/{code}/join-requests`.
+    /// - Remark: Generated from `#/paths//room/{code}/join-requests/post`.
+    public enum PostRoomCodeJoinRequests {
+        public static let id: Swift.String = "post/room/{code}/join-requests"
         public struct Input: Sendable, Hashable {
-            /// - Remark: Generated from `#/paths/room/join-requests/{code}/POST/path`.
+            /// - Remark: Generated from `#/paths/room/{code}/join-requests/POST/path`.
             public struct Path: Sendable, Hashable {
                 /// A code uniquely identifying an alive room.
                 ///
-                /// - Remark: Generated from `#/paths/room/join-requests/{code}/POST/path/code`.
+                /// - Remark: Generated from `#/paths/room/{code}/join-requests/POST/path/code`.
                 public var code: Components.Parameters.RoomCode
                 /// Creates a new `Path`.
                 ///
@@ -2246,14 +2246,14 @@ public enum Operations {
                     self.code = code
                 }
             }
-            public var path: Operations.PostRoomJoinRequestsCode.Input.Path
-            /// - Remark: Generated from `#/paths/room/join-requests/{code}/POST/header`.
+            public var path: Operations.PostRoomCodeJoinRequests.Input.Path
+            /// - Remark: Generated from `#/paths/room/{code}/join-requests/POST/header`.
             public struct Headers: Sendable, Hashable {
                 /// To ensure that only an admin is able to make privileged actions to a room. The token is provided to the room creator as a response to the create request.
                 ///
-                /// - Remark: Generated from `#/paths/room/join-requests/{code}/POST/header/Room-Admin-Token`.
+                /// - Remark: Generated from `#/paths/room/{code}/join-requests/POST/header/Room-Admin-Token`.
                 public var roomAdminToken: Components.Parameters.AdminToken
-                public var accept: [OpenAPIRuntime.AcceptHeaderContentType<Operations.PostRoomJoinRequestsCode.AcceptableContentType>]
+                public var accept: [OpenAPIRuntime.AcceptHeaderContentType<Operations.PostRoomCodeJoinRequests.AcceptableContentType>]
                 /// Creates a new `Headers`.
                 ///
                 /// - Parameters:
@@ -2261,20 +2261,20 @@ public enum Operations {
                 ///   - accept:
                 public init(
                     roomAdminToken: Components.Parameters.AdminToken,
-                    accept: [OpenAPIRuntime.AcceptHeaderContentType<Operations.PostRoomJoinRequestsCode.AcceptableContentType>] = .defaultValues()
+                    accept: [OpenAPIRuntime.AcceptHeaderContentType<Operations.PostRoomCodeJoinRequests.AcceptableContentType>] = .defaultValues()
                 ) {
                     self.roomAdminToken = roomAdminToken
                     self.accept = accept
                 }
             }
-            public var headers: Operations.PostRoomJoinRequestsCode.Input.Headers
-            /// - Remark: Generated from `#/paths/room/join-requests/{code}/POST/requestBody`.
+            public var headers: Operations.PostRoomCodeJoinRequests.Input.Headers
+            /// - Remark: Generated from `#/paths/room/{code}/join-requests/POST/requestBody`.
             @frozen public enum Body: Sendable, Hashable {
-                /// - Remark: Generated from `#/paths/room/join-requests/{code}/POST/requestBody/json`.
+                /// - Remark: Generated from `#/paths/room/{code}/join-requests/POST/requestBody/json`.
                 public struct JsonPayload: Codable, Hashable, Sendable {
-                    /// - Remark: Generated from `#/paths/room/join-requests/{code}/POST/requestBody/json/accept`.
+                    /// - Remark: Generated from `#/paths/room/{code}/join-requests/POST/requestBody/json/accept`.
                     public var accept: [Swift.String]?
-                    /// - Remark: Generated from `#/paths/room/join-requests/{code}/POST/requestBody/json/reject`.
+                    /// - Remark: Generated from `#/paths/room/{code}/join-requests/POST/requestBody/json/reject`.
                     public var reject: [Swift.String]?
                     /// Creates a new `JsonPayload`.
                     ///
@@ -2293,10 +2293,10 @@ public enum Operations {
                         case reject
                     }
                 }
-                /// - Remark: Generated from `#/paths/room/join-requests/{code}/POST/requestBody/content/application\/json`.
-                case json(Operations.PostRoomJoinRequestsCode.Input.Body.JsonPayload)
+                /// - Remark: Generated from `#/paths/room/{code}/join-requests/POST/requestBody/content/application\/json`.
+                case json(Operations.PostRoomCodeJoinRequests.Input.Body.JsonPayload)
             }
-            public var body: Operations.PostRoomJoinRequestsCode.Input.Body
+            public var body: Operations.PostRoomCodeJoinRequests.Input.Body
             /// Creates a new `Input`.
             ///
             /// - Parameters:
@@ -2304,9 +2304,9 @@ public enum Operations {
             ///   - headers:
             ///   - body:
             public init(
-                path: Operations.PostRoomJoinRequestsCode.Input.Path,
-                headers: Operations.PostRoomJoinRequestsCode.Input.Headers,
-                body: Operations.PostRoomJoinRequestsCode.Input.Body
+                path: Operations.PostRoomCodeJoinRequests.Input.Path,
+                headers: Operations.PostRoomCodeJoinRequests.Input.Headers,
+                body: Operations.PostRoomCodeJoinRequests.Input.Body
             ) {
                 self.path = path
                 self.headers = headers
@@ -2315,9 +2315,9 @@ public enum Operations {
         }
         @frozen public enum Output: Sendable, Hashable {
             public struct Ok: Sendable, Hashable {
-                /// - Remark: Generated from `#/paths/room/join-requests/{code}/POST/responses/200/content`.
+                /// - Remark: Generated from `#/paths/room/{code}/join-requests/POST/responses/200/content`.
                 @frozen public enum Body: Sendable, Hashable {
-                    /// - Remark: Generated from `#/paths/room/join-requests/{code}/POST/responses/200/content/application\/json`.
+                    /// - Remark: Generated from `#/paths/room/{code}/join-requests/POST/responses/200/content/application\/json`.
                     case json(Components.Schemas.JoinRequestsResult)
                     /// The associated value of the enum case if `self` is `.json`.
                     ///
@@ -2333,26 +2333,26 @@ public enum Operations {
                     }
                 }
                 /// Received HTTP response body
-                public var body: Operations.PostRoomJoinRequestsCode.Output.Ok.Body
+                public var body: Operations.PostRoomCodeJoinRequests.Output.Ok.Body
                 /// Creates a new `Ok`.
                 ///
                 /// - Parameters:
                 ///   - body: Received HTTP response body
-                public init(body: Operations.PostRoomJoinRequestsCode.Output.Ok.Body) {
+                public init(body: Operations.PostRoomCodeJoinRequests.Output.Ok.Body) {
                     self.body = body
                 }
             }
             /// At least some of the requests were handled correctly. Checking the result is necessary to identify any that have failed.
             ///
-            /// - Remark: Generated from `#/paths//room/join-requests/{code}/post/responses/200`.
+            /// - Remark: Generated from `#/paths//room/{code}/join-requests/post/responses/200`.
             ///
             /// HTTP response code: `200 ok`.
-            case ok(Operations.PostRoomJoinRequestsCode.Output.Ok)
+            case ok(Operations.PostRoomCodeJoinRequests.Output.Ok)
             /// The associated value of the enum case if `self` is `.ok`.
             ///
             /// - Throws: An error if `self` is not `.ok`.
             /// - SeeAlso: `.ok`.
-            public var ok: Operations.PostRoomJoinRequestsCode.Output.Ok {
+            public var ok: Operations.PostRoomCodeJoinRequests.Output.Ok {
                 get throws {
                     switch self {
                     case let .ok(response):
@@ -2366,9 +2366,9 @@ public enum Operations {
                 }
             }
             public struct BadRequest: Sendable, Hashable {
-                /// - Remark: Generated from `#/paths/room/join-requests/{code}/POST/responses/400/content`.
+                /// - Remark: Generated from `#/paths/room/{code}/join-requests/POST/responses/400/content`.
                 @frozen public enum Body: Sendable, Hashable {
-                    /// - Remark: Generated from `#/paths/room/join-requests/{code}/POST/responses/400/content/application\/json`.
+                    /// - Remark: Generated from `#/paths/room/{code}/join-requests/POST/responses/400/content/application\/json`.
                     case json(Components.Schemas.JoinRequestsResult)
                     /// The associated value of the enum case if `self` is `.json`.
                     ///
@@ -2384,26 +2384,26 @@ public enum Operations {
                     }
                 }
                 /// Received HTTP response body
-                public var body: Operations.PostRoomJoinRequestsCode.Output.BadRequest.Body
+                public var body: Operations.PostRoomCodeJoinRequests.Output.BadRequest.Body
                 /// Creates a new `BadRequest`.
                 ///
                 /// - Parameters:
                 ///   - body: Received HTTP response body
-                public init(body: Operations.PostRoomJoinRequestsCode.Output.BadRequest.Body) {
+                public init(body: Operations.PostRoomCodeJoinRequests.Output.BadRequest.Body) {
                     self.body = body
                 }
             }
             /// All join requests were not handled correctly.
             ///
-            /// - Remark: Generated from `#/paths//room/join-requests/{code}/post/responses/400`.
+            /// - Remark: Generated from `#/paths//room/{code}/join-requests/post/responses/400`.
             ///
             /// HTTP response code: `400 badRequest`.
-            case badRequest(Operations.PostRoomJoinRequestsCode.Output.BadRequest)
+            case badRequest(Operations.PostRoomCodeJoinRequests.Output.BadRequest)
             /// The associated value of the enum case if `self` is `.badRequest`.
             ///
             /// - Throws: An error if `self` is not `.badRequest`.
             /// - SeeAlso: `.badRequest`.
-            public var badRequest: Operations.PostRoomJoinRequestsCode.Output.BadRequest {
+            public var badRequest: Operations.PostRoomCodeJoinRequests.Output.BadRequest {
                 get throws {
                     switch self {
                     case let .badRequest(response):
@@ -2418,13 +2418,13 @@ public enum Operations {
             }
             /// The admin token is either missing or incorrect
             ///
-            /// - Remark: Generated from `#/paths//room/join-requests/{code}/post/responses/403`.
+            /// - Remark: Generated from `#/paths//room/{code}/join-requests/post/responses/403`.
             ///
             /// HTTP response code: `403 forbidden`.
             case forbidden(Components.Responses.InvalidAdminToken)
             /// The admin token is either missing or incorrect
             ///
-            /// - Remark: Generated from `#/paths//room/join-requests/{code}/post/responses/403`.
+            /// - Remark: Generated from `#/paths//room/{code}/join-requests/post/responses/403`.
             ///
             /// HTTP response code: `403 forbidden`.
             public static var forbidden: Self {
@@ -2449,13 +2449,13 @@ public enum Operations {
             }
             /// The room does not exist
             ///
-            /// - Remark: Generated from `#/paths//room/join-requests/{code}/post/responses/404`.
+            /// - Remark: Generated from `#/paths//room/{code}/join-requests/post/responses/404`.
             ///
             /// HTTP response code: `404 notFound`.
             case notFound(Components.Responses.InvalidRoomCode)
             /// The room does not exist
             ///
-            /// - Remark: Generated from `#/paths//room/join-requests/{code}/post/responses/404`.
+            /// - Remark: Generated from `#/paths//room/{code}/join-requests/post/responses/404`.
             ///
             /// HTTP response code: `404 notFound`.
             public static var notFound: Self {
@@ -2511,16 +2511,16 @@ public enum Operations {
     }
     /// Get the active question
     ///
-    /// - Remark: HTTP `GET /room/question/{code}`.
-    /// - Remark: Generated from `#/paths//room/question/{code}/get`.
-    public enum GetRoomQuestionCode {
-        public static let id: Swift.String = "get/room/question/{code}"
+    /// - Remark: HTTP `GET /room/{code}/question`.
+    /// - Remark: Generated from `#/paths//room/{code}/question/get`.
+    public enum GetRoomCodeQuestion {
+        public static let id: Swift.String = "get/room/{code}/question"
         public struct Input: Sendable, Hashable {
-            /// - Remark: Generated from `#/paths/room/question/{code}/GET/path`.
+            /// - Remark: Generated from `#/paths/room/{code}/question/GET/path`.
             public struct Path: Sendable, Hashable {
                 /// A code uniquely identifying an alive room.
                 ///
-                /// - Remark: Generated from `#/paths/room/question/{code}/GET/path/code`.
+                /// - Remark: Generated from `#/paths/room/{code}/question/GET/path/code`.
                 public var code: Components.Parameters.RoomCode
                 /// Creates a new `Path`.
                 ///
@@ -2530,27 +2530,27 @@ public enum Operations {
                     self.code = code
                 }
             }
-            public var path: Operations.GetRoomQuestionCode.Input.Path
-            /// - Remark: Generated from `#/paths/room/question/{code}/GET/header`.
+            public var path: Operations.GetRoomCodeQuestion.Input.Path
+            /// - Remark: Generated from `#/paths/room/{code}/question/GET/header`.
             public struct Headers: Sendable, Hashable {
-                public var accept: [OpenAPIRuntime.AcceptHeaderContentType<Operations.GetRoomQuestionCode.AcceptableContentType>]
+                public var accept: [OpenAPIRuntime.AcceptHeaderContentType<Operations.GetRoomCodeQuestion.AcceptableContentType>]
                 /// Creates a new `Headers`.
                 ///
                 /// - Parameters:
                 ///   - accept:
-                public init(accept: [OpenAPIRuntime.AcceptHeaderContentType<Operations.GetRoomQuestionCode.AcceptableContentType>] = .defaultValues()) {
+                public init(accept: [OpenAPIRuntime.AcceptHeaderContentType<Operations.GetRoomCodeQuestion.AcceptableContentType>] = .defaultValues()) {
                     self.accept = accept
                 }
             }
-            public var headers: Operations.GetRoomQuestionCode.Input.Headers
+            public var headers: Operations.GetRoomCodeQuestion.Input.Headers
             /// Creates a new `Input`.
             ///
             /// - Parameters:
             ///   - path:
             ///   - headers:
             public init(
-                path: Operations.GetRoomQuestionCode.Input.Path,
-                headers: Operations.GetRoomQuestionCode.Input.Headers = .init()
+                path: Operations.GetRoomCodeQuestion.Input.Path,
+                headers: Operations.GetRoomCodeQuestion.Input.Headers = .init()
             ) {
                 self.path = path
                 self.headers = headers
@@ -2558,9 +2558,9 @@ public enum Operations {
         }
         @frozen public enum Output: Sendable, Hashable {
             public struct Ok: Sendable, Hashable {
-                /// - Remark: Generated from `#/paths/room/question/{code}/GET/responses/200/content`.
+                /// - Remark: Generated from `#/paths/room/{code}/question/GET/responses/200/content`.
                 @frozen public enum Body: Sendable, Hashable {
-                    /// - Remark: Generated from `#/paths/room/question/{code}/GET/responses/200/content/application\/json`.
+                    /// - Remark: Generated from `#/paths/room/{code}/question/GET/responses/200/content/application\/json`.
                     case json(Components.Schemas.Question)
                     /// The associated value of the enum case if `self` is `.json`.
                     ///
@@ -2576,26 +2576,26 @@ public enum Operations {
                     }
                 }
                 /// Received HTTP response body
-                public var body: Operations.GetRoomQuestionCode.Output.Ok.Body
+                public var body: Operations.GetRoomCodeQuestion.Output.Ok.Body
                 /// Creates a new `Ok`.
                 ///
                 /// - Parameters:
                 ///   - body: Received HTTP response body
-                public init(body: Operations.GetRoomQuestionCode.Output.Ok.Body) {
+                public init(body: Operations.GetRoomCodeQuestion.Output.Ok.Body) {
                     self.body = body
                 }
             }
             /// There is an active question
             ///
-            /// - Remark: Generated from `#/paths//room/question/{code}/get/responses/200`.
+            /// - Remark: Generated from `#/paths//room/{code}/question/get/responses/200`.
             ///
             /// HTTP response code: `200 ok`.
-            case ok(Operations.GetRoomQuestionCode.Output.Ok)
+            case ok(Operations.GetRoomCodeQuestion.Output.Ok)
             /// The associated value of the enum case if `self` is `.ok`.
             ///
             /// - Throws: An error if `self` is not `.ok`.
             /// - SeeAlso: `.ok`.
-            public var ok: Operations.GetRoomQuestionCode.Output.Ok {
+            public var ok: Operations.GetRoomCodeQuestion.Output.Ok {
                 get throws {
                     switch self {
                     case let .ok(response):
@@ -2614,13 +2614,13 @@ public enum Operations {
             }
             /// There is no active question
             ///
-            /// - Remark: Generated from `#/paths//room/question/{code}/get/responses/400`.
+            /// - Remark: Generated from `#/paths//room/{code}/question/get/responses/400`.
             ///
             /// HTTP response code: `400 badRequest`.
-            case badRequest(Operations.GetRoomQuestionCode.Output.BadRequest)
+            case badRequest(Operations.GetRoomCodeQuestion.Output.BadRequest)
             /// There is no active question
             ///
-            /// - Remark: Generated from `#/paths//room/question/{code}/get/responses/400`.
+            /// - Remark: Generated from `#/paths//room/{code}/question/get/responses/400`.
             ///
             /// HTTP response code: `400 badRequest`.
             public static var badRequest: Self {
@@ -2630,7 +2630,7 @@ public enum Operations {
             ///
             /// - Throws: An error if `self` is not `.badRequest`.
             /// - SeeAlso: `.badRequest`.
-            public var badRequest: Operations.GetRoomQuestionCode.Output.BadRequest {
+            public var badRequest: Operations.GetRoomCodeQuestion.Output.BadRequest {
                 get throws {
                     switch self {
                     case let .badRequest(response):
@@ -2649,13 +2649,13 @@ public enum Operations {
             }
             /// A room with the specified code was not found
             ///
-            /// - Remark: Generated from `#/paths//room/question/{code}/get/responses/404`.
+            /// - Remark: Generated from `#/paths//room/{code}/question/get/responses/404`.
             ///
             /// HTTP response code: `404 notFound`.
-            case notFound(Operations.GetRoomQuestionCode.Output.NotFound)
+            case notFound(Operations.GetRoomCodeQuestion.Output.NotFound)
             /// A room with the specified code was not found
             ///
-            /// - Remark: Generated from `#/paths//room/question/{code}/get/responses/404`.
+            /// - Remark: Generated from `#/paths//room/{code}/question/get/responses/404`.
             ///
             /// HTTP response code: `404 notFound`.
             public static var notFound: Self {
@@ -2665,7 +2665,7 @@ public enum Operations {
             ///
             /// - Throws: An error if `self` is not `.notFound`.
             /// - SeeAlso: `.notFound`.
-            public var notFound: Operations.GetRoomQuestionCode.Output.NotFound {
+            public var notFound: Operations.GetRoomCodeQuestion.Output.NotFound {
                 get throws {
                     switch self {
                     case let .notFound(response):
@@ -2711,16 +2711,16 @@ public enum Operations {
     }
     /// Submit a new question
     ///
-    /// - Remark: HTTP `POST /room/question/{code}`.
-    /// - Remark: Generated from `#/paths//room/question/{code}/post`.
-    public enum PostRoomQuestionCode {
-        public static let id: Swift.String = "post/room/question/{code}"
+    /// - Remark: HTTP `POST /room/{code}/question`.
+    /// - Remark: Generated from `#/paths//room/{code}/question/post`.
+    public enum PostRoomCodeQuestion {
+        public static let id: Swift.String = "post/room/{code}/question"
         public struct Input: Sendable, Hashable {
-            /// - Remark: Generated from `#/paths/room/question/{code}/POST/path`.
+            /// - Remark: Generated from `#/paths/room/{code}/question/POST/path`.
             public struct Path: Sendable, Hashable {
                 /// A code uniquely identifying an alive room.
                 ///
-                /// - Remark: Generated from `#/paths/room/question/{code}/POST/path/code`.
+                /// - Remark: Generated from `#/paths/room/{code}/question/POST/path/code`.
                 public var code: Components.Parameters.RoomCode
                 /// Creates a new `Path`.
                 ///
@@ -2730,14 +2730,14 @@ public enum Operations {
                     self.code = code
                 }
             }
-            public var path: Operations.PostRoomQuestionCode.Input.Path
-            /// - Remark: Generated from `#/paths/room/question/{code}/POST/header`.
+            public var path: Operations.PostRoomCodeQuestion.Input.Path
+            /// - Remark: Generated from `#/paths/room/{code}/question/POST/header`.
             public struct Headers: Sendable, Hashable {
                 /// To ensure that only an admin is able to make privileged actions to a room. The token is provided to the room creator as a response to the create request.
                 ///
-                /// - Remark: Generated from `#/paths/room/question/{code}/POST/header/Room-Admin-Token`.
+                /// - Remark: Generated from `#/paths/room/{code}/question/POST/header/Room-Admin-Token`.
                 public var roomAdminToken: Components.Parameters.AdminToken
-                public var accept: [OpenAPIRuntime.AcceptHeaderContentType<Operations.PostRoomQuestionCode.AcceptableContentType>]
+                public var accept: [OpenAPIRuntime.AcceptHeaderContentType<Operations.PostRoomCodeQuestion.AcceptableContentType>]
                 /// Creates a new `Headers`.
                 ///
                 /// - Parameters:
@@ -2745,19 +2745,19 @@ public enum Operations {
                 ///   - accept:
                 public init(
                     roomAdminToken: Components.Parameters.AdminToken,
-                    accept: [OpenAPIRuntime.AcceptHeaderContentType<Operations.PostRoomQuestionCode.AcceptableContentType>] = .defaultValues()
+                    accept: [OpenAPIRuntime.AcceptHeaderContentType<Operations.PostRoomCodeQuestion.AcceptableContentType>] = .defaultValues()
                 ) {
                     self.roomAdminToken = roomAdminToken
                     self.accept = accept
                 }
             }
-            public var headers: Operations.PostRoomQuestionCode.Input.Headers
-            /// - Remark: Generated from `#/paths/room/question/{code}/POST/requestBody`.
+            public var headers: Operations.PostRoomCodeQuestion.Input.Headers
+            /// - Remark: Generated from `#/paths/room/{code}/question/POST/requestBody`.
             @frozen public enum Body: Sendable, Hashable {
-                /// - Remark: Generated from `#/paths/room/question/{code}/POST/requestBody/content/application\/json`.
+                /// - Remark: Generated from `#/paths/room/{code}/question/POST/requestBody/content/application\/json`.
                 case json(Components.Schemas.QuestionCreateRequest)
             }
-            public var body: Operations.PostRoomQuestionCode.Input.Body
+            public var body: Operations.PostRoomCodeQuestion.Input.Body
             /// Creates a new `Input`.
             ///
             /// - Parameters:
@@ -2765,9 +2765,9 @@ public enum Operations {
             ///   - headers:
             ///   - body:
             public init(
-                path: Operations.PostRoomQuestionCode.Input.Path,
-                headers: Operations.PostRoomQuestionCode.Input.Headers,
-                body: Operations.PostRoomQuestionCode.Input.Body
+                path: Operations.PostRoomCodeQuestion.Input.Path,
+                headers: Operations.PostRoomCodeQuestion.Input.Headers,
+                body: Operations.PostRoomCodeQuestion.Input.Body
             ) {
                 self.path = path
                 self.headers = headers
@@ -2776,9 +2776,9 @@ public enum Operations {
         }
         @frozen public enum Output: Sendable, Hashable {
             public struct Ok: Sendable, Hashable {
-                /// - Remark: Generated from `#/paths/room/question/{code}/POST/responses/200/content`.
+                /// - Remark: Generated from `#/paths/room/{code}/question/POST/responses/200/content`.
                 @frozen public enum Body: Sendable, Hashable {
-                    /// - Remark: Generated from `#/paths/room/question/{code}/POST/responses/200/content/application\/json`.
+                    /// - Remark: Generated from `#/paths/room/{code}/question/POST/responses/200/content/application\/json`.
                     case json(Components.Schemas.Question)
                     /// The associated value of the enum case if `self` is `.json`.
                     ///
@@ -2794,26 +2794,26 @@ public enum Operations {
                     }
                 }
                 /// Received HTTP response body
-                public var body: Operations.PostRoomQuestionCode.Output.Ok.Body
+                public var body: Operations.PostRoomCodeQuestion.Output.Ok.Body
                 /// Creates a new `Ok`.
                 ///
                 /// - Parameters:
                 ///   - body: Received HTTP response body
-                public init(body: Operations.PostRoomQuestionCode.Output.Ok.Body) {
+                public init(body: Operations.PostRoomCodeQuestion.Output.Ok.Body) {
                     self.body = body
                 }
             }
             /// The question was created successfully
             ///
-            /// - Remark: Generated from `#/paths//room/question/{code}/post/responses/200`.
+            /// - Remark: Generated from `#/paths//room/{code}/question/post/responses/200`.
             ///
             /// HTTP response code: `200 ok`.
-            case ok(Operations.PostRoomQuestionCode.Output.Ok)
+            case ok(Operations.PostRoomCodeQuestion.Output.Ok)
             /// The associated value of the enum case if `self` is `.ok`.
             ///
             /// - Throws: An error if `self` is not `.ok`.
             /// - SeeAlso: `.ok`.
-            public var ok: Operations.PostRoomQuestionCode.Output.Ok {
+            public var ok: Operations.PostRoomCodeQuestion.Output.Ok {
                 get throws {
                     switch self {
                     case let .ok(response):
@@ -2827,9 +2827,9 @@ public enum Operations {
                 }
             }
             public struct BadRequest: Sendable, Hashable {
-                /// - Remark: Generated from `#/paths/room/question/{code}/POST/responses/400/content`.
+                /// - Remark: Generated from `#/paths/room/{code}/question/POST/responses/400/content`.
                 @frozen public enum Body: Sendable, Hashable {
-                    /// - Remark: Generated from `#/paths/room/question/{code}/POST/responses/400/content/application\/json`.
+                    /// - Remark: Generated from `#/paths/room/{code}/question/POST/responses/400/content/application\/json`.
                     case json(Components.Schemas.BasicError)
                     /// The associated value of the enum case if `self` is `.json`.
                     ///
@@ -2845,26 +2845,26 @@ public enum Operations {
                     }
                 }
                 /// Received HTTP response body
-                public var body: Operations.PostRoomQuestionCode.Output.BadRequest.Body
+                public var body: Operations.PostRoomCodeQuestion.Output.BadRequest.Body
                 /// Creates a new `BadRequest`.
                 ///
                 /// - Parameters:
                 ///   - body: Received HTTP response body
-                public init(body: Operations.PostRoomQuestionCode.Output.BadRequest.Body) {
+                public init(body: Operations.PostRoomCodeQuestion.Output.BadRequest.Body) {
                     self.body = body
                 }
             }
             /// The question to create was invalid
             ///
-            /// - Remark: Generated from `#/paths//room/question/{code}/post/responses/400`.
+            /// - Remark: Generated from `#/paths//room/{code}/question/post/responses/400`.
             ///
             /// HTTP response code: `400 badRequest`.
-            case badRequest(Operations.PostRoomQuestionCode.Output.BadRequest)
+            case badRequest(Operations.PostRoomCodeQuestion.Output.BadRequest)
             /// The associated value of the enum case if `self` is `.badRequest`.
             ///
             /// - Throws: An error if `self` is not `.badRequest`.
             /// - SeeAlso: `.badRequest`.
-            public var badRequest: Operations.PostRoomQuestionCode.Output.BadRequest {
+            public var badRequest: Operations.PostRoomCodeQuestion.Output.BadRequest {
                 get throws {
                     switch self {
                     case let .badRequest(response):
@@ -2879,13 +2879,13 @@ public enum Operations {
             }
             /// The admin token is either missing or incorrect
             ///
-            /// - Remark: Generated from `#/paths//room/question/{code}/post/responses/403`.
+            /// - Remark: Generated from `#/paths//room/{code}/question/post/responses/403`.
             ///
             /// HTTP response code: `403 forbidden`.
             case forbidden(Components.Responses.InvalidAdminToken)
             /// The admin token is either missing or incorrect
             ///
-            /// - Remark: Generated from `#/paths//room/question/{code}/post/responses/403`.
+            /// - Remark: Generated from `#/paths//room/{code}/question/post/responses/403`.
             ///
             /// HTTP response code: `403 forbidden`.
             public static var forbidden: Self {
@@ -2910,13 +2910,13 @@ public enum Operations {
             }
             /// The room does not exist
             ///
-            /// - Remark: Generated from `#/paths//room/question/{code}/post/responses/404`.
+            /// - Remark: Generated from `#/paths//room/{code}/question/post/responses/404`.
             ///
             /// HTTP response code: `404 notFound`.
             case notFound(Components.Responses.InvalidRoomCode)
             /// The room does not exist
             ///
-            /// - Remark: Generated from `#/paths//room/question/{code}/post/responses/404`.
+            /// - Remark: Generated from `#/paths//room/{code}/question/post/responses/404`.
             ///
             /// HTTP response code: `404 notFound`.
             public static var notFound: Self {
@@ -2940,9 +2940,9 @@ public enum Operations {
                 }
             }
             public struct InternalServerError: Sendable, Hashable {
-                /// - Remark: Generated from `#/paths/room/question/{code}/POST/responses/500/content`.
+                /// - Remark: Generated from `#/paths/room/{code}/question/POST/responses/500/content`.
                 @frozen public enum Body: Sendable, Hashable {
-                    /// - Remark: Generated from `#/paths/room/question/{code}/POST/responses/500/content/application\/json`.
+                    /// - Remark: Generated from `#/paths/room/{code}/question/POST/responses/500/content/application\/json`.
                     case json(Components.Schemas.BasicError)
                     /// The associated value of the enum case if `self` is `.json`.
                     ///
@@ -2958,26 +2958,26 @@ public enum Operations {
                     }
                 }
                 /// Received HTTP response body
-                public var body: Operations.PostRoomQuestionCode.Output.InternalServerError.Body
+                public var body: Operations.PostRoomCodeQuestion.Output.InternalServerError.Body
                 /// Creates a new `InternalServerError`.
                 ///
                 /// - Parameters:
                 ///   - body: Received HTTP response body
-                public init(body: Operations.PostRoomQuestionCode.Output.InternalServerError.Body) {
+                public init(body: Operations.PostRoomCodeQuestion.Output.InternalServerError.Body) {
                     self.body = body
                 }
             }
             /// The question could not be updated correctly.
             ///
-            /// - Remark: Generated from `#/paths//room/question/{code}/post/responses/500`.
+            /// - Remark: Generated from `#/paths//room/{code}/question/post/responses/500`.
             ///
             /// HTTP response code: `500 internalServerError`.
-            case internalServerError(Operations.PostRoomQuestionCode.Output.InternalServerError)
+            case internalServerError(Operations.PostRoomCodeQuestion.Output.InternalServerError)
             /// The associated value of the enum case if `self` is `.internalServerError`.
             ///
             /// - Throws: An error if `self` is not `.internalServerError`.
             /// - SeeAlso: `.internalServerError`.
-            public var internalServerError: Operations.PostRoomQuestionCode.Output.InternalServerError {
+            public var internalServerError: Operations.PostRoomCodeQuestion.Output.InternalServerError {
                 get throws {
                     switch self {
                     case let .internalServerError(response):
@@ -3025,20 +3025,20 @@ public enum Operations {
     ///
     /// Modify attributes of the current question
     ///
-    /// - Remark: HTTP `PUT /room/question/{code}/{questionID}`.
-    /// - Remark: Generated from `#/paths//room/question/{code}/{questionID}/put`.
-    public enum PutRoomQuestionCodeQuestionID {
-        public static let id: Swift.String = "put/room/question/{code}/{questionID}"
+    /// - Remark: HTTP `PUT /room/{code}/{questionID}`.
+    /// - Remark: Generated from `#/paths//room/{code}/{questionID}/put`.
+    public enum PutRoomCodeQuestionID {
+        public static let id: Swift.String = "put/room/{code}/{questionID}"
         public struct Input: Sendable, Hashable {
-            /// - Remark: Generated from `#/paths/room/question/{code}/{questionID}/PUT/path`.
+            /// - Remark: Generated from `#/paths/room/{code}/{questionID}/PUT/path`.
             public struct Path: Sendable, Hashable {
                 /// A code uniquely identifying an alive room.
                 ///
-                /// - Remark: Generated from `#/paths/room/question/{code}/{questionID}/PUT/path/code`.
+                /// - Remark: Generated from `#/paths/room/{code}/{questionID}/PUT/path/code`.
                 public var code: Components.Parameters.RoomCode
                 /// The id uniquely identifying the question. This is used to make sure that the client is voting on the question they expect.
                 ///
-                /// - Remark: Generated from `#/paths/room/question/{code}/{questionID}/PUT/path/questionID`.
+                /// - Remark: Generated from `#/paths/room/{code}/{questionID}/PUT/path/questionID`.
                 public var questionID: Components.Parameters.QuestionID
                 /// Creates a new `Path`.
                 ///
@@ -3053,12 +3053,12 @@ public enum Operations {
                     self.questionID = questionID
                 }
             }
-            public var path: Operations.PutRoomQuestionCodeQuestionID.Input.Path
-            /// - Remark: Generated from `#/paths/room/question/{code}/{questionID}/PUT/header`.
+            public var path: Operations.PutRoomCodeQuestionID.Input.Path
+            /// - Remark: Generated from `#/paths/room/{code}/{questionID}/PUT/header`.
             public struct Headers: Sendable, Hashable {
                 /// To ensure that only an admin is able to make privileged actions to a room. The token is provided to the room creator as a response to the create request.
                 ///
-                /// - Remark: Generated from `#/paths/room/question/{code}/{questionID}/PUT/header/Room-Admin-Token`.
+                /// - Remark: Generated from `#/paths/room/{code}/{questionID}/PUT/header/Room-Admin-Token`.
                 public var roomAdminToken: Components.Parameters.AdminToken
                 /// Creates a new `Headers`.
                 ///
@@ -3068,13 +3068,13 @@ public enum Operations {
                     self.roomAdminToken = roomAdminToken
                 }
             }
-            public var headers: Operations.PutRoomQuestionCodeQuestionID.Input.Headers
-            /// - Remark: Generated from `#/paths/room/question/{code}/{questionID}/PUT/requestBody`.
+            public var headers: Operations.PutRoomCodeQuestionID.Input.Headers
+            /// - Remark: Generated from `#/paths/room/{code}/{questionID}/PUT/requestBody`.
             @frozen public enum Body: Sendable, Hashable {
-                /// - Remark: Generated from `#/paths/room/question/{code}/{questionID}/PUT/requestBody/content/application\/json`.
+                /// - Remark: Generated from `#/paths/room/{code}/{questionID}/PUT/requestBody/content/application\/json`.
                 case json(Components.Schemas.QuestionModifyRequest)
             }
-            public var body: Operations.PutRoomQuestionCodeQuestionID.Input.Body
+            public var body: Operations.PutRoomCodeQuestionID.Input.Body
             /// Creates a new `Input`.
             ///
             /// - Parameters:
@@ -3082,9 +3082,9 @@ public enum Operations {
             ///   - headers:
             ///   - body:
             public init(
-                path: Operations.PutRoomQuestionCodeQuestionID.Input.Path,
-                headers: Operations.PutRoomQuestionCodeQuestionID.Input.Headers,
-                body: Operations.PutRoomQuestionCodeQuestionID.Input.Body
+                path: Operations.PutRoomCodeQuestionID.Input.Path,
+                headers: Operations.PutRoomCodeQuestionID.Input.Headers,
+                body: Operations.PutRoomCodeQuestionID.Input.Body
             ) {
                 self.path = path
                 self.headers = headers
@@ -3098,13 +3098,13 @@ public enum Operations {
             }
             /// The operation was processed successfully
             ///
-            /// - Remark: Generated from `#/paths//room/question/{code}/{questionID}/put/responses/200`.
+            /// - Remark: Generated from `#/paths//room/{code}/{questionID}/put/responses/200`.
             ///
             /// HTTP response code: `200 ok`.
-            case ok(Operations.PutRoomQuestionCodeQuestionID.Output.Ok)
+            case ok(Operations.PutRoomCodeQuestionID.Output.Ok)
             /// The operation was processed successfully
             ///
-            /// - Remark: Generated from `#/paths//room/question/{code}/{questionID}/put/responses/200`.
+            /// - Remark: Generated from `#/paths//room/{code}/{questionID}/put/responses/200`.
             ///
             /// HTTP response code: `200 ok`.
             public static var ok: Self {
@@ -3114,7 +3114,7 @@ public enum Operations {
             ///
             /// - Throws: An error if `self` is not `.ok`.
             /// - SeeAlso: `.ok`.
-            public var ok: Operations.PutRoomQuestionCodeQuestionID.Output.Ok {
+            public var ok: Operations.PutRoomCodeQuestionID.Output.Ok {
                 get throws {
                     switch self {
                     case let .ok(response):
@@ -3133,13 +3133,13 @@ public enum Operations {
             }
             /// The modify request was invalid
             ///
-            /// - Remark: Generated from `#/paths//room/question/{code}/{questionID}/put/responses/400`.
+            /// - Remark: Generated from `#/paths//room/{code}/{questionID}/put/responses/400`.
             ///
             /// HTTP response code: `400 badRequest`.
-            case badRequest(Operations.PutRoomQuestionCodeQuestionID.Output.BadRequest)
+            case badRequest(Operations.PutRoomCodeQuestionID.Output.BadRequest)
             /// The modify request was invalid
             ///
-            /// - Remark: Generated from `#/paths//room/question/{code}/{questionID}/put/responses/400`.
+            /// - Remark: Generated from `#/paths//room/{code}/{questionID}/put/responses/400`.
             ///
             /// HTTP response code: `400 badRequest`.
             public static var badRequest: Self {
@@ -3149,7 +3149,7 @@ public enum Operations {
             ///
             /// - Throws: An error if `self` is not `.badRequest`.
             /// - SeeAlso: `.badRequest`.
-            public var badRequest: Operations.PutRoomQuestionCodeQuestionID.Output.BadRequest {
+            public var badRequest: Operations.PutRoomCodeQuestionID.Output.BadRequest {
                 get throws {
                     switch self {
                     case let .badRequest(response):
@@ -3164,13 +3164,13 @@ public enum Operations {
             }
             /// The participant token is either missing or doesn't correspond to a room participant
             ///
-            /// - Remark: Generated from `#/paths//room/question/{code}/{questionID}/put/responses/403`.
+            /// - Remark: Generated from `#/paths//room/{code}/{questionID}/put/responses/403`.
             ///
             /// HTTP response code: `403 forbidden`.
             case forbidden(Components.Responses.InvalidParticipantToken)
             /// The participant token is either missing or doesn't correspond to a room participant
             ///
-            /// - Remark: Generated from `#/paths//room/question/{code}/{questionID}/put/responses/403`.
+            /// - Remark: Generated from `#/paths//room/{code}/{questionID}/put/responses/403`.
             ///
             /// HTTP response code: `403 forbidden`.
             public static var forbidden: Self {
@@ -3195,13 +3195,13 @@ public enum Operations {
             }
             /// The room does not exist
             ///
-            /// - Remark: Generated from `#/paths//room/question/{code}/{questionID}/put/responses/404`.
+            /// - Remark: Generated from `#/paths//room/{code}/{questionID}/put/responses/404`.
             ///
             /// HTTP response code: `404 notFound`.
             case notFound(Components.Responses.InvalidRoomCode)
             /// The room does not exist
             ///
-            /// - Remark: Generated from `#/paths//room/question/{code}/{questionID}/put/responses/404`.
+            /// - Remark: Generated from `#/paths//room/{code}/{questionID}/put/responses/404`.
             ///
             /// HTTP response code: `404 notFound`.
             public static var notFound: Self {
@@ -3232,20 +3232,20 @@ public enum Operations {
     }
     /// Removes the current question
     ///
-    /// - Remark: HTTP `DELETE /room/question/{code}/{questionID}`.
-    /// - Remark: Generated from `#/paths//room/question/{code}/{questionID}/delete`.
-    public enum DeleteRoomQuestionCodeQuestionID {
-        public static let id: Swift.String = "delete/room/question/{code}/{questionID}"
+    /// - Remark: HTTP `DELETE /room/{code}/{questionID}`.
+    /// - Remark: Generated from `#/paths//room/{code}/{questionID}/delete`.
+    public enum DeleteRoomCodeQuestionID {
+        public static let id: Swift.String = "delete/room/{code}/{questionID}"
         public struct Input: Sendable, Hashable {
-            /// - Remark: Generated from `#/paths/room/question/{code}/{questionID}/DELETE/path`.
+            /// - Remark: Generated from `#/paths/room/{code}/{questionID}/DELETE/path`.
             public struct Path: Sendable, Hashable {
                 /// A code uniquely identifying an alive room.
                 ///
-                /// - Remark: Generated from `#/paths/room/question/{code}/{questionID}/DELETE/path/code`.
+                /// - Remark: Generated from `#/paths/room/{code}/{questionID}/DELETE/path/code`.
                 public var code: Components.Parameters.RoomCode
                 /// The id uniquely identifying the question. This is used to make sure that the client is voting on the question they expect.
                 ///
-                /// - Remark: Generated from `#/paths/room/question/{code}/{questionID}/DELETE/path/questionID`.
+                /// - Remark: Generated from `#/paths/room/{code}/{questionID}/DELETE/path/questionID`.
                 public var questionID: Components.Parameters.QuestionID
                 /// Creates a new `Path`.
                 ///
@@ -3260,14 +3260,14 @@ public enum Operations {
                     self.questionID = questionID
                 }
             }
-            public var path: Operations.DeleteRoomQuestionCodeQuestionID.Input.Path
-            /// - Remark: Generated from `#/paths/room/question/{code}/{questionID}/DELETE/header`.
+            public var path: Operations.DeleteRoomCodeQuestionID.Input.Path
+            /// - Remark: Generated from `#/paths/room/{code}/{questionID}/DELETE/header`.
             public struct Headers: Sendable, Hashable {
                 /// To ensure that only an admin is able to make privileged actions to a room. The token is provided to the room creator as a response to the create request.
                 ///
-                /// - Remark: Generated from `#/paths/room/question/{code}/{questionID}/DELETE/header/Room-Admin-Token`.
+                /// - Remark: Generated from `#/paths/room/{code}/{questionID}/DELETE/header/Room-Admin-Token`.
                 public var roomAdminToken: Components.Parameters.AdminToken
-                public var accept: [OpenAPIRuntime.AcceptHeaderContentType<Operations.DeleteRoomQuestionCodeQuestionID.AcceptableContentType>]
+                public var accept: [OpenAPIRuntime.AcceptHeaderContentType<Operations.DeleteRoomCodeQuestionID.AcceptableContentType>]
                 /// Creates a new `Headers`.
                 ///
                 /// - Parameters:
@@ -3275,21 +3275,21 @@ public enum Operations {
                 ///   - accept:
                 public init(
                     roomAdminToken: Components.Parameters.AdminToken,
-                    accept: [OpenAPIRuntime.AcceptHeaderContentType<Operations.DeleteRoomQuestionCodeQuestionID.AcceptableContentType>] = .defaultValues()
+                    accept: [OpenAPIRuntime.AcceptHeaderContentType<Operations.DeleteRoomCodeQuestionID.AcceptableContentType>] = .defaultValues()
                 ) {
                     self.roomAdminToken = roomAdminToken
                     self.accept = accept
                 }
             }
-            public var headers: Operations.DeleteRoomQuestionCodeQuestionID.Input.Headers
+            public var headers: Operations.DeleteRoomCodeQuestionID.Input.Headers
             /// Creates a new `Input`.
             ///
             /// - Parameters:
             ///   - path:
             ///   - headers:
             public init(
-                path: Operations.DeleteRoomQuestionCodeQuestionID.Input.Path,
-                headers: Operations.DeleteRoomQuestionCodeQuestionID.Input.Headers
+                path: Operations.DeleteRoomCodeQuestionID.Input.Path,
+                headers: Operations.DeleteRoomCodeQuestionID.Input.Headers
             ) {
                 self.path = path
                 self.headers = headers
@@ -3297,9 +3297,9 @@ public enum Operations {
         }
         @frozen public enum Output: Sendable, Hashable {
             public struct Ok: Sendable, Hashable {
-                /// - Remark: Generated from `#/paths/room/question/{code}/{questionID}/DELETE/responses/200/content`.
+                /// - Remark: Generated from `#/paths/room/{code}/{questionID}/DELETE/responses/200/content`.
                 @frozen public enum Body: Sendable, Hashable {
-                    /// - Remark: Generated from `#/paths/room/question/{code}/{questionID}/DELETE/responses/200/content/application\/json`.
+                    /// - Remark: Generated from `#/paths/room/{code}/{questionID}/DELETE/responses/200/content/application\/json`.
                     case json(Components.Schemas.Question)
                     /// The associated value of the enum case if `self` is `.json`.
                     ///
@@ -3315,26 +3315,26 @@ public enum Operations {
                     }
                 }
                 /// Received HTTP response body
-                public var body: Operations.DeleteRoomQuestionCodeQuestionID.Output.Ok.Body
+                public var body: Operations.DeleteRoomCodeQuestionID.Output.Ok.Body
                 /// Creates a new `Ok`.
                 ///
                 /// - Parameters:
                 ///   - body: Received HTTP response body
-                public init(body: Operations.DeleteRoomQuestionCodeQuestionID.Output.Ok.Body) {
+                public init(body: Operations.DeleteRoomCodeQuestionID.Output.Ok.Body) {
                     self.body = body
                 }
             }
             /// The question was deleted successully
             ///
-            /// - Remark: Generated from `#/paths//room/question/{code}/{questionID}/delete/responses/200`.
+            /// - Remark: Generated from `#/paths//room/{code}/{questionID}/delete/responses/200`.
             ///
             /// HTTP response code: `200 ok`.
-            case ok(Operations.DeleteRoomQuestionCodeQuestionID.Output.Ok)
+            case ok(Operations.DeleteRoomCodeQuestionID.Output.Ok)
             /// The associated value of the enum case if `self` is `.ok`.
             ///
             /// - Throws: An error if `self` is not `.ok`.
             /// - SeeAlso: `.ok`.
-            public var ok: Operations.DeleteRoomQuestionCodeQuestionID.Output.Ok {
+            public var ok: Operations.DeleteRoomCodeQuestionID.Output.Ok {
                 get throws {
                     switch self {
                     case let .ok(response):
@@ -3353,13 +3353,13 @@ public enum Operations {
             }
             /// There is no room to delete
             ///
-            /// - Remark: Generated from `#/paths//room/question/{code}/{questionID}/delete/responses/400`.
+            /// - Remark: Generated from `#/paths//room/{code}/{questionID}/delete/responses/400`.
             ///
             /// HTTP response code: `400 badRequest`.
-            case badRequest(Operations.DeleteRoomQuestionCodeQuestionID.Output.BadRequest)
+            case badRequest(Operations.DeleteRoomCodeQuestionID.Output.BadRequest)
             /// There is no room to delete
             ///
-            /// - Remark: Generated from `#/paths//room/question/{code}/{questionID}/delete/responses/400`.
+            /// - Remark: Generated from `#/paths//room/{code}/{questionID}/delete/responses/400`.
             ///
             /// HTTP response code: `400 badRequest`.
             public static var badRequest: Self {
@@ -3369,7 +3369,7 @@ public enum Operations {
             ///
             /// - Throws: An error if `self` is not `.badRequest`.
             /// - SeeAlso: `.badRequest`.
-            public var badRequest: Operations.DeleteRoomQuestionCodeQuestionID.Output.BadRequest {
+            public var badRequest: Operations.DeleteRoomCodeQuestionID.Output.BadRequest {
                 get throws {
                     switch self {
                     case let .badRequest(response):
@@ -3384,13 +3384,13 @@ public enum Operations {
             }
             /// The admin token is either missing or incorrect
             ///
-            /// - Remark: Generated from `#/paths//room/question/{code}/{questionID}/delete/responses/403`.
+            /// - Remark: Generated from `#/paths//room/{code}/{questionID}/delete/responses/403`.
             ///
             /// HTTP response code: `403 forbidden`.
             case forbidden(Components.Responses.InvalidAdminToken)
             /// The admin token is either missing or incorrect
             ///
-            /// - Remark: Generated from `#/paths//room/question/{code}/{questionID}/delete/responses/403`.
+            /// - Remark: Generated from `#/paths//room/{code}/{questionID}/delete/responses/403`.
             ///
             /// HTTP response code: `403 forbidden`.
             public static var forbidden: Self {
@@ -3415,13 +3415,13 @@ public enum Operations {
             }
             /// The room does not exist
             ///
-            /// - Remark: Generated from `#/paths//room/question/{code}/{questionID}/delete/responses/404`.
+            /// - Remark: Generated from `#/paths//room/{code}/{questionID}/delete/responses/404`.
             ///
             /// HTTP response code: `404 notFound`.
             case notFound(Components.Responses.InvalidRoomCode)
             /// The room does not exist
             ///
-            /// - Remark: Generated from `#/paths//room/question/{code}/{questionID}/delete/responses/404`.
+            /// - Remark: Generated from `#/paths//room/{code}/{questionID}/delete/responses/404`.
             ///
             /// HTTP response code: `404 notFound`.
             public static var notFound: Self {
@@ -3477,20 +3477,20 @@ public enum Operations {
     }
     /// Vote on a question
     ///
-    /// - Remark: HTTP `POST /room/vote/{code}/{questionID}`.
-    /// - Remark: Generated from `#/paths//room/vote/{code}/{questionID}/post`.
-    public enum PostRoomVoteCodeQuestionID {
-        public static let id: Swift.String = "post/room/vote/{code}/{questionID}"
+    /// - Remark: HTTP `POST /room/{code}/{questionID}/vote`.
+    /// - Remark: Generated from `#/paths//room/{code}/{questionID}/vote/post`.
+    public enum PostRoomCodeQuestionIDVote {
+        public static let id: Swift.String = "post/room/{code}/{questionID}/vote"
         public struct Input: Sendable, Hashable {
-            /// - Remark: Generated from `#/paths/room/vote/{code}/{questionID}/POST/path`.
+            /// - Remark: Generated from `#/paths/room/{code}/{questionID}/vote/POST/path`.
             public struct Path: Sendable, Hashable {
                 /// A code uniquely identifying an alive room.
                 ///
-                /// - Remark: Generated from `#/paths/room/vote/{code}/{questionID}/POST/path/code`.
+                /// - Remark: Generated from `#/paths/room/{code}/{questionID}/vote/POST/path/code`.
                 public var code: Components.Parameters.RoomCode
                 /// The id uniquely identifying the question. This is used to make sure that the client is voting on the question they expect.
                 ///
-                /// - Remark: Generated from `#/paths/room/vote/{code}/{questionID}/POST/path/questionID`.
+                /// - Remark: Generated from `#/paths/room/{code}/{questionID}/vote/POST/path/questionID`.
                 public var questionID: Components.Parameters.QuestionID
                 /// Creates a new `Path`.
                 ///
@@ -3505,12 +3505,12 @@ public enum Operations {
                     self.questionID = questionID
                 }
             }
-            public var path: Operations.PostRoomVoteCodeQuestionID.Input.Path
-            /// - Remark: Generated from `#/paths/room/vote/{code}/{questionID}/POST/header`.
+            public var path: Operations.PostRoomCodeQuestionIDVote.Input.Path
+            /// - Remark: Generated from `#/paths/room/{code}/{questionID}/vote/POST/header`.
             public struct Headers: Sendable, Hashable {
                 /// A token that uniquely identifies a participant.
                 ///
-                /// - Remark: Generated from `#/paths/room/vote/{code}/{questionID}/POST/header/Participant-Token`.
+                /// - Remark: Generated from `#/paths/room/{code}/{questionID}/vote/POST/header/Participant-Token`.
                 public var participantToken: Components.Parameters.ParticipantToken
                 /// Creates a new `Headers`.
                 ///
@@ -3520,13 +3520,13 @@ public enum Operations {
                     self.participantToken = participantToken
                 }
             }
-            public var headers: Operations.PostRoomVoteCodeQuestionID.Input.Headers
-            /// - Remark: Generated from `#/paths/room/vote/{code}/{questionID}/POST/requestBody`.
+            public var headers: Operations.PostRoomCodeQuestionIDVote.Input.Headers
+            /// - Remark: Generated from `#/paths/room/{code}/{questionID}/vote/POST/requestBody`.
             @frozen public enum Body: Sendable, Hashable {
-                /// - Remark: Generated from `#/paths/room/vote/{code}/{questionID}/POST/requestBody/content/application\/json`.
+                /// - Remark: Generated from `#/paths/room/{code}/{questionID}/vote/POST/requestBody/content/application\/json`.
                 case json(Components.Schemas.AnyVote)
             }
-            public var body: Operations.PostRoomVoteCodeQuestionID.Input.Body
+            public var body: Operations.PostRoomCodeQuestionIDVote.Input.Body
             /// Creates a new `Input`.
             ///
             /// - Parameters:
@@ -3534,9 +3534,9 @@ public enum Operations {
             ///   - headers:
             ///   - body:
             public init(
-                path: Operations.PostRoomVoteCodeQuestionID.Input.Path,
-                headers: Operations.PostRoomVoteCodeQuestionID.Input.Headers,
-                body: Operations.PostRoomVoteCodeQuestionID.Input.Body
+                path: Operations.PostRoomCodeQuestionIDVote.Input.Path,
+                headers: Operations.PostRoomCodeQuestionIDVote.Input.Headers,
+                body: Operations.PostRoomCodeQuestionIDVote.Input.Body
             ) {
                 self.path = path
                 self.headers = headers
@@ -3550,13 +3550,13 @@ public enum Operations {
             }
             /// The vote was counted successfully. If this participant already voted, the new vote replaces the old one.
             ///
-            /// - Remark: Generated from `#/paths//room/vote/{code}/{questionID}/post/responses/200`.
+            /// - Remark: Generated from `#/paths//room/{code}/{questionID}/vote/post/responses/200`.
             ///
             /// HTTP response code: `200 ok`.
-            case ok(Operations.PostRoomVoteCodeQuestionID.Output.Ok)
+            case ok(Operations.PostRoomCodeQuestionIDVote.Output.Ok)
             /// The vote was counted successfully. If this participant already voted, the new vote replaces the old one.
             ///
-            /// - Remark: Generated from `#/paths//room/vote/{code}/{questionID}/post/responses/200`.
+            /// - Remark: Generated from `#/paths//room/{code}/{questionID}/vote/post/responses/200`.
             ///
             /// HTTP response code: `200 ok`.
             public static var ok: Self {
@@ -3566,7 +3566,7 @@ public enum Operations {
             ///
             /// - Throws: An error if `self` is not `.ok`.
             /// - SeeAlso: `.ok`.
-            public var ok: Operations.PostRoomVoteCodeQuestionID.Output.Ok {
+            public var ok: Operations.PostRoomCodeQuestionIDVote.Output.Ok {
                 get throws {
                     switch self {
                     case let .ok(response):
@@ -3585,13 +3585,13 @@ public enum Operations {
             }
             /// The vote doesn't match the question
             ///
-            /// - Remark: Generated from `#/paths//room/vote/{code}/{questionID}/post/responses/400`.
+            /// - Remark: Generated from `#/paths//room/{code}/{questionID}/vote/post/responses/400`.
             ///
             /// HTTP response code: `400 badRequest`.
-            case badRequest(Operations.PostRoomVoteCodeQuestionID.Output.BadRequest)
+            case badRequest(Operations.PostRoomCodeQuestionIDVote.Output.BadRequest)
             /// The vote doesn't match the question
             ///
-            /// - Remark: Generated from `#/paths//room/vote/{code}/{questionID}/post/responses/400`.
+            /// - Remark: Generated from `#/paths//room/{code}/{questionID}/vote/post/responses/400`.
             ///
             /// HTTP response code: `400 badRequest`.
             public static var badRequest: Self {
@@ -3601,7 +3601,7 @@ public enum Operations {
             ///
             /// - Throws: An error if `self` is not `.badRequest`.
             /// - SeeAlso: `.badRequest`.
-            public var badRequest: Operations.PostRoomVoteCodeQuestionID.Output.BadRequest {
+            public var badRequest: Operations.PostRoomCodeQuestionIDVote.Output.BadRequest {
                 get throws {
                     switch self {
                     case let .badRequest(response):
@@ -3616,13 +3616,13 @@ public enum Operations {
             }
             /// The participant token is either missing or doesn't correspond to a room participant
             ///
-            /// - Remark: Generated from `#/paths//room/vote/{code}/{questionID}/post/responses/403`.
+            /// - Remark: Generated from `#/paths//room/{code}/{questionID}/vote/post/responses/403`.
             ///
             /// HTTP response code: `403 forbidden`.
             case forbidden(Components.Responses.InvalidParticipantToken)
             /// The participant token is either missing or doesn't correspond to a room participant
             ///
-            /// - Remark: Generated from `#/paths//room/vote/{code}/{questionID}/post/responses/403`.
+            /// - Remark: Generated from `#/paths//room/{code}/{questionID}/vote/post/responses/403`.
             ///
             /// HTTP response code: `403 forbidden`.
             public static var forbidden: Self {
@@ -3647,13 +3647,13 @@ public enum Operations {
             }
             /// The room does not exist
             ///
-            /// - Remark: Generated from `#/paths//room/vote/{code}/{questionID}/post/responses/404`.
+            /// - Remark: Generated from `#/paths//room/{code}/{questionID}/vote/post/responses/404`.
             ///
             /// HTTP response code: `404 notFound`.
             case notFound(Components.Responses.InvalidRoomCode)
             /// The room does not exist
             ///
-            /// - Remark: Generated from `#/paths//room/vote/{code}/{questionID}/post/responses/404`.
+            /// - Remark: Generated from `#/paths//room/{code}/{questionID}/vote/post/responses/404`.
             ///
             /// HTTP response code: `404 notFound`.
             public static var notFound: Self {
@@ -3684,20 +3684,20 @@ public enum Operations {
     }
     /// Check the result of the question
     ///
-    /// - Remark: HTTP `GET /room/question-result/{code}/{questionID}`.
-    /// - Remark: Generated from `#/paths//room/question-result/{code}/{questionID}/get`.
-    public enum GetRoomQuestionResultCodeQuestionID {
-        public static let id: Swift.String = "get/room/question-result/{code}/{questionID}"
+    /// - Remark: HTTP `GET /room/{code}/{questionID}/result`.
+    /// - Remark: Generated from `#/paths//room/{code}/{questionID}/result/get`.
+    public enum GetRoomCodeQuestionIDResult {
+        public static let id: Swift.String = "get/room/{code}/{questionID}/result"
         public struct Input: Sendable, Hashable {
-            /// - Remark: Generated from `#/paths/room/question-result/{code}/{questionID}/GET/path`.
+            /// - Remark: Generated from `#/paths/room/{code}/{questionID}/result/GET/path`.
             public struct Path: Sendable, Hashable {
                 /// A code uniquely identifying an alive room.
                 ///
-                /// - Remark: Generated from `#/paths/room/question-result/{code}/{questionID}/GET/path/code`.
+                /// - Remark: Generated from `#/paths/room/{code}/{questionID}/result/GET/path/code`.
                 public var code: Components.Parameters.RoomCode
                 /// The id uniquely identifying the question. This is used to make sure that the client is voting on the question they expect.
                 ///
-                /// - Remark: Generated from `#/paths/room/question-result/{code}/{questionID}/GET/path/questionID`.
+                /// - Remark: Generated from `#/paths/room/{code}/{questionID}/result/GET/path/questionID`.
                 public var questionID: Components.Parameters.QuestionID
                 /// Creates a new `Path`.
                 ///
@@ -3712,27 +3712,27 @@ public enum Operations {
                     self.questionID = questionID
                 }
             }
-            public var path: Operations.GetRoomQuestionResultCodeQuestionID.Input.Path
-            /// - Remark: Generated from `#/paths/room/question-result/{code}/{questionID}/GET/header`.
+            public var path: Operations.GetRoomCodeQuestionIDResult.Input.Path
+            /// - Remark: Generated from `#/paths/room/{code}/{questionID}/result/GET/header`.
             public struct Headers: Sendable, Hashable {
-                public var accept: [OpenAPIRuntime.AcceptHeaderContentType<Operations.GetRoomQuestionResultCodeQuestionID.AcceptableContentType>]
+                public var accept: [OpenAPIRuntime.AcceptHeaderContentType<Operations.GetRoomCodeQuestionIDResult.AcceptableContentType>]
                 /// Creates a new `Headers`.
                 ///
                 /// - Parameters:
                 ///   - accept:
-                public init(accept: [OpenAPIRuntime.AcceptHeaderContentType<Operations.GetRoomQuestionResultCodeQuestionID.AcceptableContentType>] = .defaultValues()) {
+                public init(accept: [OpenAPIRuntime.AcceptHeaderContentType<Operations.GetRoomCodeQuestionIDResult.AcceptableContentType>] = .defaultValues()) {
                     self.accept = accept
                 }
             }
-            public var headers: Operations.GetRoomQuestionResultCodeQuestionID.Input.Headers
+            public var headers: Operations.GetRoomCodeQuestionIDResult.Input.Headers
             /// Creates a new `Input`.
             ///
             /// - Parameters:
             ///   - path:
             ///   - headers:
             public init(
-                path: Operations.GetRoomQuestionResultCodeQuestionID.Input.Path,
-                headers: Operations.GetRoomQuestionResultCodeQuestionID.Input.Headers = .init()
+                path: Operations.GetRoomCodeQuestionIDResult.Input.Path,
+                headers: Operations.GetRoomCodeQuestionIDResult.Input.Headers = .init()
             ) {
                 self.path = path
                 self.headers = headers
@@ -3740,9 +3740,9 @@ public enum Operations {
         }
         @frozen public enum Output: Sendable, Hashable {
             public struct Ok: Sendable, Hashable {
-                /// - Remark: Generated from `#/paths/room/question-result/{code}/{questionID}/GET/responses/200/content`.
+                /// - Remark: Generated from `#/paths/room/{code}/{questionID}/result/GET/responses/200/content`.
                 @frozen public enum Body: Sendable, Hashable {
-                    /// - Remark: Generated from `#/paths/room/question-result/{code}/{questionID}/GET/responses/200/content/application\/json`.
+                    /// - Remark: Generated from `#/paths/room/{code}/{questionID}/result/GET/responses/200/content/application\/json`.
                     case json(Components.Schemas.QuestionFinalInfo)
                     /// The associated value of the enum case if `self` is `.json`.
                     ///
@@ -3758,26 +3758,26 @@ public enum Operations {
                     }
                 }
                 /// Received HTTP response body
-                public var body: Operations.GetRoomQuestionResultCodeQuestionID.Output.Ok.Body
+                public var body: Operations.GetRoomCodeQuestionIDResult.Output.Ok.Body
                 /// Creates a new `Ok`.
                 ///
                 /// - Parameters:
                 ///   - body: Received HTTP response body
-                public init(body: Operations.GetRoomQuestionResultCodeQuestionID.Output.Ok.Body) {
+                public init(body: Operations.GetRoomCodeQuestionIDResult.Output.Ok.Body) {
                     self.body = body
                 }
             }
             /// The result was found
             ///
-            /// - Remark: Generated from `#/paths//room/question-result/{code}/{questionID}/get/responses/200`.
+            /// - Remark: Generated from `#/paths//room/{code}/{questionID}/result/get/responses/200`.
             ///
             /// HTTP response code: `200 ok`.
-            case ok(Operations.GetRoomQuestionResultCodeQuestionID.Output.Ok)
+            case ok(Operations.GetRoomCodeQuestionIDResult.Output.Ok)
             /// The associated value of the enum case if `self` is `.ok`.
             ///
             /// - Throws: An error if `self` is not `.ok`.
             /// - SeeAlso: `.ok`.
-            public var ok: Operations.GetRoomQuestionResultCodeQuestionID.Output.Ok {
+            public var ok: Operations.GetRoomCodeQuestionIDResult.Output.Ok {
                 get throws {
                     switch self {
                     case let .ok(response):
@@ -3791,9 +3791,9 @@ public enum Operations {
                 }
             }
             public struct BadRequest: Sendable, Hashable {
-                /// - Remark: Generated from `#/paths/room/question-result/{code}/{questionID}/GET/responses/400/content`.
+                /// - Remark: Generated from `#/paths/room/{code}/{questionID}/result/GET/responses/400/content`.
                 @frozen public enum Body: Sendable, Hashable {
-                    /// - Remark: Generated from `#/paths/room/question-result/{code}/{questionID}/GET/responses/400/content/application\/json`.
+                    /// - Remark: Generated from `#/paths/room/{code}/{questionID}/result/GET/responses/400/content/application\/json`.
                     case json(Components.Schemas.QuestionStateError)
                     /// The associated value of the enum case if `self` is `.json`.
                     ///
@@ -3809,26 +3809,26 @@ public enum Operations {
                     }
                 }
                 /// Received HTTP response body
-                public var body: Operations.GetRoomQuestionResultCodeQuestionID.Output.BadRequest.Body
+                public var body: Operations.GetRoomCodeQuestionIDResult.Output.BadRequest.Body
                 /// Creates a new `BadRequest`.
                 ///
                 /// - Parameters:
                 ///   - body: Received HTTP response body
-                public init(body: Operations.GetRoomQuestionResultCodeQuestionID.Output.BadRequest.Body) {
+                public init(body: Operations.GetRoomCodeQuestionIDResult.Output.BadRequest.Body) {
                     self.body = body
                 }
             }
             /// The question does not have a result
             ///
-            /// - Remark: Generated from `#/paths//room/question-result/{code}/{questionID}/get/responses/400`.
+            /// - Remark: Generated from `#/paths//room/{code}/{questionID}/result/get/responses/400`.
             ///
             /// HTTP response code: `400 badRequest`.
-            case badRequest(Operations.GetRoomQuestionResultCodeQuestionID.Output.BadRequest)
+            case badRequest(Operations.GetRoomCodeQuestionIDResult.Output.BadRequest)
             /// The associated value of the enum case if `self` is `.badRequest`.
             ///
             /// - Throws: An error if `self` is not `.badRequest`.
             /// - SeeAlso: `.badRequest`.
-            public var badRequest: Operations.GetRoomQuestionResultCodeQuestionID.Output.BadRequest {
+            public var badRequest: Operations.GetRoomCodeQuestionIDResult.Output.BadRequest {
                 get throws {
                     switch self {
                     case let .badRequest(response):
@@ -3843,7 +3843,7 @@ public enum Operations {
             }
             /// Either the room or question was not found
             ///
-            /// - Remark: Generated from `#/paths//room/question-result/{code}/{questionID}/get/responses/404`.
+            /// - Remark: Generated from `#/paths//room/{code}/{questionID}/result/get/responses/404`.
             ///
             /// HTTP response code: `404 notFound`.
             case notFound(Components.Responses.RoomOrQuestionNotFound)
@@ -3899,20 +3899,20 @@ public enum Operations {
     ///
     /// This information is limited intentionally to prevent spoiling the vote.
     ///
-    /// - Remark: HTTP `GET /room/question-votes-info/{code}/{questionID}`.
-    /// - Remark: Generated from `#/paths//room/question-votes-info/{code}/{questionID}/get`.
-    public enum GetRoomQuestionVotesInfoCodeQuestionID {
-        public static let id: Swift.String = "get/room/question-votes-info/{code}/{questionID}"
+    /// - Remark: HTTP `GET /room/{code}/{questionID}/votes-info`.
+    /// - Remark: Generated from `#/paths//room/{code}/{questionID}/votes-info/get`.
+    public enum GetRoomCodeQuestionIDVotesInfo {
+        public static let id: Swift.String = "get/room/{code}/{questionID}/votes-info"
         public struct Input: Sendable, Hashable {
-            /// - Remark: Generated from `#/paths/room/question-votes-info/{code}/{questionID}/GET/path`.
+            /// - Remark: Generated from `#/paths/room/{code}/{questionID}/votes-info/GET/path`.
             public struct Path: Sendable, Hashable {
                 /// A code uniquely identifying an alive room.
                 ///
-                /// - Remark: Generated from `#/paths/room/question-votes-info/{code}/{questionID}/GET/path/code`.
+                /// - Remark: Generated from `#/paths/room/{code}/{questionID}/votes-info/GET/path/code`.
                 public var code: Components.Parameters.RoomCode
                 /// The id uniquely identifying the question. This is used to make sure that the client is voting on the question they expect.
                 ///
-                /// - Remark: Generated from `#/paths/room/question-votes-info/{code}/{questionID}/GET/path/questionID`.
+                /// - Remark: Generated from `#/paths/room/{code}/{questionID}/votes-info/GET/path/questionID`.
                 public var questionID: Components.Parameters.QuestionID
                 /// Creates a new `Path`.
                 ///
@@ -3927,14 +3927,14 @@ public enum Operations {
                     self.questionID = questionID
                 }
             }
-            public var path: Operations.GetRoomQuestionVotesInfoCodeQuestionID.Input.Path
-            /// - Remark: Generated from `#/paths/room/question-votes-info/{code}/{questionID}/GET/header`.
+            public var path: Operations.GetRoomCodeQuestionIDVotesInfo.Input.Path
+            /// - Remark: Generated from `#/paths/room/{code}/{questionID}/votes-info/GET/header`.
             public struct Headers: Sendable, Hashable {
                 /// To ensure that only an admin is able to make privileged actions to a room. The token is provided to the room creator as a response to the create request.
                 ///
-                /// - Remark: Generated from `#/paths/room/question-votes-info/{code}/{questionID}/GET/header/Room-Admin-Token`.
+                /// - Remark: Generated from `#/paths/room/{code}/{questionID}/votes-info/GET/header/Room-Admin-Token`.
                 public var roomAdminToken: Components.Parameters.AdminToken
-                public var accept: [OpenAPIRuntime.AcceptHeaderContentType<Operations.GetRoomQuestionVotesInfoCodeQuestionID.AcceptableContentType>]
+                public var accept: [OpenAPIRuntime.AcceptHeaderContentType<Operations.GetRoomCodeQuestionIDVotesInfo.AcceptableContentType>]
                 /// Creates a new `Headers`.
                 ///
                 /// - Parameters:
@@ -3942,21 +3942,21 @@ public enum Operations {
                 ///   - accept:
                 public init(
                     roomAdminToken: Components.Parameters.AdminToken,
-                    accept: [OpenAPIRuntime.AcceptHeaderContentType<Operations.GetRoomQuestionVotesInfoCodeQuestionID.AcceptableContentType>] = .defaultValues()
+                    accept: [OpenAPIRuntime.AcceptHeaderContentType<Operations.GetRoomCodeQuestionIDVotesInfo.AcceptableContentType>] = .defaultValues()
                 ) {
                     self.roomAdminToken = roomAdminToken
                     self.accept = accept
                 }
             }
-            public var headers: Operations.GetRoomQuestionVotesInfoCodeQuestionID.Input.Headers
+            public var headers: Operations.GetRoomCodeQuestionIDVotesInfo.Input.Headers
             /// Creates a new `Input`.
             ///
             /// - Parameters:
             ///   - path:
             ///   - headers:
             public init(
-                path: Operations.GetRoomQuestionVotesInfoCodeQuestionID.Input.Path,
-                headers: Operations.GetRoomQuestionVotesInfoCodeQuestionID.Input.Headers
+                path: Operations.GetRoomCodeQuestionIDVotesInfo.Input.Path,
+                headers: Operations.GetRoomCodeQuestionIDVotesInfo.Input.Headers
             ) {
                 self.path = path
                 self.headers = headers
@@ -3964,9 +3964,9 @@ public enum Operations {
         }
         @frozen public enum Output: Sendable, Hashable {
             public struct Ok: Sendable, Hashable {
-                /// - Remark: Generated from `#/paths/room/question-votes-info/{code}/{questionID}/GET/responses/200/content`.
+                /// - Remark: Generated from `#/paths/room/{code}/{questionID}/votes-info/GET/responses/200/content`.
                 @frozen public enum Body: Sendable, Hashable {
-                    /// - Remark: Generated from `#/paths/room/question-votes-info/{code}/{questionID}/GET/responses/200/content/application\/json`.
+                    /// - Remark: Generated from `#/paths/room/{code}/{questionID}/votes-info/GET/responses/200/content/application\/json`.
                     case json(Components.Schemas.QuestionVotesInfo)
                     /// The associated value of the enum case if `self` is `.json`.
                     ///
@@ -3982,26 +3982,26 @@ public enum Operations {
                     }
                 }
                 /// Received HTTP response body
-                public var body: Operations.GetRoomQuestionVotesInfoCodeQuestionID.Output.Ok.Body
+                public var body: Operations.GetRoomCodeQuestionIDVotesInfo.Output.Ok.Body
                 /// Creates a new `Ok`.
                 ///
                 /// - Parameters:
                 ///   - body: Received HTTP response body
-                public init(body: Operations.GetRoomQuestionVotesInfoCodeQuestionID.Output.Ok.Body) {
+                public init(body: Operations.GetRoomCodeQuestionIDVotesInfo.Output.Ok.Body) {
                     self.body = body
                 }
             }
             /// The question could be found, and the admin token is valid
             ///
-            /// - Remark: Generated from `#/paths//room/question-votes-info/{code}/{questionID}/get/responses/200`.
+            /// - Remark: Generated from `#/paths//room/{code}/{questionID}/votes-info/get/responses/200`.
             ///
             /// HTTP response code: `200 ok`.
-            case ok(Operations.GetRoomQuestionVotesInfoCodeQuestionID.Output.Ok)
+            case ok(Operations.GetRoomCodeQuestionIDVotesInfo.Output.Ok)
             /// The associated value of the enum case if `self` is `.ok`.
             ///
             /// - Throws: An error if `self` is not `.ok`.
             /// - SeeAlso: `.ok`.
-            public var ok: Operations.GetRoomQuestionVotesInfoCodeQuestionID.Output.Ok {
+            public var ok: Operations.GetRoomCodeQuestionIDVotesInfo.Output.Ok {
                 get throws {
                     switch self {
                     case let .ok(response):
@@ -4016,7 +4016,7 @@ public enum Operations {
             }
             /// Either the admin token was not provided, or it is invalid
             ///
-            /// - Remark: Generated from `#/paths//room/question-votes-info/{code}/{questionID}/get/responses/403`.
+            /// - Remark: Generated from `#/paths//room/{code}/{questionID}/votes-info/get/responses/403`.
             ///
             /// HTTP response code: `403 forbidden`.
             case forbidden(Components.Responses.RoomAdminTokenInvalid)
@@ -4039,7 +4039,7 @@ public enum Operations {
             }
             /// Either the room or question was not found
             ///
-            /// - Remark: Generated from `#/paths//room/question-votes-info/{code}/{questionID}/get/responses/404`.
+            /// - Remark: Generated from `#/paths//room/{code}/{questionID}/votes-info/get/responses/404`.
             ///
             /// HTTP response code: `404 notFound`.
             case notFound(Components.Responses.RoomOrQuestionNotFound)

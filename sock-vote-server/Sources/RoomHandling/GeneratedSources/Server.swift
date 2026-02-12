@@ -43,124 +43,124 @@ extension APIProtocol {
         )
         try transport.register(
             {
-                try await server.getRoomInfoCode(
+                try await server.getRoomCodeInfo(
                     request: $0,
                     body: $1,
                     metadata: $2
                 )
             },
             method: .get,
-            path: server.apiPathComponentsWithServerPrefix("/room/info/{code}")
+            path: server.apiPathComponentsWithServerPrefix("/room/{code}/info")
         )
         try transport.register(
             {
-                try await server.postRoomJoinCode(
+                try await server.postRoomCodeJoin(
                     request: $0,
                     body: $1,
                     metadata: $2
                 )
             },
             method: .post,
-            path: server.apiPathComponentsWithServerPrefix("/room/join/{code}")
+            path: server.apiPathComponentsWithServerPrefix("/room/{code}/join")
         )
         try transport.register(
             {
-                try await server.getRoomJoinRequestsCode(
+                try await server.getRoomCodeJoinRequests(
                     request: $0,
                     body: $1,
                     metadata: $2
                 )
             },
             method: .get,
-            path: server.apiPathComponentsWithServerPrefix("/room/join-requests/{code}")
+            path: server.apiPathComponentsWithServerPrefix("/room/{code}/join-requests")
         )
         try transport.register(
             {
-                try await server.postRoomJoinRequestsCode(
+                try await server.postRoomCodeJoinRequests(
                     request: $0,
                     body: $1,
                     metadata: $2
                 )
             },
             method: .post,
-            path: server.apiPathComponentsWithServerPrefix("/room/join-requests/{code}")
+            path: server.apiPathComponentsWithServerPrefix("/room/{code}/join-requests")
         )
         try transport.register(
             {
-                try await server.getRoomQuestionCode(
+                try await server.getRoomCodeQuestion(
                     request: $0,
                     body: $1,
                     metadata: $2
                 )
             },
             method: .get,
-            path: server.apiPathComponentsWithServerPrefix("/room/question/{code}")
+            path: server.apiPathComponentsWithServerPrefix("/room/{code}/question")
         )
         try transport.register(
             {
-                try await server.postRoomQuestionCode(
+                try await server.postRoomCodeQuestion(
                     request: $0,
                     body: $1,
                     metadata: $2
                 )
             },
             method: .post,
-            path: server.apiPathComponentsWithServerPrefix("/room/question/{code}")
+            path: server.apiPathComponentsWithServerPrefix("/room/{code}/question")
         )
         try transport.register(
             {
-                try await server.putRoomQuestionCodeQuestionID(
+                try await server.putRoomCodeQuestionID(
                     request: $0,
                     body: $1,
                     metadata: $2
                 )
             },
             method: .put,
-            path: server.apiPathComponentsWithServerPrefix("/room/question/{code}/{questionID}")
+            path: server.apiPathComponentsWithServerPrefix("/room/{code}/{questionID}")
         )
         try transport.register(
             {
-                try await server.deleteRoomQuestionCodeQuestionID(
+                try await server.deleteRoomCodeQuestionID(
                     request: $0,
                     body: $1,
                     metadata: $2
                 )
             },
             method: .delete,
-            path: server.apiPathComponentsWithServerPrefix("/room/question/{code}/{questionID}")
+            path: server.apiPathComponentsWithServerPrefix("/room/{code}/{questionID}")
         )
         try transport.register(
             {
-                try await server.postRoomVoteCodeQuestionID(
+                try await server.postRoomCodeQuestionIDVote(
                     request: $0,
                     body: $1,
                     metadata: $2
                 )
             },
             method: .post,
-            path: server.apiPathComponentsWithServerPrefix("/room/vote/{code}/{questionID}")
+            path: server.apiPathComponentsWithServerPrefix("/room/{code}/{questionID}/vote")
         )
         try transport.register(
             {
-                try await server.getRoomQuestionResultCodeQuestionID(
+                try await server.getRoomCodeQuestionIDResult(
                     request: $0,
                     body: $1,
                     metadata: $2
                 )
             },
             method: .get,
-            path: server.apiPathComponentsWithServerPrefix("/room/question-result/{code}/{questionID}")
+            path: server.apiPathComponentsWithServerPrefix("/room/{code}/{questionID}/result")
         )
         try transport.register(
             {
-                try await server.getRoomQuestionVotesInfoCodeQuestionID(
+                try await server.getRoomCodeQuestionIDVotesInfo(
                     request: $0,
                     body: $1,
                     metadata: $2
                 )
             },
             method: .get,
-            path: server.apiPathComponentsWithServerPrefix("/room/question-votes-info/{code}/{questionID}")
+            path: server.apiPathComponentsWithServerPrefix("/room/{code}/{questionID}/votes-info")
         )
     }
 }
@@ -260,9 +260,9 @@ fileprivate extension UniversalServer where APIHandler: APIProtocol {
     ///
     /// Provides information about a room, like whether the room code corresponds to a valid room
     ///
-    /// - Remark: HTTP `GET /room/info/{code}`.
-    /// - Remark: Generated from `#/paths//room/info/{code}/get`.
-    func getRoomInfoCode(
+    /// - Remark: HTTP `GET /room/{code}/info`.
+    /// - Remark: Generated from `#/paths//room/{code}/info/get`.
+    func getRoomCodeInfo(
         request: HTTPTypes.HTTPRequest,
         body: OpenAPIRuntime.HTTPBody?,
         metadata: OpenAPIRuntime.ServerRequestMetadata
@@ -271,18 +271,18 @@ fileprivate extension UniversalServer where APIHandler: APIProtocol {
             request: request,
             requestBody: body,
             metadata: metadata,
-            forOperation: Operations.GetRoomInfoCode.id,
+            forOperation: Operations.GetRoomCodeInfo.id,
             using: {
-                APIHandler.getRoomInfoCode($0)
+                APIHandler.getRoomCodeInfo($0)
             },
             deserializer: { request, requestBody, metadata in
-                let path: Operations.GetRoomInfoCode.Input.Path = .init(code: try converter.getPathParameterAsURI(
+                let path: Operations.GetRoomCodeInfo.Input.Path = .init(code: try converter.getPathParameterAsURI(
                     in: metadata.pathParameters,
                     name: "code",
                     as: Components.Parameters.RoomCode.self
                 ))
-                let headers: Operations.GetRoomInfoCode.Input.Headers = .init(accept: try converter.extractAcceptHeaderIfPresent(in: request.headerFields))
-                return Operations.GetRoomInfoCode.Input(
+                let headers: Operations.GetRoomCodeInfo.Input.Headers = .init(accept: try converter.extractAcceptHeaderIfPresent(in: request.headerFields))
+                return Operations.GetRoomCodeInfo.Input(
                     path: path,
                     headers: headers
                 )
@@ -322,9 +322,9 @@ fileprivate extension UniversalServer where APIHandler: APIProtocol {
     ///
     /// This route only asks the room owner whether to allow you to join the room, it doesn't actually open a connection to the room. To do that, use the `/room/connect/{code}` route.
     ///
-    /// - Remark: HTTP `POST /room/join/{code}`.
-    /// - Remark: Generated from `#/paths//room/join/{code}/post`.
-    func postRoomJoinCode(
+    /// - Remark: HTTP `POST /room/{code}/join`.
+    /// - Remark: Generated from `#/paths//room/{code}/join/post`.
+    func postRoomCodeJoin(
         request: HTTPTypes.HTTPRequest,
         body: OpenAPIRuntime.HTTPBody?,
         metadata: OpenAPIRuntime.ServerRequestMetadata
@@ -333,19 +333,19 @@ fileprivate extension UniversalServer where APIHandler: APIProtocol {
             request: request,
             requestBody: body,
             metadata: metadata,
-            forOperation: Operations.PostRoomJoinCode.id,
+            forOperation: Operations.PostRoomCodeJoin.id,
             using: {
-                APIHandler.postRoomJoinCode($0)
+                APIHandler.postRoomCodeJoin($0)
             },
             deserializer: { request, requestBody, metadata in
-                let path: Operations.PostRoomJoinCode.Input.Path = .init(code: try converter.getPathParameterAsURI(
+                let path: Operations.PostRoomCodeJoin.Input.Path = .init(code: try converter.getPathParameterAsURI(
                     in: metadata.pathParameters,
                     name: "code",
                     as: Components.Parameters.RoomCode.self
                 ))
-                let headers: Operations.PostRoomJoinCode.Input.Headers = .init(accept: try converter.extractAcceptHeaderIfPresent(in: request.headerFields))
+                let headers: Operations.PostRoomCodeJoin.Input.Headers = .init(accept: try converter.extractAcceptHeaderIfPresent(in: request.headerFields))
                 let contentType = converter.extractContentTypeIfPresent(in: request.headerFields)
-                let body: Operations.PostRoomJoinCode.Input.Body
+                let body: Operations.PostRoomCodeJoin.Input.Body
                 let chosenContentType = try converter.bestContentType(
                     received: contentType,
                     options: [
@@ -355,7 +355,7 @@ fileprivate extension UniversalServer where APIHandler: APIProtocol {
                 switch chosenContentType {
                 case "application/json":
                     body = try await converter.getRequiredRequestBodyAsJSON(
-                        Operations.PostRoomJoinCode.Input.Body.JsonPayload.self,
+                        Operations.PostRoomCodeJoin.Input.Body.JsonPayload.self,
                         from: requestBody,
                         transforming: { value in
                             .json(value)
@@ -364,7 +364,7 @@ fileprivate extension UniversalServer where APIHandler: APIProtocol {
                 default:
                     preconditionFailure("bestContentType chose an invalid content type.")
                 }
-                return Operations.PostRoomJoinCode.Input(
+                return Operations.PostRoomCodeJoin.Input(
                     path: path,
                     headers: headers,
                     body: body
@@ -410,9 +410,9 @@ fileprivate extension UniversalServer where APIHandler: APIProtocol {
     ///
     /// Allows an admin to view pending join requests for a room
     ///
-    /// - Remark: HTTP `GET /room/join-requests/{code}`.
-    /// - Remark: Generated from `#/paths//room/join-requests/{code}/get`.
-    func getRoomJoinRequestsCode(
+    /// - Remark: HTTP `GET /room/{code}/join-requests`.
+    /// - Remark: Generated from `#/paths//room/{code}/join-requests/get`.
+    func getRoomCodeJoinRequests(
         request: HTTPTypes.HTTPRequest,
         body: OpenAPIRuntime.HTTPBody?,
         metadata: OpenAPIRuntime.ServerRequestMetadata
@@ -421,17 +421,17 @@ fileprivate extension UniversalServer where APIHandler: APIProtocol {
             request: request,
             requestBody: body,
             metadata: metadata,
-            forOperation: Operations.GetRoomJoinRequestsCode.id,
+            forOperation: Operations.GetRoomCodeJoinRequests.id,
             using: {
-                APIHandler.getRoomJoinRequestsCode($0)
+                APIHandler.getRoomCodeJoinRequests($0)
             },
             deserializer: { request, requestBody, metadata in
-                let path: Operations.GetRoomJoinRequestsCode.Input.Path = .init(code: try converter.getPathParameterAsURI(
+                let path: Operations.GetRoomCodeJoinRequests.Input.Path = .init(code: try converter.getPathParameterAsURI(
                     in: metadata.pathParameters,
                     name: "code",
                     as: Components.Parameters.RoomCode.self
                 ))
-                let headers: Operations.GetRoomJoinRequestsCode.Input.Headers = .init(
+                let headers: Operations.GetRoomCodeJoinRequests.Input.Headers = .init(
                     roomAdminToken: try converter.getRequiredHeaderFieldAsURI(
                         in: request.headerFields,
                         name: "Room-Admin-Token",
@@ -439,7 +439,7 @@ fileprivate extension UniversalServer where APIHandler: APIProtocol {
                     ),
                     accept: try converter.extractAcceptHeaderIfPresent(in: request.headerFields)
                 )
-                return Operations.GetRoomJoinRequestsCode.Input(
+                return Operations.GetRoomCodeJoinRequests.Input(
                     path: path,
                     headers: headers
                 )
@@ -484,9 +484,9 @@ fileprivate extension UniversalServer where APIHandler: APIProtocol {
     ///
     /// Allows a room admin to accept or reject join requests.
     ///
-    /// - Remark: HTTP `POST /room/join-requests/{code}`.
-    /// - Remark: Generated from `#/paths//room/join-requests/{code}/post`.
-    func postRoomJoinRequestsCode(
+    /// - Remark: HTTP `POST /room/{code}/join-requests`.
+    /// - Remark: Generated from `#/paths//room/{code}/join-requests/post`.
+    func postRoomCodeJoinRequests(
         request: HTTPTypes.HTTPRequest,
         body: OpenAPIRuntime.HTTPBody?,
         metadata: OpenAPIRuntime.ServerRequestMetadata
@@ -495,17 +495,17 @@ fileprivate extension UniversalServer where APIHandler: APIProtocol {
             request: request,
             requestBody: body,
             metadata: metadata,
-            forOperation: Operations.PostRoomJoinRequestsCode.id,
+            forOperation: Operations.PostRoomCodeJoinRequests.id,
             using: {
-                APIHandler.postRoomJoinRequestsCode($0)
+                APIHandler.postRoomCodeJoinRequests($0)
             },
             deserializer: { request, requestBody, metadata in
-                let path: Operations.PostRoomJoinRequestsCode.Input.Path = .init(code: try converter.getPathParameterAsURI(
+                let path: Operations.PostRoomCodeJoinRequests.Input.Path = .init(code: try converter.getPathParameterAsURI(
                     in: metadata.pathParameters,
                     name: "code",
                     as: Components.Parameters.RoomCode.self
                 ))
-                let headers: Operations.PostRoomJoinRequestsCode.Input.Headers = .init(
+                let headers: Operations.PostRoomCodeJoinRequests.Input.Headers = .init(
                     roomAdminToken: try converter.getRequiredHeaderFieldAsURI(
                         in: request.headerFields,
                         name: "Room-Admin-Token",
@@ -514,7 +514,7 @@ fileprivate extension UniversalServer where APIHandler: APIProtocol {
                     accept: try converter.extractAcceptHeaderIfPresent(in: request.headerFields)
                 )
                 let contentType = converter.extractContentTypeIfPresent(in: request.headerFields)
-                let body: Operations.PostRoomJoinRequestsCode.Input.Body
+                let body: Operations.PostRoomCodeJoinRequests.Input.Body
                 let chosenContentType = try converter.bestContentType(
                     received: contentType,
                     options: [
@@ -524,7 +524,7 @@ fileprivate extension UniversalServer where APIHandler: APIProtocol {
                 switch chosenContentType {
                 case "application/json":
                     body = try await converter.getRequiredRequestBodyAsJSON(
-                        Operations.PostRoomJoinRequestsCode.Input.Body.JsonPayload.self,
+                        Operations.PostRoomCodeJoinRequests.Input.Body.JsonPayload.self,
                         from: requestBody,
                         transforming: { value in
                             .json(value)
@@ -533,7 +533,7 @@ fileprivate extension UniversalServer where APIHandler: APIProtocol {
                 default:
                     preconditionFailure("bestContentType chose an invalid content type.")
                 }
-                return Operations.PostRoomJoinRequestsCode.Input(
+                return Operations.PostRoomCodeJoinRequests.Input(
                     path: path,
                     headers: headers,
                     body: body
@@ -595,9 +595,9 @@ fileprivate extension UniversalServer where APIHandler: APIProtocol {
     }
     /// Get the active question
     ///
-    /// - Remark: HTTP `GET /room/question/{code}`.
-    /// - Remark: Generated from `#/paths//room/question/{code}/get`.
-    func getRoomQuestionCode(
+    /// - Remark: HTTP `GET /room/{code}/question`.
+    /// - Remark: Generated from `#/paths//room/{code}/question/get`.
+    func getRoomCodeQuestion(
         request: HTTPTypes.HTTPRequest,
         body: OpenAPIRuntime.HTTPBody?,
         metadata: OpenAPIRuntime.ServerRequestMetadata
@@ -606,18 +606,18 @@ fileprivate extension UniversalServer where APIHandler: APIProtocol {
             request: request,
             requestBody: body,
             metadata: metadata,
-            forOperation: Operations.GetRoomQuestionCode.id,
+            forOperation: Operations.GetRoomCodeQuestion.id,
             using: {
-                APIHandler.getRoomQuestionCode($0)
+                APIHandler.getRoomCodeQuestion($0)
             },
             deserializer: { request, requestBody, metadata in
-                let path: Operations.GetRoomQuestionCode.Input.Path = .init(code: try converter.getPathParameterAsURI(
+                let path: Operations.GetRoomCodeQuestion.Input.Path = .init(code: try converter.getPathParameterAsURI(
                     in: metadata.pathParameters,
                     name: "code",
                     as: Components.Parameters.RoomCode.self
                 ))
-                let headers: Operations.GetRoomQuestionCode.Input.Headers = .init(accept: try converter.extractAcceptHeaderIfPresent(in: request.headerFields))
-                return Operations.GetRoomQuestionCode.Input(
+                let headers: Operations.GetRoomCodeQuestion.Input.Headers = .init(accept: try converter.extractAcceptHeaderIfPresent(in: request.headerFields))
+                return Operations.GetRoomCodeQuestion.Input(
                     path: path,
                     headers: headers
                 )
@@ -660,9 +660,9 @@ fileprivate extension UniversalServer where APIHandler: APIProtocol {
     }
     /// Submit a new question
     ///
-    /// - Remark: HTTP `POST /room/question/{code}`.
-    /// - Remark: Generated from `#/paths//room/question/{code}/post`.
-    func postRoomQuestionCode(
+    /// - Remark: HTTP `POST /room/{code}/question`.
+    /// - Remark: Generated from `#/paths//room/{code}/question/post`.
+    func postRoomCodeQuestion(
         request: HTTPTypes.HTTPRequest,
         body: OpenAPIRuntime.HTTPBody?,
         metadata: OpenAPIRuntime.ServerRequestMetadata
@@ -671,17 +671,17 @@ fileprivate extension UniversalServer where APIHandler: APIProtocol {
             request: request,
             requestBody: body,
             metadata: metadata,
-            forOperation: Operations.PostRoomQuestionCode.id,
+            forOperation: Operations.PostRoomCodeQuestion.id,
             using: {
-                APIHandler.postRoomQuestionCode($0)
+                APIHandler.postRoomCodeQuestion($0)
             },
             deserializer: { request, requestBody, metadata in
-                let path: Operations.PostRoomQuestionCode.Input.Path = .init(code: try converter.getPathParameterAsURI(
+                let path: Operations.PostRoomCodeQuestion.Input.Path = .init(code: try converter.getPathParameterAsURI(
                     in: metadata.pathParameters,
                     name: "code",
                     as: Components.Parameters.RoomCode.self
                 ))
-                let headers: Operations.PostRoomQuestionCode.Input.Headers = .init(
+                let headers: Operations.PostRoomCodeQuestion.Input.Headers = .init(
                     roomAdminToken: try converter.getRequiredHeaderFieldAsURI(
                         in: request.headerFields,
                         name: "Room-Admin-Token",
@@ -690,7 +690,7 @@ fileprivate extension UniversalServer where APIHandler: APIProtocol {
                     accept: try converter.extractAcceptHeaderIfPresent(in: request.headerFields)
                 )
                 let contentType = converter.extractContentTypeIfPresent(in: request.headerFields)
-                let body: Operations.PostRoomQuestionCode.Input.Body
+                let body: Operations.PostRoomCodeQuestion.Input.Body
                 let chosenContentType = try converter.bestContentType(
                     received: contentType,
                     options: [
@@ -709,7 +709,7 @@ fileprivate extension UniversalServer where APIHandler: APIProtocol {
                 default:
                     preconditionFailure("bestContentType chose an invalid content type.")
                 }
-                return Operations.PostRoomQuestionCode.Input(
+                return Operations.PostRoomCodeQuestion.Input(
                     path: path,
                     headers: headers,
                     body: body
@@ -791,9 +791,9 @@ fileprivate extension UniversalServer where APIHandler: APIProtocol {
     ///
     /// Modify attributes of the current question
     ///
-    /// - Remark: HTTP `PUT /room/question/{code}/{questionID}`.
-    /// - Remark: Generated from `#/paths//room/question/{code}/{questionID}/put`.
-    func putRoomQuestionCodeQuestionID(
+    /// - Remark: HTTP `PUT /room/{code}/{questionID}`.
+    /// - Remark: Generated from `#/paths//room/{code}/{questionID}/put`.
+    func putRoomCodeQuestionID(
         request: HTTPTypes.HTTPRequest,
         body: OpenAPIRuntime.HTTPBody?,
         metadata: OpenAPIRuntime.ServerRequestMetadata
@@ -802,12 +802,12 @@ fileprivate extension UniversalServer where APIHandler: APIProtocol {
             request: request,
             requestBody: body,
             metadata: metadata,
-            forOperation: Operations.PutRoomQuestionCodeQuestionID.id,
+            forOperation: Operations.PutRoomCodeQuestionID.id,
             using: {
-                APIHandler.putRoomQuestionCodeQuestionID($0)
+                APIHandler.putRoomCodeQuestionID($0)
             },
             deserializer: { request, requestBody, metadata in
-                let path: Operations.PutRoomQuestionCodeQuestionID.Input.Path = .init(
+                let path: Operations.PutRoomCodeQuestionID.Input.Path = .init(
                     code: try converter.getPathParameterAsURI(
                         in: metadata.pathParameters,
                         name: "code",
@@ -819,13 +819,13 @@ fileprivate extension UniversalServer where APIHandler: APIProtocol {
                         as: Components.Parameters.QuestionID.self
                     )
                 )
-                let headers: Operations.PutRoomQuestionCodeQuestionID.Input.Headers = .init(roomAdminToken: try converter.getRequiredHeaderFieldAsURI(
+                let headers: Operations.PutRoomCodeQuestionID.Input.Headers = .init(roomAdminToken: try converter.getRequiredHeaderFieldAsURI(
                     in: request.headerFields,
                     name: "Room-Admin-Token",
                     as: Components.Parameters.AdminToken.self
                 ))
                 let contentType = converter.extractContentTypeIfPresent(in: request.headerFields)
-                let body: Operations.PutRoomQuestionCodeQuestionID.Input.Body
+                let body: Operations.PutRoomCodeQuestionID.Input.Body
                 let chosenContentType = try converter.bestContentType(
                     received: contentType,
                     options: [
@@ -844,7 +844,7 @@ fileprivate extension UniversalServer where APIHandler: APIProtocol {
                 default:
                     preconditionFailure("bestContentType chose an invalid content type.")
                 }
-                return Operations.PutRoomQuestionCodeQuestionID.Input(
+                return Operations.PutRoomCodeQuestionID.Input(
                     path: path,
                     headers: headers,
                     body: body
@@ -880,9 +880,9 @@ fileprivate extension UniversalServer where APIHandler: APIProtocol {
     }
     /// Removes the current question
     ///
-    /// - Remark: HTTP `DELETE /room/question/{code}/{questionID}`.
-    /// - Remark: Generated from `#/paths//room/question/{code}/{questionID}/delete`.
-    func deleteRoomQuestionCodeQuestionID(
+    /// - Remark: HTTP `DELETE /room/{code}/{questionID}`.
+    /// - Remark: Generated from `#/paths//room/{code}/{questionID}/delete`.
+    func deleteRoomCodeQuestionID(
         request: HTTPTypes.HTTPRequest,
         body: OpenAPIRuntime.HTTPBody?,
         metadata: OpenAPIRuntime.ServerRequestMetadata
@@ -891,12 +891,12 @@ fileprivate extension UniversalServer where APIHandler: APIProtocol {
             request: request,
             requestBody: body,
             metadata: metadata,
-            forOperation: Operations.DeleteRoomQuestionCodeQuestionID.id,
+            forOperation: Operations.DeleteRoomCodeQuestionID.id,
             using: {
-                APIHandler.deleteRoomQuestionCodeQuestionID($0)
+                APIHandler.deleteRoomCodeQuestionID($0)
             },
             deserializer: { request, requestBody, metadata in
-                let path: Operations.DeleteRoomQuestionCodeQuestionID.Input.Path = .init(
+                let path: Operations.DeleteRoomCodeQuestionID.Input.Path = .init(
                     code: try converter.getPathParameterAsURI(
                         in: metadata.pathParameters,
                         name: "code",
@@ -908,7 +908,7 @@ fileprivate extension UniversalServer where APIHandler: APIProtocol {
                         as: Components.Parameters.QuestionID.self
                     )
                 )
-                let headers: Operations.DeleteRoomQuestionCodeQuestionID.Input.Headers = .init(
+                let headers: Operations.DeleteRoomCodeQuestionID.Input.Headers = .init(
                     roomAdminToken: try converter.getRequiredHeaderFieldAsURI(
                         in: request.headerFields,
                         name: "Room-Admin-Token",
@@ -916,7 +916,7 @@ fileprivate extension UniversalServer where APIHandler: APIProtocol {
                     ),
                     accept: try converter.extractAcceptHeaderIfPresent(in: request.headerFields)
                 )
-                return Operations.DeleteRoomQuestionCodeQuestionID.Input(
+                return Operations.DeleteRoomCodeQuestionID.Input(
                     path: path,
                     headers: headers
                 )
@@ -964,9 +964,9 @@ fileprivate extension UniversalServer where APIHandler: APIProtocol {
     }
     /// Vote on a question
     ///
-    /// - Remark: HTTP `POST /room/vote/{code}/{questionID}`.
-    /// - Remark: Generated from `#/paths//room/vote/{code}/{questionID}/post`.
-    func postRoomVoteCodeQuestionID(
+    /// - Remark: HTTP `POST /room/{code}/{questionID}/vote`.
+    /// - Remark: Generated from `#/paths//room/{code}/{questionID}/vote/post`.
+    func postRoomCodeQuestionIDVote(
         request: HTTPTypes.HTTPRequest,
         body: OpenAPIRuntime.HTTPBody?,
         metadata: OpenAPIRuntime.ServerRequestMetadata
@@ -975,12 +975,12 @@ fileprivate extension UniversalServer where APIHandler: APIProtocol {
             request: request,
             requestBody: body,
             metadata: metadata,
-            forOperation: Operations.PostRoomVoteCodeQuestionID.id,
+            forOperation: Operations.PostRoomCodeQuestionIDVote.id,
             using: {
-                APIHandler.postRoomVoteCodeQuestionID($0)
+                APIHandler.postRoomCodeQuestionIDVote($0)
             },
             deserializer: { request, requestBody, metadata in
-                let path: Operations.PostRoomVoteCodeQuestionID.Input.Path = .init(
+                let path: Operations.PostRoomCodeQuestionIDVote.Input.Path = .init(
                     code: try converter.getPathParameterAsURI(
                         in: metadata.pathParameters,
                         name: "code",
@@ -992,13 +992,13 @@ fileprivate extension UniversalServer where APIHandler: APIProtocol {
                         as: Components.Parameters.QuestionID.self
                     )
                 )
-                let headers: Operations.PostRoomVoteCodeQuestionID.Input.Headers = .init(participantToken: try converter.getRequiredHeaderFieldAsURI(
+                let headers: Operations.PostRoomCodeQuestionIDVote.Input.Headers = .init(participantToken: try converter.getRequiredHeaderFieldAsURI(
                     in: request.headerFields,
                     name: "Participant-Token",
                     as: Components.Parameters.ParticipantToken.self
                 ))
                 let contentType = converter.extractContentTypeIfPresent(in: request.headerFields)
-                let body: Operations.PostRoomVoteCodeQuestionID.Input.Body
+                let body: Operations.PostRoomCodeQuestionIDVote.Input.Body
                 let chosenContentType = try converter.bestContentType(
                     received: contentType,
                     options: [
@@ -1017,7 +1017,7 @@ fileprivate extension UniversalServer where APIHandler: APIProtocol {
                 default:
                     preconditionFailure("bestContentType chose an invalid content type.")
                 }
-                return Operations.PostRoomVoteCodeQuestionID.Input(
+                return Operations.PostRoomCodeQuestionIDVote.Input(
                     path: path,
                     headers: headers,
                     body: body
@@ -1053,9 +1053,9 @@ fileprivate extension UniversalServer where APIHandler: APIProtocol {
     }
     /// Check the result of the question
     ///
-    /// - Remark: HTTP `GET /room/question-result/{code}/{questionID}`.
-    /// - Remark: Generated from `#/paths//room/question-result/{code}/{questionID}/get`.
-    func getRoomQuestionResultCodeQuestionID(
+    /// - Remark: HTTP `GET /room/{code}/{questionID}/result`.
+    /// - Remark: Generated from `#/paths//room/{code}/{questionID}/result/get`.
+    func getRoomCodeQuestionIDResult(
         request: HTTPTypes.HTTPRequest,
         body: OpenAPIRuntime.HTTPBody?,
         metadata: OpenAPIRuntime.ServerRequestMetadata
@@ -1064,12 +1064,12 @@ fileprivate extension UniversalServer where APIHandler: APIProtocol {
             request: request,
             requestBody: body,
             metadata: metadata,
-            forOperation: Operations.GetRoomQuestionResultCodeQuestionID.id,
+            forOperation: Operations.GetRoomCodeQuestionIDResult.id,
             using: {
-                APIHandler.getRoomQuestionResultCodeQuestionID($0)
+                APIHandler.getRoomCodeQuestionIDResult($0)
             },
             deserializer: { request, requestBody, metadata in
-                let path: Operations.GetRoomQuestionResultCodeQuestionID.Input.Path = .init(
+                let path: Operations.GetRoomCodeQuestionIDResult.Input.Path = .init(
                     code: try converter.getPathParameterAsURI(
                         in: metadata.pathParameters,
                         name: "code",
@@ -1081,8 +1081,8 @@ fileprivate extension UniversalServer where APIHandler: APIProtocol {
                         as: Components.Parameters.QuestionID.self
                     )
                 )
-                let headers: Operations.GetRoomQuestionResultCodeQuestionID.Input.Headers = .init(accept: try converter.extractAcceptHeaderIfPresent(in: request.headerFields))
-                return Operations.GetRoomQuestionResultCodeQuestionID.Input(
+                let headers: Operations.GetRoomCodeQuestionIDResult.Input.Headers = .init(accept: try converter.extractAcceptHeaderIfPresent(in: request.headerFields))
+                return Operations.GetRoomCodeQuestionIDResult.Input(
                     path: path,
                     headers: headers
                 )
@@ -1153,9 +1153,9 @@ fileprivate extension UniversalServer where APIHandler: APIProtocol {
     ///
     /// This information is limited intentionally to prevent spoiling the vote.
     ///
-    /// - Remark: HTTP `GET /room/question-votes-info/{code}/{questionID}`.
-    /// - Remark: Generated from `#/paths//room/question-votes-info/{code}/{questionID}/get`.
-    func getRoomQuestionVotesInfoCodeQuestionID(
+    /// - Remark: HTTP `GET /room/{code}/{questionID}/votes-info`.
+    /// - Remark: Generated from `#/paths//room/{code}/{questionID}/votes-info/get`.
+    func getRoomCodeQuestionIDVotesInfo(
         request: HTTPTypes.HTTPRequest,
         body: OpenAPIRuntime.HTTPBody?,
         metadata: OpenAPIRuntime.ServerRequestMetadata
@@ -1164,12 +1164,12 @@ fileprivate extension UniversalServer where APIHandler: APIProtocol {
             request: request,
             requestBody: body,
             metadata: metadata,
-            forOperation: Operations.GetRoomQuestionVotesInfoCodeQuestionID.id,
+            forOperation: Operations.GetRoomCodeQuestionIDVotesInfo.id,
             using: {
-                APIHandler.getRoomQuestionVotesInfoCodeQuestionID($0)
+                APIHandler.getRoomCodeQuestionIDVotesInfo($0)
             },
             deserializer: { request, requestBody, metadata in
-                let path: Operations.GetRoomQuestionVotesInfoCodeQuestionID.Input.Path = .init(
+                let path: Operations.GetRoomCodeQuestionIDVotesInfo.Input.Path = .init(
                     code: try converter.getPathParameterAsURI(
                         in: metadata.pathParameters,
                         name: "code",
@@ -1181,7 +1181,7 @@ fileprivate extension UniversalServer where APIHandler: APIProtocol {
                         as: Components.Parameters.QuestionID.self
                     )
                 )
-                let headers: Operations.GetRoomQuestionVotesInfoCodeQuestionID.Input.Headers = .init(
+                let headers: Operations.GetRoomCodeQuestionIDVotesInfo.Input.Headers = .init(
                     roomAdminToken: try converter.getRequiredHeaderFieldAsURI(
                         in: request.headerFields,
                         name: "Room-Admin-Token",
@@ -1189,7 +1189,7 @@ fileprivate extension UniversalServer where APIHandler: APIProtocol {
                     ),
                     accept: try converter.extractAcceptHeaderIfPresent(in: request.headerFields)
                 )
-                return Operations.GetRoomQuestionVotesInfoCodeQuestionID.Input(
+                return Operations.GetRoomCodeQuestionIDVotesInfo.Input(
                     path: path,
                     headers: headers
                 )
