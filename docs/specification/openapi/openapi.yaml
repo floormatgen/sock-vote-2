@@ -83,7 +83,7 @@ paths:
               example:
                 reason: "An available room code could not be generated."
   
-  /room/info/{code}:
+  /room/{code}/info:
     get:
       summary: Get information about a room
       description:
@@ -116,7 +116,7 @@ paths:
         "404":
           $ref: '#/components/responses/InvalidRoomCode'
   
-  /room/join/{code}:
+  /room/{code}/join:
     post:
       summary: Join a room
       description:
@@ -159,7 +159,7 @@ paths:
         "404":
           $ref: '#/components/responses/InvalidRoomCode'
   
-  /room/join-requests/{code}:
+  /room/{code}/join-requests:
     get:
       summary: Pending requests to join a room
       description:
@@ -247,7 +247,7 @@ paths:
         "404":
           $ref: '#/components/responses/InvalidRoomCode'
   
-  /room/question/{code}:
+  /room/{code}/question:
     get:
       summary: Get the active question
       tags:
@@ -308,7 +308,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/BasicError'
-  /room/question/{code}/{questionID}:
+  /room/{code}/{questionID}:
     delete:
       summary: Removes the current question
       tags:
@@ -360,7 +360,7 @@ paths:
         "404":
           $ref: '#/components/responses/InvalidRoomCode'
   
-  /room/vote/{code}/{questionID}:
+  /room/{code}/{questionID}/vote:
     post:
       summary: Vote on a question
       tags:
@@ -388,7 +388,7 @@ paths:
         "404":
           $ref: '#/components/responses/InvalidRoomCode'
   
-  /room/question-result/{code}/{questionID}:
+  /room/{code}/{questionID}/result:
     get:
       summary: Check the result of the question
       tags:
@@ -415,9 +415,11 @@ paths:
         "404":
           $ref: '#/components/responses/RoomOrQuestionNotFound'
 
-  /room/question-vote-count/{code}/{questionID}:
+  /room/{code}/{questionID}/votes-info:
     get:
-      summary: Get the vote count associated with a question
+      summary: Get the vote-information
+      description:
+        This information is limited intentionally to prevent spoiling the vote.
       tags:
         - Room Management
       parameters:
@@ -427,7 +429,13 @@ paths:
       responses:
         "200":
           description:
-            The question could be found.
+            The question could be found, and the admin token is valid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/QuestionVotesInfo'
+        "403":
+          $ref: '#/components/responses/RoomAdminTokenInvalid'
         "404":
           $ref: '#/components/responses/RoomOrQuestionNotFound'
   
@@ -503,11 +511,31 @@ components:
         type:
           type: string
 
+    QuestionVotesInfo:
+      type: object
+      description:
+        Information about the current voting state of the current question.
+        The information is curated to prevent leaking individual votes, as well as
+        to prematurely leak the result.
+      required:
+        - timestamp
+        - voteCount
+      properties:
+        timestamp:
+          $ref: '#/components/schemas/Timestamp'
+        voteCount:
+          type: integer
+
     # MARK: - Data Types
     Fields:
       type: object
       additionalProperties:
         type: string
+
+    Timestamp:
+      description:
+        A timestamp in the ISO8601 format.
+      type: string
       
     Question:
       allOf:
@@ -638,6 +666,7 @@ components:
       type: string
       enum:
         - roomNotFound
+        - roomAdminTokenInvalid
         - questionNotFound
         - questionNotFinalized
       description: >
@@ -770,6 +799,14 @@ components:
         type: string
 
   responses:
+
+    RoomAdminTokenInvalid:
+      description:
+        Either the admin token was not provided, or it is invalid
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/RoomAdminError'
 
     RoomOrQuestionNotFound:
       description:
