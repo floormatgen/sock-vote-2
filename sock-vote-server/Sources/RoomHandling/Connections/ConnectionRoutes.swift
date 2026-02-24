@@ -24,7 +24,7 @@ extension Connections {
         ) {
 
             webSocketRouter.ws(
-                "room/connect/:code/participant", 
+                "room/:code/connect/participant", 
                 shouldUpgrade: self.shouldUpgradeParticipant(request:context:), 
                 onUpgrade: self.handleUpgradedParticipant(inbound:writer:context:)
             )
@@ -63,7 +63,7 @@ extension Connections {
                 return
             }
             let connection = WebSocketParticipantConnection(
-                inboundMessageStream: inbound.messages(maxSize: 1024), 
+                inboundMessageStream: inbound.messages(maxSize: 1024), // Doesn't matter right now
                 outboardWriter: writer
             )
             try await room.addParticipantConnection(connection, forParticipantToken: participantToken)
@@ -80,5 +80,6 @@ extension Connections {
 public extension HTTPField.Name {
 
     static let participantToken = HTTPField.Name("Participant-Token")!
+    static let adminToken = HTTPField.Name("Room-Admin-Token")!
 
 }

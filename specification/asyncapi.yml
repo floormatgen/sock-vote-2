@@ -17,7 +17,7 @@ servers:
 
 channels:
   participantConnection:
-    address: 'room/connect/{code}/participant'
+    address: 'room/{code}/connect/participant'
     title: Participant Notification
     parameters:
       code:
