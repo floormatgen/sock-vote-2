@@ -87,8 +87,10 @@ let package = Package(
             name: "ServerTests",
             dependencies: [
                 .target(name: "SockVoteServer"),
+                .target(name: "VoteHandling"),
                 .product(name: "Hummingbird", package: "hummingbird"),
                 .product(name: "HummingbirdTesting", package: "hummingbird"),
+                .product(name: "HummingbirdWSTesting", package: "hummingbird-websocket"),
                 .product(name: "NIOFoundationCompat", package: "swift-nio"),
             ]
         ),

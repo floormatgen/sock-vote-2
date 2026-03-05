@@ -38,14 +38,14 @@ extension Connections {
             let message = QuestionUpdated(
                 question: description
             )
-            let buffer = try encoder.encodeAsByteBuffer(message, allocator:  allocator)
-            await outputStream.send(.text(.init(buffer: buffer)))
+            let buffer = try encoder.encodeAsByteBuffer(message, allocator: allocator)
+            await outputStream.send(.binary(buffer))
         }
 
         public func sendQuestionDeleted() async throws {
             let message = QuestionRemoved()
             let buffer = try encoder.encodeAsByteBuffer(message, allocator: allocator)
-            await outputStream.send(.text(.init(buffer: buffer)))
+            await outputStream.send(.binary(buffer))
         }
 
         public func removeConnection() {

@@ -13,22 +13,22 @@ extension Connections {
     {
         public let roomManager: RoomManager
 
-        public typealias Context = WebSocketRequestContext & RequestContext
+        public typealias Context = BasicWebSocketRequestContext
 
         public init(roomManager: RoomManager) {
             self.roomManager = roomManager
         }
-
-        public func addRoutes(
-            to webSocketRouter: Router<some Context>
-        ) {
-
-            webSocketRouter.ws(
-                "room/:code/connect/participant", 
-                shouldUpgrade: self.shouldUpgradeParticipant(request:context:), 
+        
+        public var routes: RouteCollection<Context> {
+            let routes = RouteCollection(context: Context.self)
+            
+            routes.ws(
+                "room/:code/connect/participant",
+                shouldUpgrade: self.shouldUpgradeParticipant(request:context:),
                 onUpgrade: self.handleUpgradedParticipant(inbound:writer:context:)
             )
-
+            
+            return routes
         }
 
         // MARK: - Participant connections
@@ -36,7 +36,7 @@ extension Connections {
         @Sendable
         internal func shouldUpgradeParticipant(
             request: Request, 
-            context: some Context
+            context: Context
         ) async throws -> RouterShouldUpgrade {
             guard 
                 let code = context.parameters.get("code"),
@@ -53,7 +53,7 @@ extension Connections {
         internal func handleUpgradedParticipant(
             inbound: WebSocketInboundStream,
             writer: WebSocketOutboundWriter,
-            context: WebSocketRouterContext<some Context>
+            context: WebSocketRouterContext<Context>
         ) async throws {
             guard
                 let code = context.requestContext.parameters.get("code"),

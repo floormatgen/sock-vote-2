@@ -14,7 +14,7 @@ internal extension RoomHandler {
         questionID: String,
         adminToken: String,
         outputType: Output.Type = Output.self,
-        operation: sending (_ room: /* isolated */ RoomManager.Room, _ adminToken: String, _ questionUUID: UUID) 
+        operation: sending (_ room: /* isolated */ RoomManager.Room, _ adminToken: String, _ questionUUID: UUID)
             async throws(E) -> sending Output
     ) async throws(E) -> sending Output {
         guard let room = await roomManager.room(withCode: roomCode) else {

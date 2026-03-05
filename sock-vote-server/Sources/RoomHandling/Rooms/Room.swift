@@ -448,7 +448,7 @@ private extension Room {
 
     func addJoinRequest(_ joinRequest: JoinRequest, participantToken: String) {
         joinRequests[participantToken] = joinRequest
-        joinRequestTimeouts[participantToken] = Task {
+        joinRequestTimeouts[participantToken] = Task(name: "Pending Join Request for \"\(joinRequest.name)\"") {
             try await joinRequestTimeoutFunction(joinRequestTimeout)
             if var request = joinRequests[participantToken] {
                 request.handleRequest(with: .timeout)

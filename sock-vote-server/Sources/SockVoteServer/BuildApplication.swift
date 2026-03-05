@@ -3,6 +3,7 @@ import HummingbirdWebSocket
 import OpenAPIHummingbird
 import RoomHandling
 import Configuration
+import Logging
 
 typealias DefaultApplication = Application<RouterResponder<BasicRequestContext>>
 
@@ -20,7 +21,7 @@ func buildApplication(
 
     let webSocketRouter = Router(context: BasicWebSocketRequestContext.self)
     let connectionRoutes = Connections.Routes(roomManager: roomManager)
-    connectionRoutes.addRoutes(to: webSocketRouter)
+    webSocketRouter.addRoutes(connectionRoutes.routes)
 
     var application = Application(
         router: router, 
@@ -29,6 +30,7 @@ func buildApplication(
         ),
         configuration: config
     )
+    application.logger.logLevel = .trace
 
     application.addServices(roomManager)
     

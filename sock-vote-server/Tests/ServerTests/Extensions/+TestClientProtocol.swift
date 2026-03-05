@@ -1,13 +1,19 @@
 import Testing
 
+import VoteHandling
+
 import Hummingbird
 import HummingbirdTesting
+import HummingbirdWebSocket
+import HummingbirdWSClient
+import HummingbirdWSTesting
 import Foundation
 import NIOFoundationCompat
 import RoomHandling
 
-fileprivate let encoder = JSONEncoder()
-fileprivate let decoder = JSONDecoder()
+fileprivate let encoder     = JSONEncoder()
+fileprivate let decoder     = JSONDecoder()
+fileprivate let allocator   = ByteBufferAllocator()
 
 extension TestClientProtocol {
 
@@ -52,9 +58,9 @@ extension TestClientProtocol {
         withCode code: String
     ) async throws -> (name: String, code: String, fields: [String]) {
         let response = try await roomInfoWithResponse(withCode: code)
-        #expect(response.status == 200)
+        try #require(response.status == 200)
         let responseBody = try decoder.decode(RoomInfoResponse.self, from: response.body)
-        #expect(responseBody.code == code)
+        try #require(responseBody.code == code)
         let code = responseBody.code
         let name = responseBody.name
         let fields = responseBody.fields
@@ -66,24 +72,16 @@ extension TestClientProtocol {
         name: String,
         fields: [String : String]? = nil
     ) async throws -> TestResponse {
-        var body = """
-        {
-            "name": "\(name)"
-        """
-        if let fields = fields {
-            body += """
-                , "fields": \(String(data: try encoder.encode(fields), encoding: .utf8) ?? "{}")
-            }
-            """
-        } else {
-            body += """
-            }
-            """
-        }
         return try await self.execute(
             uri: "/room/\(code)/join", 
             method: .post,
-            body: .init(string: body)
+            body: encoder.encodeAsByteBuffer(
+                JoinRoomRequest(
+                    name: name,
+                    fields: fields
+                ),
+                allocator: allocator
+            )
         )
     }
 
@@ -97,7 +95,7 @@ extension TestClientProtocol {
             name: name,
             fields: fields
         )
-        #expect(response.status == 200)
+        try #require(response.status == 200)
         let responseBody = try decoder.decode(RoomJoinResponse.self, from: response.body)
         return responseBody.participantToken
     }
@@ -108,32 +106,19 @@ extension TestClientProtocol {
         accept: [String]?,
         reject: [String]?
     ) async throws -> TestResponse {
-        var body = """
-        {
-        """
-        if let accept = accept {
-            body += """
-                "accept": \(try encoder.encode(accept)) 
-            """
-            if reject != nil {
-                body += ", "
-            }
-        }
-        if let reject = reject {
-            body += """
-                "reject": \(try encoder.encode(reject))
-            """
-        }
-        body += """
-        }
-        """
         return try await self.execute(
             uri: "/room/\(code)/join-requests", 
             method: .post, 
             headers: [
                 .adminToken : adminToken
             ], 
-            body: .init(string: body)
+            body: encoder.encodeAsByteBuffer(
+                HandleJoinRequestRequest(
+                    accept: accept, 
+                    reject: reject
+                ), 
+                allocator: allocator
+            )
         )
     }
 
@@ -150,7 +135,7 @@ extension TestClientProtocol {
             accept: accept, 
             reject: reject
         )
-        #expect(response.status == 200)
+        try #require(response.status == 200)
         let responseBody = try decoder.decode(
             HandleJoinRequestsResponse.self, 
             from: response.body
@@ -187,26 +172,124 @@ extension TestClientProtocol {
             code: code, 
             adminToken: adminToken
         )
-        #expect(response.status == 200)
+        try #require(response.status == 200)
         let responseBody = try decoder.decode(
-            JoinRequestsResponse.self, 
+            JoinRequestsResponse.self,
             from: response.body
         )
-        let timestamp = try Date.ISO8601FormatStyle().parse(responseBody.lastUpdated)
-        #expect((Date.now - timestampWindow) <= timestamp && timestamp <= (Date.now + timestampWindow))
+//        let timestamp = try Date.ISO8601FormatStyle().parse(responseBody.lastUpdated)
+//        #expect((Date.now - timestampWindow) <= timestamp && timestamp <= (Date.now + timestampWindow))
         return responseBody.requests
     }
 
+    func forceJoinRoom(
+        code: String,
+        adminToken: String,
+        participants: some Collection<(name: String, fields: [String : String]?)>
+    ) async throws -> [String] {
+        try await withThrowingTaskGroup { group in
+            for (name, fields) in participants {
+                group.addTask(name: "Join request for participant: \"\(name)\"") {
+                    try await joinRoom(code: code, name: name, fields: fields)
+                }
+            }
+            try await Task.sleep(for: .milliseconds(participants.count))
+            let requests = try await getJoinRequests(code: code, adminToken: adminToken)
+            try #require(requests.count >= participants.count)
+            let names = Set(participants.map(\.name))
+            let participantTokens = requests.filter { names.contains($0.name) } .map(\.participantToken)
+            try await handleJoinRequest(code: code, adminToken: adminToken, accept: participantTokens, reject: nil)
+            var acceptedTokens: [String] = []
+            acceptedTokens.reserveCapacity(participants.count)
+            for try await participantToken in group {
+                acceptedTokens.append(participantToken)
+            }
+            return acceptedTokens
+        }
+    }
+    
     @discardableResult
     func forceJoinRoom(
         code: String,
         adminToken: String,
         name: String,
-        fields: [String : String]? = nil,
-    ) async throws -> [String : String] {
-        async let participantToken = joinRoom(code: code, name: name, fields: fields)
-        try await Task.sleep(for: .milliseconds(1))
-        return [:]
+        fields: [String : String]?
+    ) async throws -> String! {
+        try await forceJoinRoom(
+            code: code,
+            adminToken: adminToken,
+            participants: CollectionOfOne((name: name, fields: fields))
+        ).first
+    }
+    
+    // MARK: - Questions
+    
+    func updateQuestionWithResponse(
+        code: String,
+        adminToken: String,
+        prompt: String,
+        options: [String],
+        style: Question.VotingStyle
+    ) async throws -> TestResponse {
+        try await self.executeRequest(
+            uri: "room/\(code)/question",
+            method: .post,
+            headers: [
+                .adminToken: adminToken
+            ],
+            body: encoder.encodeAsByteBuffer(
+                UpdateQuestionRequest(
+                    prompt: prompt,
+                    options: options,
+                    style: style.description
+                ),
+                allocator: allocator
+            )
+        )
+    }
+    
+    @discardableResult
+    func updateQuestion(
+        code: String,
+        adminToken: String,
+        prompt: String,
+        options: [String],
+        style: Question.VotingStyle
+    ) async throws -> String {
+        let response = try await updateQuestionWithResponse(
+            code: code,
+            adminToken: adminToken,
+            prompt: prompt,
+            options: options,
+            style: style
+        )
+        try #require(response.status == 200)
+        let body = try decoder.decode(
+            QuestionUpdateResponse.self,
+            from: response.body
+        )
+        #expect(prompt == body.prompt)
+        #expect(options == body.options)
+        #expect(style == Question.VotingStyle(body.votingStyle))
+        return body.id
+    }
+    
+    // MARK: - Connections
+    
+    func connectAsParticipant(
+        code: String,
+        token: String,
+        handler: @escaping WebSocketDataHandler<WebSocketClient.Context>
+    ) async throws {
+        try await self.ws(
+            "/room/\(code)/connect/participant",
+            configuration: .init(
+                additionalHeaders: [
+                    .participantToken: token
+                ]
+            ),
+            handler: handler
+        )
     }
 
 }

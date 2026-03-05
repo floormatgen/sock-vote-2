@@ -12,6 +12,22 @@ struct RoomInfoRequest: Codable {
     var fields: [String]?
 }
 
+struct JoinRoomRequest: Codable {
+    var name: String
+    var fields: [String: String]?
+}
+
+struct HandleJoinRequestRequest: Codable {
+    var accept: [String]?
+    var reject: [String]?
+}
+
+struct UpdateQuestionRequest: Codable {
+    var prompt: String
+    var options: [String]
+    var style: String
+}
+
 // MARK: - Responses
 
 struct CreateRoomResponse: Codable {
@@ -45,5 +61,30 @@ struct JoinRequestObject: Codable {
     var name: String
     var participantToken: String
     var timestamp: String
-    var fields: [String : String]
+    var fields: [String : String]?
 }
+
+struct QuestionUpdateResponse: Codable {
+    var prompt: String
+    var votingStyle: String
+    var options: [String]
+    var id: String
+    var state: String
+}
+
+// MARK: - Connection Notifications
+
+enum Messages {
+
+    struct QuestionUpdated: Codable {
+        var type: String
+        var timestamp: String
+        var id: String
+        var prompt: String
+        var votingStyle: String
+        var options: [String]
+        var state: String
+    }
+
+}
+
