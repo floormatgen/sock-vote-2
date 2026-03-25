@@ -7,7 +7,7 @@ extension Question: @unchecked Sendable { }
 public /* abstract */ class Question: Identifiable {
 
     /// The style of voting for the question
-    public enum VotingStyle: Sendable, Codable {
+    public enum VotingStyle: String, Sendable, Codable {
         case plurality
         case preferential
     }
@@ -15,7 +15,7 @@ public /* abstract */ class Question: Identifiable {
     /// The current state of the question
     /// 
     /// The question state affects what actions are permitted to take on a question
-    public enum State: Sendable, Codable {
+    public enum State: String, Sendable, Codable {
         /// The question is accepting votes
         case open
         /// The question is not accepting votes
