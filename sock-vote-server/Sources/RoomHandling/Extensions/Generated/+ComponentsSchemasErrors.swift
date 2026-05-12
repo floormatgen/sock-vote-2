@@ -99,6 +99,40 @@ public extension Components.Schemas.QuestionStateError {
 
 }
 
+public extension Components.Schemas.RoomParticipantError {
+
+    fileprivate init(
+        _type type: Components.Schemas.ErrorType,
+        description: String,
+        roomCode: String,
+        participantToken: String
+    ) {
+        self.init(
+            value1: .init(
+                _type: type, 
+                description: description, 
+                roomCode: roomCode
+            ), 
+            value2: .init(
+                participantToken:  participantToken
+            )
+        )
+    }
+
+    static func roomParticipantTokenInvalid(
+        roomCode: String,
+        participantToken: String
+    ) -> Self {
+        self.init(
+            _type: .roomParticipantTokenInvalid, 
+            description: "The participant token \(participantToken) is invalid for room \(roomCode)", 
+            roomCode: roomCode, 
+            participantToken: participantToken
+        )
+    }
+
+}
+
 public extension Components.Schemas.RoomAdminError {
 
     fileprivate init(

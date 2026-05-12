@@ -356,7 +356,7 @@ paths:
           description:
             The modify request was invalid
         "403":
-          $ref: '#/components/responses/InvalidParticipantToken'
+          $ref: '#/components/responses/InvalidAdminToken'
         "404":
           $ref: '#/components/responses/InvalidRoomCode'
   
@@ -386,7 +386,7 @@ paths:
         "403":
           $ref: '#/components/responses/InvalidParticipantToken'
         "404":
-          $ref: '#/components/responses/InvalidRoomCode'
+          $ref: '#/components/responses/RoomOrQuestionNotFound'
   
   /room/{code}/{questionID}/result:
     get:
@@ -667,6 +667,7 @@ components:
       enum:
         - roomNotFound
         - roomAdminTokenInvalid
+        - roomParticipantTokenInvalid
         - questionNotFound
         - questionNotFinalized
       description: >
@@ -677,6 +678,8 @@ components:
             A room could not be found with the provided code
           * `roomAdminTokenInvalid` -
             The admin token provided is either missing or invalid
+          * `roomParticipantTokenInvalid` -
+            The participant token provided is either missing or invalid
           * `questionNotFound` -
             A question could not be found with the provided id
           * `questionNotFinalized` -
@@ -719,6 +722,18 @@ components:
                 - 'null'
               description:
                 The admin token associated with the request
+
+    RoomParticipantError:
+      allOf:
+        - $ref: '#/components/schemas/RoomError'
+        - type: object
+          required:
+            - participantToken
+          properties:
+            participantToken:
+              type: string
+              description:
+                The participant token associated with the request
     
     QuestionError:
       allOf:
@@ -821,10 +836,18 @@ components:
     InvalidAdminToken:
       description:
         The admin token is either missing or incorrect
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/RoomAdminError'
     InvalidParticipantToken:
       description:
         The participant token is either missing or doesn't correspond to
         a room participant
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/RoomParticipantError'
     InvalidRoomCode:
       description:
         The room does not exist

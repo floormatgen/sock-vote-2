@@ -82,7 +82,9 @@ public extension RoomHandler {
             return .notFound
         }
         guard room.verifyAdminToken(adminToken) else {
-            return .forbidden
+            return .forbidden(.init(body: .json(.roomAdminTokenInvalid(
+                roomCode: code, adminToken: adminToken
+            ))))
         }
         return .ok(.init(body: .json(.init(
             lastUpdated: Date.now.ISO8601Format(), 
@@ -109,7 +111,9 @@ public extension RoomHandler {
             return .notFound
         }
         guard room.verifyAdminToken(adminToken) else {
-            return .forbidden
+            return .forbidden(.init(body: .json(.roomAdminTokenInvalid(
+                roomCode: code, adminToken: adminToken
+            ))))
         }
         var accepted = [String]()
         var rejected = [String]()
@@ -175,7 +179,9 @@ public extension RoomHandler {
             return .notFound
         }
         guard room.verifyAdminToken(adminToken) else {
-            return .forbidden
+            return .forbidden(.init(body: .json(.roomAdminTokenInvalid(
+                roomCode: code, adminToken: adminToken
+            ))))
         }
         switch input.body {
             case .json(let question):
@@ -203,7 +209,9 @@ public extension RoomHandler {
             return .notFound
         }
         guard room.verifyAdminToken(adminToken) else {
-            return .forbidden
+            return .forbidden(.init(body: .json(.roomAdminTokenInvalid(
+                roomCode: code, adminToken: adminToken
+            ))))
         }
         guard let questionDescription = await room.currentQuestionDescription else {
             return .badRequest
@@ -225,7 +233,9 @@ public extension RoomHandler {
             return .notFound
         }
         guard room.verifyAdminToken(adminToken) else {
-            return .forbidden
+            return .forbidden(.init(body: .json(.roomAdminTokenInvalid(
+                roomCode: code, adminToken: adminToken
+            ))))
         }
         guard
             let questionUUID = UUID(uuidString: questionID),
@@ -359,7 +369,7 @@ public extension RoomHandler {
         let questionID = input.path.questionID
         let participantToken = input.headers.participantToken
         guard let room = await roomManager.room(withCode: code) else {
-            return .notFound
+            return .notFound(.init(body: .json(.RoomError(.roomNotFound(roomCode: code)))))
         }
         switch input.body {
             case .json(let anyVote):
@@ -384,7 +394,10 @@ private extension RoomProtocol {
         vote: Components.Schemas.AnyVote
     ) throws -> Operations.PostRoomCodeQuestionIDVote.Output {
         guard hasParticipant(withParticipantToken: participantToken) else {
-            return .forbidden
+            return .forbidden(.init(body: .json(.roomParticipantTokenInvalid(
+                roomCode: code, 
+                participantToken: participantToken
+            ))))
         }
         do {
             try registerVote(vote, forParticipant: participantToken)
