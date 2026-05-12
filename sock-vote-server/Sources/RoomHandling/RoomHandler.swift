@@ -255,48 +255,97 @@ public extension RoomHandler {
         return .ok
     }
 
+}
+
+public extension RoomHandler {
+
     func getRoomCodeQuestionIDResult(
         _ input: Operations.GetRoomCodeQuestionIDResult.Input
     ) async throws -> Operations.GetRoomCodeQuestionIDResult.Output {
-        try await withVerifiedQuestion(input: input) { room, questionUUID in
-            guard let currentQuestionState = await room.currentQuestionState else {
-                assertionFailure("\(#function): Question exists but currentQuestionState return nil")
-                return .undocumented(statusCode: 500, .init())
-            }
-            guard currentQuestionState == .finalized else {
-                return .badRequest(.init(body: .json(.questionNotFinalized(
-                    roomCode: room.code, 
-                    questionID: input.path.questionID, 
-                    currentState: currentQuestionState.openAPIQuestionState
-                ))))
-            }
-            // This should not throw, as we already checked that the question state is finalized
-            guard
-                let description = await room.currentQuestionDescription,
-                let result = try await room.currentQuestionResult,
-                let voteCount = await room.currentQuestionVoteCount
-            else {
-                assertionFailure("\(#function): Question exists and is finalized but has no result")
-                return .undocumented(statusCode: 500, .init())
-            }
-            return .ok(.init(body: .json(.init(
-                description: description, 
-                voteCount: voteCount, 
-                result: result
-            ))))
+        let code = input.path.code
+        let questionID = input.path.questionID
+        guard let room = await roomManager.room(withCode: code) else {
+            return .notFound(.init(body: .json(.RoomError(.roomNotFound(roomCode: code)))))
         }
+        guard let questionUUID = UUID(uuidString: questionID) else {
+            return .notFound(.init(body: .json(.QuestionError(.questionNotFound(
+                roomCode: code, 
+                questionID: questionID
+            )))))
+        }
+        return try await room._getRoomCodeQuestionIDResult_handler(questionID: questionUUID)
     }
 
     func getRoomCodeQuestionIDVotesInfo(
         _ input: Operations.GetRoomCodeQuestionIDVotesInfo.Input
     ) async throws -> Operations.GetRoomCodeQuestionIDVotesInfo.Output {
-        await withVerifiedQuestionAndAdmin(input: input) { room, _, _ in
-            return .ok(.init(body: .json(.init(
-                timestamp: Date.now.ISO8601Format(), 
-                voteCount: await room.currentQuestionVoteCount ?? 0
+        let code = input.path.code
+        let questionID = input.path.questionID
+        let adminToken = input.headers.roomAdminToken
+        guard let room = await roomManager.room(withCode: code) else {
+            return .notFound(.init(body: .json(.RoomError(.roomNotFound(
+                roomCode: code
+            )))))
+        }
+        return try await room._getRoomCodeQuestionIDVotesInfo_handler(
+            questionID: questionID, 
+            adminToken: adminToken
+        )
+    }
+
+}
+
+private extension RoomProtocol {
+
+    // TODO: Handle when the room can store multiple questions
+
+    func _getRoomCodeQuestionIDResult_handler(
+        questionID: UUID
+    ) throws -> Operations.GetRoomCodeQuestionIDResult.Output {
+        guard hasQuestion(with: questionID) else {
+            return .notFound(.init(body: .json(.QuestionError(.questionNotFound(
+                roomCode: code, questionID: questionID.uuidString
+            )))))
+        }
+        guard let state = currentQuestionState else {
+            preconditionFailure("\(#function): Question exists but no state reported")
+        }
+        guard state == .finalized else {
+            return .badRequest(.init(body: .json(.questionNotFinalized(
+                roomCode: code, 
+                questionID: questionID.uuidString, 
+                currentState: state.openAPIQuestionState
             ))))
         }
+        guard 
+            let description = currentQuestionDescription, 
+            let result = try? currentQuestionResult,
+            let voteCount = currentQuestionVoteCount
+        else {
+            preconditionFailure(
+                """
+                \(#function): Question should be finalized, but is missing \
+                description, result or voteCount
+                """
+            )
+        }
+        return .ok(.init(body: .json(.init(
+            description: description, 
+            voteCount: voteCount, 
+            result: result
+        ))))
     }
+
+    func _getRoomCodeQuestionIDVotesInfo_handler(
+        questionID: String,
+        adminToken: String
+    ) throws -> Operations.GetRoomCodeQuestionIDVotesInfo.Output {
+        return .ok(.init(body: .json(.init(
+            timestamp: Date.now.ISO8601Format(), 
+            voteCount: currentQuestionVoteCount ?? 0
+        ))))
+    }
+
 }
 
 // MARK: - Voting
