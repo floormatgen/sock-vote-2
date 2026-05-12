@@ -297,8 +297,11 @@ public extension RoomHandler {
             ))))
         }
     }
+}
 
-    // MARK: - Voting
+// MARK: - Voting
+
+public extension RoomHandler {
 
     func postRoomCodeQuestionIDVote(
         _ input: Operations.PostRoomCodeQuestionIDVote.Input
@@ -306,28 +309,44 @@ public extension RoomHandler {
         let code = input.path.code
         let questionID = input.path.questionID
         let participantToken = input.headers.participantToken
-        guard 
-            let room = await roomManager.room(withCode: code),
-            await questionID == room.currentQuestionDescription?.id.uuidString
-        else {
+        guard let room = await roomManager.room(withCode: code) else {
             return .notFound
-        }
-        guard await room.hasParticipant(withParticipantToken: participantToken) else {
-            return .forbidden
         }
         switch input.body {
             case .json(let anyVote):
-                do {
-                    try await room.registerVote(anyVote, forParticipant: participantToken)
-                    return .ok
-                } catch let questionError as Question.Error {
-                    switch questionError {
-                        case .invalidVote, .voteStyleMismatch:
-                            return .badRequest
-                        default:
-                            throw questionError
-                    }
-                }
+                return try await room._postRoomCodeQuestionIDVote_handler(
+                    questionID: questionID, 
+                    participantToken: participantToken, 
+                    vote: anyVote
+                )
+        }
+    }
+
+}
+
+private extension RoomProtocol {
+
+    /// Registers the vote for a specific participant
+    /// 
+    /// This always runs on the Actor's executor, so reentrancy should not be an issue.
+    func _postRoomCodeQuestionIDVote_handler(
+        questionID: String,
+        participantToken: String,
+        vote: Components.Schemas.AnyVote
+    ) throws -> Operations.PostRoomCodeQuestionIDVote.Output {
+        guard hasParticipant(withParticipantToken: participantToken) else {
+            return .forbidden
+        }
+        do {
+            try registerVote(vote, forParticipant: participantToken)
+            return .ok
+        } catch let questionError as Question.Error {
+            switch questionError {
+                case .invalidVote, .voteStyleMismatch:
+                    return .badRequest
+                default:
+                    throw questionError
+            }
         }
     }
 
