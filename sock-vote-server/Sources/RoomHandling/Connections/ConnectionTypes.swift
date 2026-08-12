@@ -1,49 +1,49 @@
-public import _PlatformFoundation
 public import VoteHandling
+public import _PlatformFoundation
 
 // MARK: - Data Types
 
 extension Connections {
 
-    public enum PayloadType: String, Codable {
-        case questionUpdated
-        case questionDeleted
+  public enum PayloadType: String, Codable {
+    case questionUpdated
+    case questionDeleted
+  }
+
+  public struct BasePayload {
+    var type: PayloadType
+    var timestamp: Date
+
+    public init(type: PayloadType, timestamp: Date = .now) {
+      self.type = type
+      self.timestamp = timestamp
     }
+  }
 
-    public struct BasePayload {
-        var type: PayloadType
-        var timestamp: Date
-
-        public init(type: PayloadType, timestamp: Date = .now) {
-            self.type = type
-            self.timestamp = timestamp
-        }
-    }
-
-    public typealias Question = VoteHandling.Question.Description
+  public typealias Question = VoteHandling.Question.Description
 
 }
 
 extension Connections.BasePayload: Codable {
 
-    public enum CodingKeys: String, CodingKey {
-        case type
-        case timestamp
-    }
+  public enum CodingKeys: String, CodingKey {
+    case type
+    case timestamp
+  }
 
-    public func encode(to encoder: any Encoder) throws {
-        var container = encoder.container(keyedBy: CodingKeys.self)
-        try container.encode(type, forKey: .type)
-        try container.encode(timestamp.ISO8601Format(), forKey: .timestamp)
-    }
+  public func encode(to encoder: any Encoder) throws {
+    var container = encoder.container(keyedBy: CodingKeys.self)
+    try container.encode(type, forKey: .type)
+    try container.encode(timestamp.ISO8601Format(), forKey: .timestamp)
+  }
 
-    public init(from decoder: any Decoder) throws {
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        self.type = try container.decode(Connections.PayloadType.self, forKey: .type)
-        let timestamp = try container.decode(String.self, forKey: .timestamp)
-        let formatStyle = Date.ISO8601FormatStyle()
-        self.timestamp = try formatStyle.parse(timestamp)
-    }
+  public init(from decoder: any Decoder) throws {
+    let container = try decoder.container(keyedBy: CodingKeys.self)
+    self.type = try container.decode(Connections.PayloadType.self, forKey: .type)
+    let timestamp = try container.decode(String.self, forKey: .timestamp)
+    let formatStyle = Date.ISO8601FormatStyle()
+    self.timestamp = try formatStyle.parse(timestamp)
+  }
 
 }
 
@@ -51,48 +51,48 @@ extension Connections.BasePayload: Codable {
 
 extension Connections {
 
-    public struct QuestionUpdated {
-        public var basePayload: BasePayload
-        public var question: Question
+  public struct QuestionUpdated {
+    public var basePayload: BasePayload
+    public var question: Question
 
-        public init(timestamp: Date = .now, question: Question) {
-            self.basePayload = .init(type: .questionUpdated, timestamp: timestamp)
-            self.question = question
-        }
+    public init(timestamp: Date = .now, question: Question) {
+      self.basePayload = .init(type: .questionUpdated, timestamp: timestamp)
+      self.question = question
     }
+  }
 
-    public struct QuestionRemoved {
-        public var basePayload: BasePayload
+  public struct QuestionRemoved {
+    public var basePayload: BasePayload
 
-        public init(timestamp: Date = .now) {
-            self.basePayload = .init(type: .questionDeleted, timestamp: timestamp)
-        }
+    public init(timestamp: Date = .now) {
+      self.basePayload = .init(type: .questionDeleted, timestamp: timestamp)
     }
+  }
 
 }
 
 extension Connections.QuestionUpdated: Codable {
 
-    public func encode(to encoder: any Encoder) throws {
-        try basePayload.encode(to: encoder)
-        try question.encode(to: encoder)
-    }
+  public func encode(to encoder: any Encoder) throws {
+    try basePayload.encode(to: encoder)
+    try question.encode(to: encoder)
+  }
 
-    public init(from decoder: any Decoder) throws {
-        self.basePayload = try .init(from: decoder)
-        self.question = try .init(from: decoder)
-    }
+  public init(from decoder: any Decoder) throws {
+    self.basePayload = try .init(from: decoder)
+    self.question = try .init(from: decoder)
+  }
 
 }
 
 extension Connections.QuestionRemoved: Codable {
 
-    public func encode(to encoder: any Encoder) throws {
-        try basePayload.encode(to: encoder)
-    }
+  public func encode(to encoder: any Encoder) throws {
+    try basePayload.encode(to: encoder)
+  }
 
-    public init(from decoder: any Decoder) throws {
-        self.basePayload = try .init(from: decoder)
-    }
+  public init(from decoder: any Decoder) throws {
+    self.basePayload = try .init(from: decoder)
+  }
 
 }

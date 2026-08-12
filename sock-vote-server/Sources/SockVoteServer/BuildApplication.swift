@@ -1,40 +1,40 @@
+import Configuration
 import Hummingbird
 import HummingbirdWebSocket
+import Logging
 import OpenAPIHummingbird
 import RoomHandling
-import Configuration
-import Logging
 
 typealias DefaultApplication = Application<RouterResponder<BasicRequestContext>>
 
 /// Build the default application using the provided options
 func buildApplication(
-    reader configReader: ConfigReader
+  reader configReader: ConfigReader
 ) async throws -> DefaultApplication {
-    let router = Router()
+  let router = Router()
 
-    let roomManager = DefaultRoomManager()
-    let roomHTTPAPI = RoomHandler(roomManager: roomManager)
-    try roomHTTPAPI.registerHandlers(on: router)
+  let roomManager = DefaultRoomManager()
+  let roomHTTPAPI = RoomHandler(roomManager: roomManager)
+  try roomHTTPAPI.registerHandlers(on: router)
 
-    let config = ApplicationConfiguration(reader: configReader)
+  let config = ApplicationConfiguration(reader: configReader)
 
-    let webSocketRouter = Router(context: BasicWebSocketRequestContext.self)
-    let connectionRoutes = Connections.Routes(roomManager: roomManager)
-    webSocketRouter.addRoutes(connectionRoutes.routes)
+  let webSocketRouter = Router(context: BasicWebSocketRequestContext.self)
+  let connectionRoutes = Connections.Routes(roomManager: roomManager)
+  webSocketRouter.addRoutes(connectionRoutes.routes)
 
-    var application = Application(
-        router: router, 
-        server: .http1WebSocketUpgrade(
-            webSocketRouter: webSocketRouter
-        ),
-        configuration: config
-    )
-    application.logger.logLevel = .trace
+  var application = Application(
+    router: router,
+    server: .http1WebSocketUpgrade(
+      webSocketRouter: webSocketRouter
+    ),
+    configuration: config
+  )
+  application.logger.logLevel = .trace
 
-    application.addServices(roomManager)
-    
-    return application
+  application.addServices(roomManager)
+
+  return application
 }
 
 extension Hummingbird.ApplicationConfiguration {

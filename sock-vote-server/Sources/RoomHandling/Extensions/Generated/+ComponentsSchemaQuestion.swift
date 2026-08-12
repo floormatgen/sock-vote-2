@@ -1,23 +1,23 @@
-public extension Components.Schemas.Question {
+extension Components.Schemas.Question {
 
-    var prompt: String {
-        value1.prompt
-    }
+  public var prompt: String {
+    value1.prompt
+  }
 
-    var votingStyle: Components.Schemas.VotingStyle? {
-        value1.votingStyle
-    }
+  public var votingStyle: Components.Schemas.VotingStyle? {
+    value1.votingStyle
+  }
 
-    var options: [String] {
-        value1.options
-    }
+  public var options: [String] {
+    value1.options
+  }
 
-    var id: String {
-        value2.id
-    }
+  public var id: String {
+    value2.id
+  }
 
-    var state: Components.Schemas.QuestionState {
-        value2.state
-    }
+  public var state: Components.Schemas.QuestionState {
+    value2.state
+  }
 
 }

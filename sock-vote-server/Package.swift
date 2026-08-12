@@ -4,113 +4,114 @@
 import PackageDescription
 
 let package = Package(
-    name: "SockVoteServer",
-    platforms: [
-        .macOS(.v15),
-    ], 
-    products: [
-        // Products define the executables and libraries a package produces, making them visible to other packages.
-        .executable(
-            name: "SockVoteServer",
-            targets: ["SockVoteServer"]
-        ),
-    ], 
-    dependencies: [
+  name: "SockVoteServer",
+  platforms: [
+    .macOS(.v15)
+  ],
+  products: [
+    // Products define the executables and libraries a package produces, making them visible to other packages.
+    .executable(
+      name: "SockVoteServer",
+      targets: ["SockVoteServer"]
+    )
+  ],
+  dependencies: [
 
-        // Utility
-        .package(url: "https://github.com/apple/swift-log", from: "1.6.0"),
-        .package(url: "https://github.com/apple/swift-http-types.git", from: "1.0.0"),
-        .package(url: "https://github.com/swift-server/swift-service-lifecycle.git", from: "2.0.0"),
+    // Utility
+    .package(url: "https://github.com/apple/swift-log", from: "1.6.0"),
+    .package(url: "https://github.com/apple/swift-http-types.git", from: "1.0.0"),
+    .package(url: "https://github.com/swift-server/swift-service-lifecycle.git", from: "2.0.0"),
 
-        // Configuration
-        .package(
-            url: "https://github.com/apple/swift-configuration", 
-            from: "1.0.0", 
-            traits: [.defaults, "CommandLineArguments"]
-        ),
+    // Configuration
+    .package(
+      url: "https://github.com/apple/swift-configuration",
+      from: "1.0.0",
+      traits: [.defaults, "CommandLineArguments"]
+    ),
 
-        // Server-related
-        .package(url: "https://github.com/apple/swift-openapi-runtime", from: "1.0.0"),
-        .package(url: "https://github.com/hummingbird-project/swift-openapi-hummingbird", from: "2.0.0"),
-        .package(url: "https://github.com/hummingbird-project/hummingbird", from: "2.18.0"),
-        .package(url: "https://github.com/hummingbird-project/hummingbird-websocket", from: "2.0.0"),
-        .package(url: "https://github.com/apple/swift-nio.git", from: "2.94.0"),
+    // Server-related
+    .package(url: "https://github.com/apple/swift-openapi-runtime", from: "1.0.0"),
+    .package(
+      url: "https://github.com/hummingbird-project/swift-openapi-hummingbird", from: "2.0.0"),
+    .package(url: "https://github.com/hummingbird-project/hummingbird", from: "2.18.0"),
+    .package(url: "https://github.com/hummingbird-project/hummingbird-websocket", from: "2.0.0"),
+    .package(url: "https://github.com/apple/swift-nio.git", from: "2.94.0"),
 
-        // Plugins
-        .package(url: "https://github.com/swiftlang/swift-docc-plugin", from: "1.1.0"),
-        .package(url: "https://github.com/apple/swift-openapi-generator", from: "1.0.0"),
+    // Plugins
+    .package(url: "https://github.com/swiftlang/swift-docc-plugin", from: "1.1.0"),
+    .package(url: "https://github.com/apple/swift-openapi-generator", from: "1.0.0"),
 
-    ],
-    targets: [
-        // Targets are the basic building blocks of a package, defining a module or a test suite.
-        // Targets can depend on other targets in this package and products from dependencies.
-        .executableTarget(
-            name: "SockVoteServer",
-            dependencies: [
-                .target(name: "RoomHandling"),
-                .product(name: "OpenAPIRuntime", package: "swift-openapi-runtime"),
-                .product(name: "OpenAPIHummingbird", package: "swift-openapi-hummingbird"),
-                .product(name: "Hummingbird", package: "hummingbird"),
-                .product(name: "Configuration", package: "swift-configuration"),
-            ],
-        ),
-        .target(
-            name: "RoomHandling",
-            dependencies: [
-                .target(name: "_PlatformFoundation"),
-                .target(name: "VoteHandling"),
-                .product(name: "Logging", package: "swift-log"),
-                .product(name: "OpenAPIRuntime", package: "swift-openapi-runtime"),
-                .product(name: "Hummingbird", package: "hummingbird"),
-                .product(name: "HummingbirdWebSocket", package: "hummingbird-websocket"),
-                .product(name: "NIOFoundationCompat", package: "swift-nio"),
-                .product(name: "ServiceLifecycle", package: "swift-service-lifecycle"),
-                .product(name: "HTTPTypes", package: "swift-http-types"),
-            ]
-        ),
-        .target(
-            name: "VoteHandling",
-            dependencies: [
-                .product(name: "Logging", package: "swift-log"),
-            ]
-        ),
-        
-        // Utility
-        .target(
-            name: "_PlatformFoundation",
-        ),
+  ],
+  targets: [
+    // Targets are the basic building blocks of a package, defining a module or a test suite.
+    // Targets can depend on other targets in this package and products from dependencies.
+    .executableTarget(
+      name: "SockVoteServer",
+      dependencies: [
+        .target(name: "RoomHandling"),
+        .product(name: "OpenAPIRuntime", package: "swift-openapi-runtime"),
+        .product(name: "OpenAPIHummingbird", package: "swift-openapi-hummingbird"),
+        .product(name: "Hummingbird", package: "hummingbird"),
+        .product(name: "Configuration", package: "swift-configuration"),
+      ],
+    ),
+    .target(
+      name: "RoomHandling",
+      dependencies: [
+        .target(name: "_PlatformFoundation"),
+        .target(name: "VoteHandling"),
+        .product(name: "Logging", package: "swift-log"),
+        .product(name: "OpenAPIRuntime", package: "swift-openapi-runtime"),
+        .product(name: "Hummingbird", package: "hummingbird"),
+        .product(name: "HummingbirdWebSocket", package: "hummingbird-websocket"),
+        .product(name: "NIOFoundationCompat", package: "swift-nio"),
+        .product(name: "ServiceLifecycle", package: "swift-service-lifecycle"),
+        .product(name: "HTTPTypes", package: "swift-http-types"),
+      ]
+    ),
+    .target(
+      name: "VoteHandling",
+      dependencies: [
+        .product(name: "Logging", package: "swift-log")
+      ]
+    ),
 
-        // MARK: Tests
-        .testTarget(
-            name: "RoomHandlingTests",
-            dependencies: [
-                .target(name: "RoomHandling"),
-                .product(name: "OpenAPIRuntime", package: "swift-openapi-runtime"),
-                .product(name: "HTTPTypes", package: "swift-http-types"),
-            ]
-        ),
-        .testTarget(
-            name: "ServerTests",
-            dependencies: [
-                .target(name: "SockVoteServer"),
-                .target(name: "VoteHandling"),
-                .product(name: "Hummingbird", package: "hummingbird"),
-                .product(name: "HummingbirdTesting", package: "hummingbird"),
-                .product(name: "HummingbirdWSTesting", package: "hummingbird-websocket"),
-                .product(name: "NIOFoundationCompat", package: "swift-nio"),
-            ]
-        ),
-        .testTarget(
-            name: "VoteHandlingTests",
-            dependencies: [
-                .target(name: "VoteHandling")
-            ]
-        ),
+    // Utility
+    .target(
+      name: "_PlatformFoundation",
+    ),
 
-    ],
-    swiftLanguageModes: [
-        .v6, .v5,
-    ]
+    // MARK: Tests
+    .testTarget(
+      name: "RoomHandlingTests",
+      dependencies: [
+        .target(name: "RoomHandling"),
+        .product(name: "OpenAPIRuntime", package: "swift-openapi-runtime"),
+        .product(name: "HTTPTypes", package: "swift-http-types"),
+      ]
+    ),
+    .testTarget(
+      name: "ServerTests",
+      dependencies: [
+        .target(name: "SockVoteServer"),
+        .target(name: "VoteHandling"),
+        .product(name: "Hummingbird", package: "hummingbird"),
+        .product(name: "HummingbirdTesting", package: "hummingbird"),
+        .product(name: "HummingbirdWSTesting", package: "hummingbird-websocket"),
+        .product(name: "NIOFoundationCompat", package: "swift-nio"),
+      ]
+    ),
+    .testTarget(
+      name: "VoteHandlingTests",
+      dependencies: [
+        .target(name: "VoteHandling")
+      ]
+    ),
+
+  ],
+  swiftLanguageModes: [
+    .v6, .v5,
+  ]
 )
 
 // MARK: - Code Generation
@@ -126,43 +127,45 @@ let environment = Context.environment
 let usePreGeneratedSources = ((environment["USE_PRE_GENERATED_SOURCES"] ?? "0") == "1")
 
 let generatorFiles: [String] = [
-    "openapi.yaml",
-    "openapi-generator-config.yaml",
+  "openapi.yaml",
+  "openapi-generator-config.yaml",
 ]
 
 #if !os(windows)
-if !usePreGeneratedSources {
-    roomHandlingTarget.plugins = (roomHandlingTarget.plugins ?? []) + [
-        .plugin(name: "OpenAPIGenerator", package: "swift-openapi-generator"),
-    ]
+  if !usePreGeneratedSources {
+    roomHandlingTarget.plugins =
+      (roomHandlingTarget.plugins ?? []) + [
+        .plugin(name: "OpenAPIGenerator", package: "swift-openapi-generator")
+      ]
     roomHandlingTarget.exclude += [
-        "GeneratedSources/Server.swift",
-        "GeneratedSources/Types.swift",
+      "GeneratedSources/Server.swift",
+      "GeneratedSources/Types.swift",
     ]
-} else {
+  } else {
     roomHandlingTarget.exclude += generatorFiles
-}
+  }
 #else
-roomHandlingTarget.exclude += generatorFiles
+  roomHandlingTarget.exclude += generatorFiles
 #endif
 
 // MARK: - Swift Settings
 
 let swiftSettings: [SwiftSetting] = [
-    .defaultIsolation(nil),
-    .strictMemorySafety(),
+  .defaultIsolation(nil),
+  .strictMemorySafety(),
 ]
 
 let upcomingFeatures: [SwiftSetting] = [
-    .enableUpcomingFeature("ExistentialAny"),
-    .enableUpcomingFeature("MemberImportVisibility"),
-    .enableUpcomingFeature("InternalImportsByDefault"),
-    .enableUpcomingFeature("NonisolatedNonsendingByDefault"),
-    .enableUpcomingFeature("ImmutableWeakCaptures"),
+  .enableUpcomingFeature("ExistentialAny"),
+  .enableUpcomingFeature("MemberImportVisibility"),
+  .enableUpcomingFeature("InternalImportsByDefault"),
+  .enableUpcomingFeature("NonisolatedNonsendingByDefault"),
+  .enableUpcomingFeature("ImmutableWeakCaptures"),
 ]
 
 for target in package.targets {
-    target.swiftSettings = (target.swiftSettings ?? []) 
-        + swiftSettings 
-        + upcomingFeatures
+  target.swiftSettings =
+    (target.swiftSettings ?? [])
+    + swiftSettings
+    + upcomingFeatures
 }

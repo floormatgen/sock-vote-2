@@ -1,59 +1,57 @@
+public import AsyncAlgorithms
 import Hummingbird
 public import HummingbirdWebSocket
 import NIOFoundationCompat
-public import AsyncAlgorithms
 public import VoteHandling
 
 extension Connections {
 
-    public typealias QuestionDescription = VoteHandling.Question.Description
+  public typealias QuestionDescription = VoteHandling.Question.Description
 
-    public protocol ParticipantConnection: Sendable {
+  public protocol ParticipantConnection: Sendable {
 
-        func sendQuestionUpdated(with description: QuestionDescription) async throws
-        func sendQuestionDeleted() async throws
-        func removeConnection()
+    func sendQuestionUpdated(with description: QuestionDescription) async throws
+    func sendQuestionDeleted() async throws
+    func removeConnection()
 
-    }
-    
-    public struct WebSocketParticipantConnection: ParticipantConnection {
-        private let inboundMessageStream: WebSocketInboundMessageStream
-        private let outboardWriter: WebSocketOutboundWriter
+  }
 
-        public typealias OutputStream = AsyncChannel<WebSocketOutboundWriter.OutboundFrame>
-        public let outputStream: OutputStream
-    
-        public init(
-            inboundMessageStream: WebSocketInboundMessageStream, 
-            outboardWriter: WebSocketOutboundWriter
-        ) {
-            self.inboundMessageStream = inboundMessageStream
-            self.outboardWriter = outboardWriter
-            self.outputStream = OutputStream()
-        }
+  public struct WebSocketParticipantConnection: ParticipantConnection {
+    private let inboundMessageStream: WebSocketInboundMessageStream
+    private let outboardWriter: WebSocketOutboundWriter
 
-        public func sendQuestionUpdated(
-            with description: QuestionDescription
-        ) async throws {
-            let message = QuestionUpdated(
-                question: description
-            )
-            let buffer = try encoder.encodeAsByteBuffer(message, allocator: allocator)
-            await outputStream.send(.binary(buffer))
-        }
+    public typealias OutputStream = AsyncChannel<WebSocketOutboundWriter.OutboundFrame>
+    public let outputStream: OutputStream
 
-        public func sendQuestionDeleted() async throws {
-            let message = QuestionRemoved()
-            let buffer = try encoder.encodeAsByteBuffer(message, allocator: allocator)
-            await outputStream.send(.binary(buffer))
-        }
-
-        public func removeConnection() {
-            outputStream.finish()
-        }
-    
+    public init(
+      inboundMessageStream: WebSocketInboundMessageStream,
+      outboardWriter: WebSocketOutboundWriter
+    ) {
+      self.inboundMessageStream = inboundMessageStream
+      self.outboardWriter = outboardWriter
+      self.outputStream = OutputStream()
     }
 
+    public func sendQuestionUpdated(
+      with description: QuestionDescription
+    ) async throws {
+      let message = QuestionUpdated(
+        question: description
+      )
+      let buffer = try encoder.encodeAsByteBuffer(message, allocator: allocator)
+      await outputStream.send(.binary(buffer))
+    }
+
+    public func sendQuestionDeleted() async throws {
+      let message = QuestionRemoved()
+      let buffer = try encoder.encodeAsByteBuffer(message, allocator: allocator)
+      await outputStream.send(.binary(buffer))
+    }
+
+    public func removeConnection() {
+      outputStream.finish()
+    }
+
+  }
 
 }
-

@@ -1,17 +1,17 @@
 public import VoteHandling
 
-public extension Question.PluralityVote {
+extension Question.PluralityVote {
 
-    init(_ pluralityVote: Components.Schemas.PluralityVote) {
-        self.init(selection: pluralityVote.selection)
-    }
+  public init(_ pluralityVote: Components.Schemas.PluralityVote) {
+    self.init(selection: pluralityVote.selection)
+  }
 
 }
 
-public extension Question.PreferentialVote {
+extension Question.PreferentialVote {
 
-    init(_ preferentialVote: Components.Schemas.PreferentialVote) {
-        self.init(selectionOrder: preferentialVote.selectionOrder)
-    }
-    
+  public init(_ preferentialVote: Components.Schemas.PreferentialVote) {
+    self.init(selectionOrder: preferentialVote.selectionOrder)
+  }
+
 }
