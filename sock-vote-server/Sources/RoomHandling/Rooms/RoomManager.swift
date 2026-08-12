@@ -1,5 +1,5 @@
-import Foundation
-import ServiceLifecycle
+import _PlatformFoundation
+public import ServiceLifecycle
 
 public protocol RoomManagerProtocol: Actor, Sendable, Service {
     associatedtype Room: RoomProtocol = DefaultRoom

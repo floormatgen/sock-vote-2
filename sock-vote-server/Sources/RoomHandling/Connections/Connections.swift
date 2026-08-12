@@ -1,4 +1,4 @@
-import Foundation
+import _PlatformFoundation
 import NIOCore
 
 public enum Connections {

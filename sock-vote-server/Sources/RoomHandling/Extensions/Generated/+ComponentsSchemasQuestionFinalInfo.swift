@@ -1,5 +1,5 @@
-import VoteHandling
-import Foundation
+public import VoteHandling
+import _PlatformFoundation
 
 public extension Components.Schemas.QuestionFinalInfo {
 

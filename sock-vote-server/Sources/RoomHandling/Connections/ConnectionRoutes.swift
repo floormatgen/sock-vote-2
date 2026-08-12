@@ -1,5 +1,5 @@
-import Hummingbird
-import HummingbirdWebSocket
+public import Hummingbird
+public import HummingbirdWebSocket
 import HTTPTypes
 import AsyncAlgorithms
 

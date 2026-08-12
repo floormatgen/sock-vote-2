@@ -1,8 +1,8 @@
 import Hummingbird
-import HummingbirdWebSocket
+public import HummingbirdWebSocket
 import NIOFoundationCompat
-import AsyncAlgorithms
-import VoteHandling
+public import AsyncAlgorithms
+public import VoteHandling
 
 extension Connections {
 

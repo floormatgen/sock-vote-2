@@ -1,4 +1,4 @@
-import VoteHandling
+public import VoteHandling
 
 public extension Question.State {
 

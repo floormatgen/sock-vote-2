@@ -1,5 +1,5 @@
-import Foundation
-import VoteHandling
+public import _PlatformFoundation
+public import VoteHandling
 import Logging
 
 public protocol RoomProtocol: Actor {

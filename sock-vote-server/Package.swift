@@ -57,6 +57,7 @@ let package = Package(
         .target(
             name: "RoomHandling",
             dependencies: [
+                .target(name: "_PlatformFoundation"),
                 .target(name: "VoteHandling"),
                 .product(name: "Logging", package: "swift-log"),
                 .product(name: "OpenAPIRuntime", package: "swift-openapi-runtime"),
@@ -72,6 +73,11 @@ let package = Package(
             dependencies: [
                 .product(name: "Logging", package: "swift-log"),
             ]
+        ),
+        
+        // Utility
+        .target(
+            name: "_PlatformFoundation",
         ),
 
         // MARK: Tests
@@ -150,7 +156,9 @@ let swiftSettings: [SwiftSetting] = [
 let upcomingFeatures: [SwiftSetting] = [
     .enableUpcomingFeature("ExistentialAny"),
     .enableUpcomingFeature("MemberImportVisibility"),
+    .enableUpcomingFeature("InternalImportsByDefault"),
     .enableUpcomingFeature("NonisolatedNonsendingByDefault"),
+    .enableUpcomingFeature("ImmutableWeakCaptures"),
 ]
 
 for target in package.targets {

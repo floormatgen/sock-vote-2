@@ -1,5 +1,5 @@
-import Foundation
-import VoteHandling
+public import _PlatformFoundation
+public import VoteHandling
 
 // MARK: - Data Types
 
