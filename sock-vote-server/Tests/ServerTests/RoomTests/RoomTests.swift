@@ -32,7 +32,7 @@ final class RoomTests: Sendable {
     try await app.test(.router) { client in
       let name = "abcd"
       let createResponse = try await client.createRoomWithResponse(name: name, fields: [])
-      try #require(createResponse.status == .ok)
+      #expect(createResponse.status == .ok)
       let createData = try Self.decoder.decode(CreateRoomRequest.self, from: createResponse.body)
       #expect(createData.name == name)
       if let fields = createData.fields { #expect(fields.isEmpty) }
@@ -51,7 +51,7 @@ final class RoomTests: Sendable {
       let name = "Room with fields"
       let fields = ["Student ID", "Email", "Phone Number"]
       let createResponse = try await client.createRoomWithResponse(name: name, fields: fields)
-      try #require(createResponse.status == .ok)
+      #expect(createResponse.status == .ok)
       let createData = try Self.decoder.decode(CreateRoomRequest.self, from: createResponse.body)
       #expect(createData.name == name)
       #expect(createData.fields == fields)

@@ -29,7 +29,7 @@ struct ConnectionTests {
   @Test(
     "Participant connections receive question update",
     //            .disabled("HummingbirdWSTesting bug"),
-    arguments: [1]
+    arguments: [ 1, 2 ]
   )
   func test_participantConnectionsReceiveQuestionUpdate(_ count: Int) async throws {
     let roomName = "Room"
@@ -54,7 +54,7 @@ struct ConnectionTests {
 
         try #require(participantTokens.count == count)
         try await withThrowingDiscardingTaskGroup { group in
-          try await confirmation { confirmation in
+          try await confirmation(expectedCount: count) { confirmation in
 
             // Connect each participant
             for token in participantTokens {

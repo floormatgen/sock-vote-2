@@ -15,7 +15,7 @@ extension RoomHandler {
     adminToken: String,
     outputType: Output.Type = Output.self,
     operation:
-      sending (_ room: /* isolated */ RoomManager.Room, _ adminToken: String, _ questionUUID: UUID)
+      @Sendable (_ room: isolated RoomManager.Room, _ adminToken: String, _ questionUUID: UUID)
       async throws(E) -> sending Output
   ) async throws(E) -> sending Output {
     guard let room = await roomManager.room(withCode: roomCode) else {
@@ -61,7 +61,7 @@ extension RoomHandler {
     input: Input,
     outputType: Output.Type = Output.self,
     operation:
-      sending (_ room: /* isolated */ RoomManager.Room, _ adminToken: String, _ questionUUID: UUID)
+      @Sendable (_ room: isolated RoomManager.Room, _ adminToken: String, _ questionUUID: UUID)
       async throws(E) -> sending Output
   ) async throws(E) -> sending Output {
     let path = input.path
@@ -81,7 +81,7 @@ extension RoomHandler {
     questionID: String,
     outputType: Output.Type = Output.self,
     operation:
-      sending (_ room: /* isolated */ RoomManager.Room, _ questionUUID: UUID)
+      @Sendable (_ room: isolated RoomManager.Room, _ questionUUID: UUID)
       async throws(E) -> sending Output
   ) async throws(E) -> sending Output {
     guard let room = await roomManager.room(withCode: roomCode) else {
@@ -118,7 +118,7 @@ extension RoomHandler {
     input: Input,
     outputType: Output.Type = Output.self,
     operation:
-      sending (_ room: /* isolated */ RoomManager.Room, _ questionUUID: UUID)
+      @Sendable (_ room: isolated RoomManager.Room, _ questionUUID: UUID)
       async throws(E) -> sending Output
   ) async throws(E) -> sending Output {
     let path = input.path
@@ -172,6 +172,7 @@ internal enum Validation {
 }
 
 // MARK: - Conformances
+// If only Swift had auto protocols...
 
 extension Operations.GetRoomCodeQuestionIDVotesInfo.Input: Validation.RoomAdminQuestionInput {}
 extension Operations.GetRoomCodeQuestionIDVotesInfo.Input.Path: Validation.RoomQuestionPath {}
